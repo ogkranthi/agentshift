@@ -16,7 +16,7 @@
 | A01 | P0 | @architect | merged | Design IR JSON Schema — universal agent model |
 | A02 | P0 | @architect | merged | Document OpenClaw SKILL.md format spec with examples |
 | A03 | P0 | @architect | merged | Document Claude Code format spec (SKILL.md + CLAUDE.md + settings.json) |
-| A04 | P1 | @architect | ready | Document Copilot declarative agent manifest schema 1.6 |
+| A04 | P1 | @architect | merged | Document Copilot declarative agent manifest schema 1.6 |
 | A05 | P1 | @architect | ready | Document Bedrock agent config + OpenAPI action group format |
 | A06 | P1 | @architect | ready | Document Vertex AI Agent Builder config format |
 | A07 | P1 | @architect | ready | Write MCP-to-OpenAPI mapping specification |
@@ -35,7 +35,7 @@
 
 | ID | Priority | Owner | Status | Title |
 |----|----------|-------|--------|-------|
-| D07 | P1 | @dev | ready | Implement Copilot emitter (IR → manifest.json + plugin.json) |
+| D07 | P1 | @dev | merged | Implement Copilot emitter (IR → .agent.md) |
 | D08 | P1 | @dev | ready | Implement Bedrock emitter (IR → instruction + OpenAPI + CloudFormation) |
 | D09 | P1 | @dev | ready | Implement Vertex AI emitter (IR → Agent Builder config) |
 | D10 | P1 | @dev | ready | Handle platform constraints (instruction length limits, etc.) |
