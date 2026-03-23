@@ -64,6 +64,42 @@ $ agentshift diff ./my-skill/ --targets copilot,bedrock
 | LangGraph | — | — | Planned |
 | CrewAI | — | — | Planned |
 
+## Quick Start
+
+### Install
+
+```bash
+pip install agentshift
+```
+
+### Convert your first agent
+
+```bash
+# Option A: Use an OpenClaw built-in skill
+cp -r ~/.nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/weather ./weather-skill
+agentshift convert ./weather-skill --from openclaw --to claude-code --output ./weather-claude
+
+# Option B: Use any skill you have installed
+agentshift convert ~/.openclaw/skills/my-skill --from openclaw --to claude-code --output ./my-skill-claude
+
+# See what was generated
+cat ./weather-claude/CLAUDE.md
+cat ./weather-claude/settings.json
+```
+
+### See a real conversion
+
+The [examples/](examples/) directory has 4 real before/after conversions:
+
+| Skill | Why interesting |
+|-------|----------------|
+| [weather](examples/weather-to-claude-code/) | Simplest case — bash-only, no API key |
+| [github](examples/github-to-claude-code/) | Tool-heavy: `gh` CLI across PRs, issues, CI |
+| [slack](examples/slack-to-claude-code/) | MCP-based — shows MCP tool → `mcp__slack__*` permission mapping |
+| [notion](examples/notion-to-claude-code/) | API-rich with structured knowledge |
+
+Each folder has `input/SKILL.md` (original) and `output/` (converted).
+
 ## Installation
 
 ```bash
