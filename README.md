@@ -69,6 +69,119 @@ The IR is the core abstraction — captured in `specs/ir-schema.json`. Adding a 
 | LangGraph | — | — | Planned |
 | CrewAI | — | — | Planned |
 
+## Using converted skills in Claude Code
+
+Once you've converted a skill, here's how to activate it in Claude Code so it works similarly to OpenClaw.
+
+### Step 1: Convert
+
+```bash
+agentshift convert ~/.openclaw/skills/github --from openclaw --to claude-code --output ./github-claude
+```
+
+This produces:
+```
+github-claude/
+├── CLAUDE.md       ← instructions + persona (Claude Code reads this automatically)
+└── settings.json   ← tool permissions (Bash, MCP, Read/Write paths)
+```
+
+### Step 2: Place the files
+
+Claude Code picks up `CLAUDE.md` and `settings.json` from these locations (in priority order):
+
+| Location | Scope | When to use |
+|---|---|---|
+| `~/.claude/CLAUDE.md` | Global — all projects | Skills you want everywhere (weather, github) |
+| `<project>/.claude/CLAUDE.md` | Project-only | Skills scoped to one repo |
+| `<project>/CLAUDE.md` | Project-only (alternative) | Same as above |
+
+```bash
+# Option A — global (skill available in every Claude Code session)
+mkdir -p ~/.claude
+cp github-claude/CLAUDE.md ~/.claude/CLAUDE.md
+cp github-claude/settings.json ~/.claude/settings.json
+
+# Option B — project-scoped
+mkdir -p my-project/.claude
+cp github-claude/CLAUDE.md my-project/.claude/CLAUDE.md
+cp github-claude/settings.json my-project/.claude/settings.json
+```
+
+> **Multiple skills:** Claude Code only loads one `CLAUDE.md` per scope. To combine multiple skills, concatenate their `CLAUDE.md` files and merge their `settings.json` permission arrays manually — or use `agentshift merge` (coming soon).
+
+### Step 3: Use it
+
+Open Claude Code in the project directory. The skill instructions load automatically.
+
+```bash
+cd my-project
+claude   # or claude --print "check open PRs"
+```
+
+Claude Code will follow the skill's instructions and respect the tool permissions from `settings.json`.
+
+### Step 4: Verify tool permissions
+
+Check that the permissions emitted match what you expect:
+
+```bash
+cat github-claude/settings.json
+# → { "permissions": { "allow": ["Bash(gh:*)", "Bash(git:*)"] } }
+```
+
+This means Claude Code can run `gh` and `git` commands — but nothing else — matching the skill's intent.
+
+---
+
+### What carries over from OpenClaw
+
+| OpenClaw feature | Claude Code equivalent | Status |
+|---|---|---|
+| Skill instructions (SKILL.md body) | `CLAUDE.md` — loaded automatically | ✅ Full fidelity |
+| Shell tool permissions | `settings.json` `allow: ["Bash(<binary>:*)"]` | ✅ Precise per-binary |
+| MCP tools (slack, github, discord) | `settings.json` `allow: ["mcp__<name>__*"]` | ✅ Works if MCP server configured |
+| Knowledge files | `CLAUDE.md` knowledge section + `Read(path)` permissions | ✅ Paths preserved |
+| Data file writes | `Write(path)` in `settings.json` | ✅ Exact paths |
+| OS constraints | `settings.json` `supportedOs` | ✅ Preserved |
+| Install dependencies | Not applicable — Claude Code assumes tools are installed | ⚠️ Manual step |
+| Cron / scheduled triggers | **Not supported in Claude Code** | ❌ See below |
+| Telegram / Slack delivery channels | **Not supported in Claude Code** | ❌ See below |
+| OpenClaw config keys (`channels.slack`) | Not applicable — Claude Code uses MCP config | ⚠️ Reconfigure MCP |
+
+---
+
+### Gaps — what Claude Code can't do (yet)
+
+**1. Scheduled triggers (cron)**
+OpenClaw skills can fire on a schedule (`0 9 * * *`). Claude Code has no built-in scheduler.
+
+*Workaround:* Use system cron or GitHub Actions to call `claude --print "<trigger message>"` on a schedule:
+```bash
+# crontab -e
+0 9 * * * cd /your/project && claude --print "Give today's pregnancy tip" >> ~/logs/tip.log 2>&1
+```
+
+**2. Proactive delivery (Telegram, Slack, Discord)**
+OpenClaw can push messages to channels when triggered. Claude Code only responds — it doesn't push.
+
+*Workaround:* Wrap `claude --print` output in a script that pipes to your messaging service:
+```bash
+RESPONSE=$(claude --print "Give today's tip")
+curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
+  -d chat_id="$CHAT_ID" -d text="$RESPONSE"
+```
+
+**3. Persistent memory across sessions**
+OpenClaw persists `MEMORY.md` between sessions. Claude Code sessions are stateless by default.
+
+*Workaround:* Pass memory files as context: `claude --print "$(cat MEMORY.md)\n\nUser: ..."` or use a project-level `CLAUDE.md` that references memory files.
+
+**4. Multi-channel routing**
+OpenClaw can route to different channels based on context. Claude Code outputs to stdout only.
+
+---
+
 ## See a real conversion
 
 The [`examples/`](examples/) directory has 4 complete before/after conversions.
@@ -110,7 +223,7 @@ Get current weather and forecasts via wttr.in. No API key needed.
 **Output** — `examples/weather-to-claude-code/output/settings.json`:
 
 ```json
-{ "permissions": { "allow": ["Bash(bash:*)"] } }
+{ "permissions": { "allow": ["Bash(curl:*)"] } }
 ```
 
 More examples: [github](examples/github-to-claude-code/) · [slack](examples/slack-to-claude-code/) · [notion](examples/notion-to-claude-code/)
