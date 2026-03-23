@@ -241,6 +241,49 @@ def _extract_tools(body: str) -> list[Tool]:
             tools.append(Tool(name=name, description=f"{name} MCP tool", kind="mcp"))
             seen.add(name)
 
+    # --- JSON action blocks (e.g. bluebubbles, wacli) ---
+    # Detect ```json blocks with "channel" or "action" fields → OpenClaw message tool
+    json_block_re = re.compile(r"```json\n(.*?)```", re.DOTALL | re.IGNORECASE)
+    channel_re = re.compile(r'"channel"\s*:\s*"([a-z][a-z0-9_-]*)"', re.IGNORECASE)
+    for block_match in json_block_re.finditer(body):
+        block = block_match.group(1)
+        if '"action"' in block:
+            for cm in channel_re.finditer(block):
+                channel_name = cm.group(1).lower()
+                if channel_name not in seen:
+                    tools.append(Tool(
+                        name=channel_name,
+                        description=f"{channel_name} messaging channel (OpenClaw message tool)",
+                        kind="mcp",
+                    ))
+                    seen.add(channel_name)
+
+    # --- Prose backtick CLI extraction ---
+    # Only extract from patterns that strongly indicate a CLI invocation:
+    #   `<binary> <arg>...`  — binary followed by at least one argument/flag
+    # This avoids picking up JSON field names, prose words, etc.
+    # Require: snippet starts with a word, has at least one space (i.e. has an argument)
+    inline_cli_re = re.compile(r"`([a-zA-Z][a-zA-Z0-9_.-]+\s+[^`\n]{1,80})`")
+    for m in inline_cli_re.finditer(body):
+        snippet = m.group(1).strip()
+        tokens = snippet.split()
+        if len(tokens) < 2:
+            continue
+        token = tokens[0]
+        if token.startswith("-") or token.startswith("/") or token.startswith("."):
+            continue
+        binary = re.match(r"^([a-zA-Z][a-zA-Z0-9_.+-]*)", token)
+        if not binary:
+            continue
+        bin_name = binary.group(1).lower()
+        if bin_name in _SHELL_BUILTINS or bin_name in seen:
+            continue
+        if bin_name in _KNOWN_MCP_TOOLS:
+            tools.append(Tool(name=bin_name, description=f"{bin_name} MCP tool", kind="mcp"))
+        else:
+            tools.append(Tool(name=bin_name, description=f"Run {bin_name} commands", kind="shell"))
+        seen.add(bin_name)
+
     return tools
 
 
