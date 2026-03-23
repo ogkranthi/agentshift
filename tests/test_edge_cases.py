@@ -2,20 +2,20 @@
 
 from __future__ import annotations
 
-import tempfile
 from pathlib import Path
 
 import pytest
 
-from agentshift.parsers.openclaw import parse_skill_dir
 from agentshift.emitters.claude_code import emit
 from agentshift.ir import AgentIR
+from agentshift.parsers.openclaw import parse_skill_dir
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def make_skill_dir(tmp_path: Path, content: str) -> Path:
     """Write SKILL.md content to a temp directory and return the path."""
@@ -27,6 +27,7 @@ def make_skill_dir(tmp_path: Path, content: str) -> Path:
 # ---------------------------------------------------------------------------
 # 1. No frontmatter — just markdown body
 # ---------------------------------------------------------------------------
+
 
 class TestNoFrontmatter:
     def test_parses_without_exception(self, tmp_path):
@@ -56,6 +57,7 @@ class TestNoFrontmatter:
 # ---------------------------------------------------------------------------
 # 2. Frontmatter only, empty body
 # ---------------------------------------------------------------------------
+
 
 class TestFrontmatterOnlyEmptyBody:
     FRONTMATTER_ONLY = "---\nname: fm-only\ndescription: 'Only frontmatter'\n---\n"
@@ -87,6 +89,7 @@ class TestFrontmatterOnlyEmptyBody:
 # 3. Special characters in name (emoji, unicode, quotes)
 # ---------------------------------------------------------------------------
 
+
 class TestSpecialCharsInName:
     def test_emoji_in_name(self, tmp_path):
         content = "---\nname: 'weather-🌤️'\ndescription: 'Emoji name'\n---\n\nBody.\n"
@@ -103,7 +106,7 @@ class TestSpecialCharsInName:
         assert ir.name  # non-empty
 
     def test_quotes_in_name(self, tmp_path):
-        content = '---\nname: "my \'cool\' skill"\ndescription: Quotes test\n---\n\nBody.\n'
+        content = "---\nname: \"my 'cool' skill\"\ndescription: Quotes test\n---\n\nBody.\n"
         d = make_skill_dir(tmp_path, content)
         ir = parse_skill_dir(d)
         assert isinstance(ir, AgentIR)
@@ -125,6 +128,7 @@ class TestSpecialCharsInName:
 # ---------------------------------------------------------------------------
 # 4. Very long description (>2000 chars)
 # ---------------------------------------------------------------------------
+
 
 class TestVeryLongDescription:
     LONG_DESC = "A" * 2500
@@ -150,6 +154,7 @@ class TestVeryLongDescription:
 # ---------------------------------------------------------------------------
 # 5. Empty SKILL.md (0 bytes)
 # ---------------------------------------------------------------------------
+
 
 class TestEmptySkillMd:
     def test_empty_file_no_raw_crash(self, tmp_path):
@@ -183,6 +188,7 @@ class TestEmptySkillMd:
 # 6. Malformed YAML frontmatter
 # ---------------------------------------------------------------------------
 
+
 class TestMalformedYAML:
     MALFORMED = "---\nname: [unclosed bracket\ndescription: bad: yaml: here\n---\n\nBody text.\n"
 
@@ -201,8 +207,12 @@ class TestMalformedYAML:
             )
             # yaml.YAMLError is also fine — check via str representation
             assert type(exc).__name__ in (
-                "YAMLError", "ScannerError", "ParserError",
-                "ValueError", "KeyError", "TypeError",
+                "YAMLError",
+                "ScannerError",
+                "ParserError",
+                "ValueError",
+                "KeyError",
+                "TypeError",
             ), f"Unexpected raw crash: {type(exc).__name__}: {exc}"
 
     def test_tab_in_frontmatter(self, tmp_path):
@@ -229,7 +239,9 @@ class TestMalformedYAML:
 # 7. Emitter Fidelity — 5 real skills
 # ---------------------------------------------------------------------------
 
-REAL_SKILLS_DIR = Path("/Users/kranthikumar/.nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills")
+REAL_SKILLS_DIR = Path(
+    "/Users/kranthikumar/.nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills"
+)
 RICH_SKILLS = ["coding-agent", "slack", "github", "notion", "weather"]
 
 
@@ -291,6 +303,7 @@ class TestEmitterFidelityRealSkills:
     @pytest.mark.parametrize("skill_name", RICH_SKILLS)
     def test_settings_json_valid(self, skill_name, tmp_path):
         import json
+
         skill_path = REAL_SKILLS_DIR / skill_name
         if not skill_path.exists():
             pytest.skip(f"Skill {skill_name} not found")

@@ -7,22 +7,25 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 FIXTURES = Path(__file__).parent / "fixtures"
 PYTHON = sys.executable
 _VENV_BIN = Path(__file__).parent.parent / ".venv" / "bin" / "agentshift"
 AGENTSHIFT = [str(_VENV_BIN)] if _VENV_BIN.exists() else [PYTHON, "-m", "agentshift"]
 
 
-def run_convert(source: Path, tmp_path: Path, from_platform: str = "openclaw", to_platform: str = "claude-code") -> "subprocess.CompletedProcess[str]":
+def run_convert(
+    source: Path, tmp_path: Path, from_platform: str = "openclaw", to_platform: str = "claude-code"
+) -> subprocess.CompletedProcess[str]:
     cmd = [
         *AGENTSHIFT,
         "convert",
         str(source),
-        "--from", from_platform,
-        "--to", to_platform,
-        "--output", str(tmp_path),
+        "--from",
+        from_platform,
+        "--to",
+        to_platform,
+        "--output",
+        str(tmp_path),
     ]
     return subprocess.run(cmd, capture_output=True, text=True, cwd=str(FIXTURES.parent.parent))
 
@@ -88,9 +91,12 @@ class TestCLIErrors:
             *AGENTSHIFT,
             "convert",
             str(FIXTURES / "simple-skill"),
-            "--from", "badplatform",
-            "--to", "claude-code",
-            "--output", str(tmp_path),
+            "--from",
+            "badplatform",
+            "--to",
+            "claude-code",
+            "--output",
+            str(tmp_path),
         ]
         result = subprocess.run(cmd, capture_output=True, text=True)
         assert result.returncode != 0
@@ -100,9 +106,12 @@ class TestCLIErrors:
             *AGENTSHIFT,
             "convert",
             str(FIXTURES / "simple-skill"),
-            "--from", "openclaw",
-            "--to", "badplatform",
-            "--output", str(tmp_path),
+            "--from",
+            "openclaw",
+            "--to",
+            "badplatform",
+            "--output",
+            str(tmp_path),
         ]
         result = subprocess.run(cmd, capture_output=True, text=True)
         assert result.returncode != 0

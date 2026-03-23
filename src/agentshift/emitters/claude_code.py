@@ -80,6 +80,4 @@ def _write_settings_json(ir: AgentIR, output_dir: Path) -> None:
     if ir.constraints.supported_os:
         settings["supportedOs"] = ir.constraints.supported_os
 
-    (output_dir / "settings.json").write_text(
-        json.dumps(settings, indent=2), encoding="utf-8"
-    )
+    (output_dir / "settings.json").write_text(json.dumps(settings, indent=2), encoding="utf-8")

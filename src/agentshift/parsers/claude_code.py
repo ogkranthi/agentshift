@@ -119,8 +119,19 @@ def _parse_settings(settings_path: Path) -> list[Tool]:
 
 def _parse_permission_rule(rule: str) -> tuple[str, str, str]:
     """Parse a permission rule string into (name, kind, description)."""
-    builtin_tools = {"Bash", "Read", "Write", "Edit", "Glob", "Grep", "WebSearch",
-                     "WebFetch", "TodoWrite", "Agent", "NotebookEdit"}
+    builtin_tools = {
+        "Bash",
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "WebSearch",
+        "WebFetch",
+        "TodoWrite",
+        "Agent",
+        "NotebookEdit",
+    }
 
     # Bare tool name e.g. "WebSearch"
     if re.match(r"^[A-Za-z]+$", rule):

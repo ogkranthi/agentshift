@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from agentshift.parsers.openclaw import parse_skill_dir
 from agentshift.ir import AgentIR
+from agentshift.parsers.openclaw import parse_skill_dir
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

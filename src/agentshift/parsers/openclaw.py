@@ -125,7 +125,7 @@ def _split_frontmatter(raw: str) -> tuple[str, str]:
         return "", raw
 
     frontmatter = rest[:end].strip()
-    body = rest[end + 4:].lstrip("\n")
+    body = rest[end + 4 :].lstrip("\n")
     return frontmatter, body
 
 

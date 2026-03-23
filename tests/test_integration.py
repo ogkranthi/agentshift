@@ -2,12 +2,10 @@
 
 from pathlib import Path
 
-import pytest
-
-from agentshift.parsers.openclaw import parse_skill_dir
 from agentshift.emitters.claude_code import emit
-from agentshift.parsers.claude_code import parse_agent_dir
 from agentshift.ir import AgentIR
+from agentshift.parsers.claude_code import parse_agent_dir
+from agentshift.parsers.openclaw import parse_skill_dir
 
 FIXTURES = Path(__file__).parent / "fixtures"
 PREGNANCY = FIXTURES / "pregnancy-companion"

@@ -32,6 +32,7 @@ def _get_parser(platform: str):
         raise typer.Exit(1)
     module_path, fn_name = _PARSERS[platform].split(":")
     import importlib
+
     mod = importlib.import_module(module_path)
     return getattr(mod, fn_name)
 
@@ -43,6 +44,7 @@ def _get_emitter(platform: str):
         raise typer.Exit(1)
     module_path, fn_name = _EMITTERS[platform].split(":")
     import importlib
+
     mod = importlib.import_module(module_path)
     return getattr(mod, fn_name)
 
@@ -52,13 +54,17 @@ def convert(
     source: Path = typer.Argument(help="Path to source agent directory"),
     from_platform: str = typer.Option(..., "--from", help="Source platform: openclaw, claude-code"),
     to_platform: str = typer.Option(..., "--to", help="Target platform: claude-code"),
-    output: Path = typer.Option(Path("./agentshift-output"), "--output", "-o", help="Output directory"),
+    output: Path = typer.Option(
+        Path("./agentshift-output"), "--output", "-o", help="Output directory"
+    ),
 ) -> None:
     """Convert an agent from one platform to another."""
     parse_fn = _get_parser(from_platform)
     emit_fn = _get_emitter(to_platform)
 
-    console.print(f"[bold]AgentShift[/bold] converting [cyan]{source}[/cyan] ({from_platform}) → [green]{to_platform}[/green]")
+    console.print(
+        f"[bold]AgentShift[/bold] converting [cyan]{source}[/cyan] ({from_platform}) → [green]{to_platform}[/green]"
+    )
 
     try:
         ir = parse_fn(source)
@@ -74,7 +80,9 @@ def convert(
 @app.command()
 def diff(
     source: str = typer.Argument(help="Path to source agent"),
-    targets: str = typer.Option("all", help="Comma-separated targets: claude-code,copilot,bedrock,vertex"),
+    targets: str = typer.Option(
+        "all", help="Comma-separated targets: claude-code,copilot,bedrock,vertex"
+    ),
 ) -> None:
     """Show portability matrix — what converts cleanly vs. needs manual work."""
     console.print(f"Diffing {source} against {targets}")

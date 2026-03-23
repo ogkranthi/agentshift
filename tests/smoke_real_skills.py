@@ -36,9 +36,9 @@ def check_skill(skill_path: Path) -> tuple[str, list[str]]:
         issues.append(f"source_platform={ir.metadata.source_platform!r}, expected 'openclaw'")
 
     # No raw Python object reprs in emitted output
-    import json
+    import tempfile
+
     from agentshift.emitters.claude_code import emit
-    import tempfile, os
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
