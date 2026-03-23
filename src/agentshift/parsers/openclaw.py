@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import contextlib
+import json
 import re
 from pathlib import Path
 
@@ -16,6 +17,8 @@ from agentshift.ir import (
     Metadata,
     Persona,
     Tool,
+    Trigger,
+    TriggerDelivery,
 )
 
 
@@ -56,6 +59,9 @@ def parse_skill_dir(path: Path) -> AgentIR:
     # Tools: parse bash blocks and tool mentions from body
     tools = _extract_tools(body)
 
+    # Triggers: read jobs.json and match by agentId == skill name
+    triggers = _extract_triggers(path, name)
+
     # Knowledge sources — from body text AND from disk
     knowledge = _extract_knowledge(body, name)
     knowledge = _merge_knowledge_from_disk(knowledge, path)
@@ -84,6 +90,7 @@ def parse_skill_dir(path: Path) -> AgentIR:
         persona=persona,
         tools=tools,
         knowledge=knowledge,
+        triggers=triggers,
         constraints=constraints,
         install=install_steps,
         metadata=metadata,
@@ -127,6 +134,57 @@ def _split_frontmatter(raw: str) -> tuple[str, str]:
     frontmatter = rest[:end].strip()
     body = rest[end + 4 :].lstrip("\n")
     return frontmatter, body
+
+
+def _extract_triggers(skill_dir: Path, agent_name: str) -> list[Trigger]:
+    """Read ~/.openclaw/cron/jobs.json and return triggers matching this skill's agentId."""
+    jobs_path = Path.home() / ".openclaw" / "cron" / "jobs.json"
+    if not jobs_path.exists():
+        return []
+
+    try:
+        data = json.loads(jobs_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return []
+
+    triggers: list[Trigger] = []
+    for job in data.get("jobs", []):
+        if job.get("agentId") != agent_name:
+            continue
+        if not job.get("enabled", True):
+            continue
+
+        cron_expr = job.get("schedule", {}).get("expr")
+        message = job.get("payload", {}).get("message")
+        job_id = job.get("id")
+        session_target = job.get("sessionTarget", "isolated")
+
+        # Map delivery
+        delivery = None
+        raw_delivery = job.get("delivery", {})
+        if raw_delivery:
+            channel = raw_delivery.get("channel")
+            to = raw_delivery.get("to")
+            mode = raw_delivery.get("mode", "announce")
+            account_id = raw_delivery.get("accountId")
+            delivery = TriggerDelivery(
+                mode=mode,
+                channel=channel,
+                to=to,
+                account_id=account_id,
+            )
+
+        triggers.append(Trigger(
+            id=job_id,
+            kind="cron",
+            cron_expr=cron_expr,
+            message=message,
+            session_target=session_target,
+            delivery=delivery,
+            enabled=True,
+        ))
+
+    return triggers
 
 
 _SHELL_BUILTINS: frozenset[str] = frozenset(

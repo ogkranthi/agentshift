@@ -15,6 +15,8 @@ def emit(ir: AgentIR, output_dir: Path) -> None:
 
     _write_claude_md(ir, output_dir)
     _write_settings_json(ir, output_dir)
+    if ir.triggers:
+        _write_schedules_md(ir, output_dir)
 
 
 def _write_claude_md(ir: AgentIR, output_dir: Path) -> None:
@@ -118,3 +120,83 @@ def _write_settings_json(ir: AgentIR, output_dir: Path) -> None:
         settings["supportedOs"] = ir.constraints.supported_os
 
     (output_dir / "settings.json").write_text(json.dumps(settings, indent=2), encoding="utf-8")
+
+
+def _write_schedules_md(ir: AgentIR, output_dir: Path) -> None:
+    """Write SCHEDULES.md with Claude Code setup instructions for each cron trigger."""
+    lines: list[str] = []
+    lines.append(f"# Scheduled Tasks — {ir.name}")
+    lines.append("")
+    lines.append(
+        "This skill has scheduled triggers in OpenClaw. "
+        "Below are the equivalent setups for Claude Code."
+    )
+    lines.append("")
+    lines.append(
+        "> **Note:** Delivery to Telegram/Slack/Discord is not natively supported in Claude Code. "
+        "Use cloud scheduled tasks for durable scheduling, or see the workarounds below."
+    )
+    lines.append("")
+
+    for trigger in ir.triggers:
+        if trigger.kind != "cron":
+            continue
+
+        lines.append(f"## {trigger.id or 'trigger'}")
+        lines.append("")
+        if trigger.cron_expr:
+            lines.append(f"**Schedule:** `{trigger.cron_expr}`")
+        if trigger.delivery:
+            ch = trigger.delivery.channel or "unknown"
+            to = trigger.delivery.to or ""
+            lines.append(f"**OpenClaw delivery:** {ch} → `{to}`")
+        lines.append("")
+
+        if trigger.message:
+            lines.append("**Prompt:**")
+            lines.append("```")
+            lines.append(trigger.message.strip())
+            lines.append("```")
+            lines.append("")
+
+        lines.append("**Set up in Claude Code:**")
+        lines.append("")
+        lines.append("Option 1 — Cloud scheduled task (recommended, survives restarts):")
+        lines.append("```")
+        lines.append("# In any Claude Code session:")
+        if trigger.cron_expr:
+            lines.append(f"/schedule cron({trigger.cron_expr}) {(trigger.message or '').splitlines()[0][:80]}")
+        lines.append("# Or visit: https://claude.ai/code/scheduled → New scheduled task")
+        lines.append("```")
+        lines.append("")
+        lines.append("Option 2 — In-session loop (disappears when Claude Code exits):")
+        lines.append("```")
+        every = _cron_to_human(trigger.cron_expr or "")
+        lines.append(f"/loop {every} {(trigger.message or '').splitlines()[0][:80]}")
+        lines.append("```")
+        lines.append("")
+
+    (output_dir / "SCHEDULES.md").write_text("\n".join(lines), encoding="utf-8")
+
+
+def _cron_to_human(expr: str) -> str:
+    """Convert common cron expressions to a human interval for /loop."""
+    parts = expr.strip().split()
+    if len(parts) != 5:
+        return "1h"
+    minute, hour, dom, month, dow = parts
+    # Daily at specific hour
+    if minute.isdigit() and hour.isdigit() and dom == "*" and month == "*" and dow == "*":
+        return "1d"
+    # Weekly
+    if minute.isdigit() and hour.isdigit() and dom == "*" and month == "*" and dow.isdigit():
+        return "7d"
+    # Every N hours
+    if minute.isdigit() and hour.startswith("*/"):
+        n = hour[2:]
+        return f"{n}h"
+    # Every N minutes
+    if minute.startswith("*/") and hour == "*":
+        n = minute[2:]
+        return f"{n}m"
+    return "1h"
