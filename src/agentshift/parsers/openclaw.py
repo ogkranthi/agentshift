@@ -56,8 +56,9 @@ def parse_skill_dir(path: Path) -> AgentIR:
     # Tools: parse bash blocks and tool mentions from body
     tools = _extract_tools(body)
 
-    # Knowledge sources from body
+    # Knowledge sources — from body text AND from disk
     knowledge = _extract_knowledge(body, name)
+    knowledge = _merge_knowledge_from_disk(knowledge, path)
 
     # Constraints
     constraints = Constraints(
@@ -316,6 +317,40 @@ def _extract_knowledge(body: str, skill_name: str) -> list[KnowledgeSource]:
             seen.add(file_path)
 
     return knowledge
+
+
+def _merge_knowledge_from_disk(
+    existing: list[KnowledgeSource], skill_dir: Path
+) -> list[KnowledgeSource]:
+    """Scan the skill's knowledge/ directory on disk and add any files not already in the list."""
+    knowledge_dir = skill_dir / "knowledge"
+    if not knowledge_dir.is_dir():
+        return existing
+
+    seen_names = {k.name for k in existing}
+    result = list(existing)
+
+    for f in sorted(knowledge_dir.iterdir()):
+        if not f.is_file() or f.name.startswith("."):
+            continue
+        stem = f.stem
+        if stem in seen_names:
+            continue
+        fmt = _infer_format(f.name)
+        canonical_path = f"~/.openclaw/skills/{skill_dir.name}/knowledge/{f.name}"
+        result.append(
+            KnowledgeSource(
+                name=stem,
+                kind="file",
+                path=canonical_path,
+                description=f"Knowledge file: {f.name}",
+                format=fmt,
+                load_mode="on_demand",
+            )
+        )
+        seen_names.add(stem)
+
+    return result
 
 
 def _infer_format(filename: str) -> str:
