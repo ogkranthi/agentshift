@@ -13,23 +13,23 @@
 
 | ID | Priority | Owner | Status | Title |
 |----|----------|-------|--------|-------|
-| A01 | P0 | @architect | ready | Design IR JSON Schema — universal agent model |
-| A02 | P0 | @architect | ready | Document OpenClaw SKILL.md format spec with examples |
-| A03 | P0 | @architect | ready | Document Claude Code format spec (SKILL.md + CLAUDE.md + settings.json) |
+| A01 | P0 | @architect | merged | Design IR JSON Schema — universal agent model |
+| A02 | P0 | @architect | merged | Document OpenClaw SKILL.md format spec with examples |
+| A03 | P0 | @architect | merged | Document Claude Code format spec (SKILL.md + CLAUDE.md + settings.json) |
 | A04 | P1 | @architect | ready | Document Copilot declarative agent manifest schema 1.6 |
 | A05 | P1 | @architect | ready | Document Bedrock agent config + OpenAPI action group format |
 | A06 | P1 | @architect | ready | Document Vertex AI Agent Builder config format |
 | A07 | P1 | @architect | ready | Write MCP-to-OpenAPI mapping specification |
-| D01 | P0 | @dev | ready | Set up Python project scaffold (pyproject.toml, src layout, CLI entry point) |
-| D02 | P0 | @dev | ready | Implement IR model as Python dataclasses (based on A01 spec) |
-| D03 | P0 | @dev | ready | Implement OpenClaw parser (SKILL.md → IR) |
-| D04 | P0 | @dev | ready | Implement Claude Code emitter (IR → SKILL.md + CLAUDE.md) |
-| D05 | P0 | @dev | ready | Implement Claude Code parser (SKILL.md + CLAUDE.md → IR) |
-| D06 | P0 | @dev | ready | Implement `agentshift convert` CLI command |
-| T01 | P0 | @tester | ready | Create test fixture skills (simple, tool-heavy, cron-knowledge) |
-| T02 | P0 | @tester | ready | Write parser tests for OpenClaw parser |
-| T03 | P0 | @tester | ready | Write round-trip tests (OpenClaw → IR → OpenClaw) |
-| T04 | P0 | @tester | ready | Copy pregnancy-companion as integration test fixture |
+| D01 | P0 | @dev | merged | Set up Python project scaffold (pyproject.toml, src layout, CLI entry point) |
+| D02 | P0 | @dev | merged | Implement IR model as Python dataclasses (based on A01 spec) |
+| D03 | P0 | @dev | merged | Implement OpenClaw parser (SKILL.md → IR) |
+| D04 | P0 | @dev | merged | Implement Claude Code emitter (IR → SKILL.md + CLAUDE.md) |
+| D05 | P0 | @dev | merged | Implement Claude Code parser (SKILL.md + CLAUDE.md → IR) |
+| D06 | P0 | @dev | merged | Implement `agentshift convert` CLI command |
+| T01 | P0 | @tester | merged | Create test fixture skills (simple, tool-heavy, cron-knowledge) |
+| T02 | P0 | @tester | merged | Write parser tests for OpenClaw parser |
+| T03 | P0 | @tester | merged | Write round-trip tests (OpenClaw → IR → OpenClaw) |
+| T04 | P0 | @tester | merged | Copy pregnancy-companion as integration test fixture |
 
 ## Week 2: Cloud Emitters
 

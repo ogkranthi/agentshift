@@ -1,0 +1,18 @@
+{
+  "name": "@ogkranthi/agentshift",
+  "version": "0.1.0",
+  "description": "CLI transpiler for converting AI agents between platforms",
+  "keywords": ["ai", "agents", "portability", "transpiler", "openclaw", "copilot", "bedrock"],
+  "homepage": "https://github.com/ogkranthi/agentshift",
+  "bugs": "https://github.com/ogkranthi/agentshift/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ogkranthi/agentshift.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Kranthi Kumar",
+  "main": "index.js",
+  "bin": {
+    "agentshift": "./bin/agentshift.js"
+  }
+}
