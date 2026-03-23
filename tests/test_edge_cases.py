@@ -198,14 +198,7 @@ class TestMalformedYAML:
             ir = parse_skill_dir(d)
             assert ir.name  # if it parses, name must be set
         except Exception as exc:
-            # Must be a recognizable exception type
-            acceptable = (
-                ValueError,
-                KeyError,
-                TypeError,
-                FileNotFoundError,
-            )
-            # yaml.YAMLError is also fine — check via str representation
+            # Must be a recognizable exception type — check via str representation
             assert type(exc).__name__ in (
                 "YAMLError",
                 "ScannerError",

@@ -96,7 +96,7 @@ def main() -> int:
     passed = 0
     failed = 0
 
-    for dir_label, skill_name, issues, status in rows:
+    for _dir_label, skill_name, issues, status in rows:
         display_name = f"{skill_name}"
         if status == "PASS":
             passed += 1
@@ -120,7 +120,7 @@ def main() -> int:
     if failed:
         print("FAILURE DETAILS")
         print("=" * 90)
-        for dir_label, skill_name, issues, status in rows:
+        for _dir_label, skill_name, issues, status in rows:
             if status == "FAIL":
                 print(f"\n[{skill_name}]")
                 for i, issue in enumerate(issues):

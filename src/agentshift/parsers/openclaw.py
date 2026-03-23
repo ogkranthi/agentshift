@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import re
 from pathlib import Path
 
@@ -49,10 +50,8 @@ def parse_skill_dir(path: Path) -> AgentIR:
     # Install steps
     install_steps = []
     for step in oc_meta.get("install", []):
-        try:
+        with contextlib.suppress(Exception):
             install_steps.append(InstallStep(**step))
-        except Exception:
-            pass
 
     # Tools: parse bash blocks and tool mentions from body
     tools = _extract_tools(body)

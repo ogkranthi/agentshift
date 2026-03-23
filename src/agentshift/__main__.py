@@ -1,4 +1,4 @@
-from agentshift.cli import cli
+from agentshift.cli import app
 
 if __name__ == "__main__":
-    cli()
+    app()
