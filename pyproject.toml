@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Software Development :: Code Generators",
 ]
 dependencies = [
-    "typer>=0.12",
+    "typer[all]>=0.12",
     "rich>=13.0",
     "pyyaml>=6.0",
     "jsonschema>=4.20",
@@ -66,6 +66,9 @@ select = [
 ]
 ignore = [
     "E501",   # line too long (handled by formatter)
+    "B008",   # typer.Argument/Option in defaults — required by Typer's API
+    "TC001",  # move first-party imports into TYPE_CHECKING — needed at runtime
+    "TC003",  # move stdlib imports into TYPE_CHECKING — needed at runtime
 ]
 
 [tool.ruff.lint.isort]
