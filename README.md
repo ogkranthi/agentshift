@@ -145,40 +145,59 @@ This means Claude Code can run `gh` and `git` commands — but nothing else — 
 | Data file writes | `Write(path)` in `settings.json` | ✅ Exact paths |
 | OS constraints | `settings.json` `supportedOs` | ✅ Preserved |
 | Install dependencies | Not applicable — Claude Code assumes tools are installed | ⚠️ Manual step |
-| Cron / scheduled triggers | **Not supported in Claude Code** | ❌ See below |
-| Telegram / Slack delivery channels | **Not supported in Claude Code** | ❌ See below |
+| Cron / scheduled triggers | **Cloud Scheduled Tasks** (Anthropic-managed) | ✅ See below |
+| Telegram / Slack delivery channels | **Not supported natively** | ⚠️ See below |
 | OpenClaw config keys (`channels.slack`) | Not applicable — Claude Code uses MCP config | ⚠️ Reconfigure MCP |
 
 ---
 
-### Gaps — what Claude Code can't do (yet)
+### Scheduled triggers — Claude Code has this now
 
-**1. Scheduled triggers (cron)**
-OpenClaw skills can fire on a schedule (`0 9 * * *`). Claude Code has no built-in scheduler.
+Claude Code has **cloud-managed scheduled tasks** that run on Anthropic's infrastructure — they keep running even when your computer is off, just like OpenClaw cron jobs.
 
-*Workaround:* Use system cron or GitHub Actions to call `claude --print "<trigger message>"` on a schedule:
+**3 ways to schedule:**
+
 ```bash
-# crontab -e
-0 9 * * * cd /your/project && claude --print "Give today's pregnancy tip" >> ~/logs/tip.log 2>&1
+# Option 1 — CLI (conversational setup)
+/schedule daily PR review at 9am
+
+# Option 2 — quick loop in-session
+/loop 30m check if the deployment finished
+
+# Option 3 — web UI
+# → https://claude.ai/code/scheduled → New scheduled task
 ```
 
-**2. Proactive delivery (Telegram, Slack, Discord)**
-OpenClaw can push messages to channels when triggered. Claude Code only responds — it doesn't push.
+The converted skill's `cron_expr` from OpenClaw maps directly:
 
-*Workaround:* Wrap `claude --print` output in a script that pipes to your messaging service:
-```bash
-RESPONSE=$(claude --print "Give today's tip")
-curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
-  -d chat_id="$CHAT_ID" -d text="$RESPONSE"
+| OpenClaw (`jobs.json`) | Claude Code |
+|---|---|
+| `"schedule": "0 9 * * *"` | `/schedule daily at 9am` or set via web UI |
+| `"message": "Give today's tip"` | Prompt field in the scheduled task |
+| `"session_target": "isolated"` | Each run is a fresh cloud session (default) |
+
+> **Note:** Session-scoped `/loop` tasks disappear when Claude Code exits. For durable cron that survives restarts, use [cloud scheduled tasks](https://claude.ai/code/scheduled) or the Desktop app's Schedule page.
+
+---
+
+### Remaining gaps
+
+**1. Proactive delivery (Telegram, Slack, Discord)**
+OpenClaw pushes results directly to messaging channels. Claude Code scheduled tasks run headlessly and output to GitHub branches or logs — not to chat.
+
+*Workaround:* Add a step at the end of your scheduled task prompt:
 ```
+... do the work, then write the summary to summary.md and commit it to a branch named daily-summary/YYYY-MM-DD
+```
+Or pipe `claude --print` output through a webhook in a GitHub Action.
 
-**3. Persistent memory across sessions**
+**2. Persistent memory across sessions**
 OpenClaw persists `MEMORY.md` between sessions. Claude Code sessions are stateless by default.
 
-*Workaround:* Pass memory files as context: `claude --print "$(cat MEMORY.md)\n\nUser: ..."` or use a project-level `CLAUDE.md` that references memory files.
+*Workaround:* Use a project-level `CLAUDE.md` that references memory files, or pass them explicitly in your scheduled task prompt.
 
-**4. Multi-channel routing**
-OpenClaw can route to different channels based on context. Claude Code outputs to stdout only.
+**3. Multi-channel routing**
+OpenClaw routes output to Telegram, Slack, Discord, or email based on context. Claude Code outputs to stdout or GitHub — not to messaging apps directly.
 
 ---
 
