@@ -1,0 +1,25 @@
+# AgentShift Code Owners
+# These owners will be automatically requested for review on PRs.
+
+# Global — all PRs need maintainer review
+* @ogkranthi
+
+# Core IR schema — changes here affect everything
+src/agentshift/ir.py @ogkranthi
+specs/ir-schema.json @ogkranthi
+
+# Parsers
+src/agentshift/parsers/ @ogkranthi
+
+# Emitters
+src/agentshift/emitters/ @ogkranthi
+
+# CLI
+src/agentshift/cli.py @ogkranthi
+
+# CI/CD and project config
+.github/ @ogkranthi
+pyproject.toml @ogkranthi
+
+# Specs — format documentation
+specs/ @ogkranthi

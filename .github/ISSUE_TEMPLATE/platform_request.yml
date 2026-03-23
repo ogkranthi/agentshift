@@ -1,0 +1,55 @@
+name: New Platform Support
+description: Request support for a new agent platform
+title: "[Platform]: "
+labels: ["platform-request", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Want AgentShift to support a new agent platform? Tell us about it!
+
+  - type: input
+    id: platform
+    attributes:
+      label: Platform name
+      placeholder: "e.g., Salesforce Agentforce, ServiceNow AI Agents"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: direction
+    attributes:
+      label: Direction needed
+      options:
+        - Parser (read from this platform)
+        - Emitter (write to this platform)
+        - Both (bidirectional)
+    validations:
+      required: true
+
+  - type: textarea
+    id: format
+    attributes:
+      label: Agent definition format
+      description: How are agents defined on this platform? Links to docs appreciated.
+      placeholder: |
+        Agents are defined as JSON manifests with...
+        Docs: https://...
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example agent definition
+      description: Paste an example agent config from this platform
+      render: json
+
+  - type: dropdown
+    id: willingness
+    attributes:
+      label: Would you contribute this?
+      options:
+        - "Yes, I can implement it"
+        - "I can help test it"
+        - "Just requesting — no bandwidth to contribute"

@@ -1,0 +1,438 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentshift.dev/schemas/ir/v1.json",
+  "title": "AgentShift Intermediate Representation (IR)",
+  "description": "Universal agent model for cross-platform agent portability. Represents agents from OpenClaw, Claude Code, Copilot, Bedrock, and Vertex AI in a single canonical format.",
+  "type": "object",
+  "required": ["ir_version", "name", "description"],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "ir_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "IR schema version. Always '1.0' for this revision."
+    },
+
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$",
+      "maxLength": 64,
+      "description": "Canonical slug identifier for the agent. Lowercase, hyphens only. e.g. 'pregnancy-companion'."
+    },
+
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Human-readable summary of what the agent does and when to invoke it. Used as a skill trigger description for Claude Code and OpenClaw."
+    },
+
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of this agent definition. e.g. '1.0.0'.",
+      "default": "1.0.0"
+    },
+
+    "author": {
+      "type": "string",
+      "description": "Author or owner of this agent definition. Free text."
+    },
+
+    "homepage": {
+      "type": "string",
+      "format": "uri",
+      "description": "Optional URL for documentation or the tool this agent wraps."
+    },
+
+    "persona": {
+      "type": "object",
+      "description": "The agent's identity and behavioral instructions — the system prompt layer.",
+      "additionalProperties": false,
+      "properties": {
+        "system_prompt": {
+          "type": "string",
+          "description": "The full system / instruction prompt passed to the model at session start. Maps to: OpenClaw SKILL.md body, Claude Code CLAUDE.md, Copilot system_prompt, Bedrock instruction, Vertex AI agent instruction."
+        },
+        "personality_notes": {
+          "type": "string",
+          "description": "Human-readable prose describing tone, style, and personality. Informational only; may be embedded in system_prompt."
+        },
+        "language": {
+          "type": "string",
+          "description": "Primary language for responses. BCP-47 code. e.g. 'en', 'es'.",
+          "default": "en"
+        }
+      }
+    },
+
+    "tools": {
+      "type": "array",
+      "description": "Capabilities / tools available to the agent. Covers MCP tools, OpenAPI action groups, shell commands, and built-in platform tools.",
+      "items": {
+        "$ref": "#/definitions/Tool"
+      },
+      "default": []
+    },
+
+    "knowledge": {
+      "type": "array",
+      "description": "Knowledge sources the agent consults — local files, vector stores, URLs, or databases.",
+      "items": {
+        "$ref": "#/definitions/KnowledgeSource"
+      },
+      "default": []
+    },
+
+    "triggers": {
+      "type": "array",
+      "description": "Conditions that activate the agent: cron schedules, webhooks, messages, or platform events.",
+      "items": {
+        "$ref": "#/definitions/Trigger"
+      },
+      "default": []
+    },
+
+    "constraints": {
+      "type": "object",
+      "description": "Platform limits, guardrails, and behavioral restrictions.",
+      "additionalProperties": false,
+      "properties": {
+        "max_instruction_chars": {
+          "type": "integer",
+          "description": "Maximum character length of the system prompt (varies by platform). Bedrock: 4000. Copilot: ~32k. Vertex: 8000+."
+        },
+        "supported_os": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["darwin", "linux", "windows"] },
+          "description": "Operating systems this agent can run on. Maps to OpenClaw 'os' frontmatter field."
+        },
+        "required_bins": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "CLI binaries that must be present (e.g. ['gh', 'curl']). Maps to OpenClaw metadata.openclaw.requires.bins."
+        },
+        "any_required_bins": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "At least one of these binaries must be present. Maps to OpenClaw metadata.openclaw.requires.anyBins."
+        },
+        "required_config_keys": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "OpenClaw config keys that must be set. e.g. ['channels.slack']."
+        },
+        "guardrails": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Named safety guardrails to apply. e.g. ['no-diagnose', 'no-prescribe', 'no-harmful-content']."
+        },
+        "topic_restrictions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Topics the agent must refuse. Free text. Maps to Bedrock/Copilot guardrails."
+        }
+      }
+    },
+
+    "install": {
+      "type": "array",
+      "description": "Installation instructions for agent dependencies. Maps to OpenClaw metadata.openclaw.install.",
+      "items": {
+        "$ref": "#/definitions/InstallStep"
+      },
+      "default": []
+    },
+
+    "metadata": {
+      "type": "object",
+      "description": "Source provenance and target platform annotations. Preserved across conversions.",
+      "additionalProperties": false,
+      "properties": {
+        "source_platform": {
+          "type": "string",
+          "enum": ["openclaw", "claude-code", "copilot", "bedrock", "vertex-ai", "unknown"],
+          "description": "Platform this IR was originally parsed from."
+        },
+        "target_platforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["openclaw", "claude-code", "copilot", "bedrock", "vertex-ai"]
+          },
+          "description": "Intended emission targets."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when this IR was first created."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of most recent modification."
+        },
+        "source_file": {
+          "type": "string",
+          "description": "Path or URI of the original source file (e.g. '~/.openclaw/skills/weather/SKILL.md')."
+        },
+        "emoji": {
+          "type": "string",
+          "description": "Display emoji for the agent. Maps to OpenClaw metadata.openclaw.emoji."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Arbitrary classification tags."
+        },
+        "platform_extensions": {
+          "type": "object",
+          "description": "Platform-specific data that has no IR equivalent. Keyed by platform slug. Preserved round-trip.",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+
+    "Tool": {
+      "type": "object",
+      "required": ["name", "description"],
+      "additionalProperties": false,
+      "description": "A capability the agent can invoke — an MCP tool, OpenAPI endpoint, shell command, or platform built-in.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Tool identifier. e.g. 'slack', 'bash', 'get_weather', 'Bash'."
+        },
+        "description": {
+          "type": "string",
+          "description": "What this tool does and when to use it."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["mcp", "openapi", "shell", "builtin", "function", "unknown"],
+          "default": "unknown",
+          "description": "Tool protocol type. 'mcp' = Model Context Protocol server. 'openapi' = REST/OpenAPI action group (Bedrock/Copilot). 'shell' = CLI subprocess. 'builtin' = platform-native tool (Bash, Read, WebSearch in Claude Code). 'function' = LLM function-calling definition."
+        },
+        "parameters": {
+          "type": "object",
+          "description": "JSON Schema object describing tool input parameters. Maps to MCP inputSchema, OpenAPI requestBody, or function call parameters.",
+          "properties": {
+            "type": { "type": "string", "const": "object" },
+            "properties": { "type": "object" },
+            "required": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "auth": {
+          "$ref": "#/definitions/ToolAuth"
+        },
+        "endpoint": {
+          "type": "string",
+          "description": "For 'openapi' kind: base URL. For 'mcp' kind: server URI or command."
+        },
+        "platform_availability": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["openclaw", "claude-code", "copilot", "bedrock", "vertex-ai"]
+          },
+          "description": "Platforms on which this tool is available. Empty = all platforms."
+        }
+      }
+    },
+
+    "ToolAuth": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Authentication requirements for a tool.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["none", "api_key", "oauth2", "bearer", "basic", "config_key"],
+          "default": "none"
+        },
+        "env_var": {
+          "type": "string",
+          "description": "Environment variable holding the credential. e.g. 'SLACK_BOT_TOKEN'."
+        },
+        "config_key": {
+          "type": "string",
+          "description": "OpenClaw config key. e.g. 'channels.slack'."
+        },
+        "scopes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "OAuth2 scopes required."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Human-readable auth setup instructions."
+        }
+      }
+    },
+
+    "KnowledgeSource": {
+      "type": "object",
+      "required": ["name", "kind"],
+      "additionalProperties": false,
+      "description": "A data source the agent reads from for grounding.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Logical name for this knowledge source. e.g. 'week-by-week'."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["file", "directory", "url", "vector_store", "database", "s3"],
+          "description": "Storage type."
+        },
+        "path": {
+          "type": "string",
+          "description": "File path, directory path, or URI. May use ~ for home dir. e.g. '~/.openclaw/skills/pregnancy-companion/knowledge/week-by-week.md'."
+        },
+        "description": {
+          "type": "string",
+          "description": "What this knowledge source contains."
+        },
+        "format": {
+          "type": "string",
+          "enum": ["markdown", "json", "yaml", "text", "pdf", "html", "unknown"],
+          "default": "unknown"
+        },
+        "load_mode": {
+          "type": "string",
+          "enum": ["always", "on_demand", "indexed"],
+          "default": "on_demand",
+          "description": "'always' = inject into every session. 'on_demand' = agent reads when needed. 'indexed' = embedded in vector store."
+        }
+      }
+    },
+
+    "Trigger": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "description": "An event or schedule that activates the agent.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique trigger identifier."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["cron", "webhook", "message", "event", "manual"],
+          "description": "Trigger type."
+        },
+        "cron_expr": {
+          "type": "string",
+          "description": "Standard cron expression (5-field). e.g. '0 9 * * 1' = Monday 9am. Required when kind='cron'."
+        },
+        "every": {
+          "type": "string",
+          "description": "Human-readable interval shorthand. e.g. '30m', '2h', '1d'. Alternative to cron_expr.",
+          "pattern": "^\\d+[smhd]$"
+        },
+        "message": {
+          "type": "string",
+          "description": "Prompt or instruction injected when the trigger fires. Maps to OpenClaw cron payload.message."
+        },
+        "webhook_path": {
+          "type": "string",
+          "description": "URL path for webhook triggers. e.g. '/webhooks/github'."
+        },
+        "event_name": {
+          "type": "string",
+          "description": "Platform event name. e.g. 'pr.opened', 'message.received'."
+        },
+        "delivery": {
+          "$ref": "#/definitions/TriggerDelivery"
+        },
+        "session_target": {
+          "type": "string",
+          "enum": ["isolated", "main", "thread"],
+          "default": "isolated",
+          "description": "Session context for the triggered run. 'isolated' = fresh session each time."
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+
+    "TriggerDelivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Where to send the trigger's output.",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["announce", "silent", "reply"],
+          "default": "announce"
+        },
+        "channel": {
+          "type": "string",
+          "enum": ["telegram", "slack", "discord", "email", "webhook", "stdout"],
+          "description": "Output channel."
+        },
+        "to": {
+          "type": "string",
+          "description": "Destination identifier: chat_id, user_id, channel_id, email address, etc."
+        },
+        "account_id": {
+          "type": "string",
+          "description": "OpenClaw account/bot identifier for multi-account setups."
+        }
+      }
+    },
+
+    "InstallStep": {
+      "type": "object",
+      "required": ["id", "kind"],
+      "additionalProperties": false,
+      "description": "One installation method for a dependency. Multiple methods give fallback options.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique id for this install method. e.g. 'brew', 'apt', 'go', 'npm'."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["brew", "apt", "go", "npm", "pip", "cargo", "script", "manual"],
+          "description": "Package manager or install mechanism."
+        },
+        "formula": {
+          "type": "string",
+          "description": "Homebrew formula name."
+        },
+        "package": {
+          "type": "string",
+          "description": "apt/npm/pip/cargo package name."
+        },
+        "module": {
+          "type": "string",
+          "description": "Go module path. e.g. 'github.com/foo/bar/cmd/baz@latest'."
+        },
+        "script_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for curl-pipe install scripts."
+        },
+        "bins": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Binary names installed by this step."
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable label for this install option."
+        }
+      }
+    }
+  }
+}
