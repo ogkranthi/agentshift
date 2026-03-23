@@ -1,63 +1,110 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="700" height="340" viewBox="0 0 700 340">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 480" width="780" height="480">
   <defs>
     <style>
-      .terminal { font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace; font-size: 13px; }
-      .prompt    { fill: #50fa7b; }
-      .cmd       { fill: #f8f8f2; }
-      .output    { fill: #6272a4; }
-      .success   { fill: #50fa7b; }
-      .key       { fill: #ff79c6; }
-      .val       { fill: #f1fa8c; }
-      .comment   { fill: #6272a4; }
+      .bg { fill: #1e1e2e; }
+      .titlebar { fill: #313244; }
+      .btn-red { fill: #f38ba8; }
+      .btn-yellow { fill: #f9e2af; }
+      .btn-green { fill: #a6e3a1; }
+      .prompt { fill: #89b4fa; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+      .cmd { fill: #cdd6f4; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+      .success { fill: #a6e3a1; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+      .comment { fill: #6c7086; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+      .key { fill: #cba6f7; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+      .val { fill: #a6e3a1; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+      .str { fill: #f9e2af; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+      .dim { fill: #585b70; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+      .title { fill: #cdd6f4; font-family: -apple-system, sans-serif; font-size: 13px; }
+      .cursor { fill: #cdd6f4; }
+
+      /* typing animation for command 1 */
+      .cmd1 { opacity: 0; animation: appear 0.1s 0.5s forwards; }
+      .cmd1-out { opacity: 0; animation: appear 0.1s 2.5s forwards; }
+      /* command 2 */
+      .cmd2 { opacity: 0; animation: appear 0.1s 3.5s forwards; }
+      .cmd2-out { opacity: 0; animation: appear 0.1s 5s forwards; }
+      /* command 3 */
+      .cmd3 { opacity: 0; animation: appear 0.1s 6s forwards; }
+      .cmd3-out { opacity: 0; animation: appear 0.1s 7.2s forwards; }
+
+      @keyframes appear { to { opacity: 1; } }
+
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+      }
+      .cursor-anim { animation: blink 1s step-end infinite; }
     </style>
   </defs>
 
-  <!-- Terminal background -->
-  <rect width="700" height="340" rx="8" ry="8" fill="#282a36"/>
+  <!-- Window -->
+  <rect width="780" height="480" rx="10" class="bg"/>
 
   <!-- Title bar -->
-  <rect width="700" height="32" rx="8" ry="8" fill="#44475a"/>
-  <rect width="700" height="16" y="16" fill="#44475a"/>
-  <circle cx="20" cy="16" r="6" fill="#ff5555"/>
-  <circle cx="40" cy="16" r="6" fill="#f1fa8c"/>
-  <circle cx="60" cy="16" r="6" fill="#50fa7b"/>
-  <text x="350" y="21" text-anchor="middle" fill="#f8f8f2" class="terminal" font-size="12">agentshift demo</text>
+  <rect width="780" height="36" rx="10" class="titlebar"/>
+  <rect y="18" width="780" height="18" class="titlebar"/>
+  <circle cx="20" cy="18" r="6" class="btn-red"/>
+  <circle cx="40" cy="18" r="6" class="btn-yellow"/>
+  <circle cx="60" cy="18" r="6" class="btn-green"/>
+  <text x="390" y="23" text-anchor="middle" class="title">agentshift — terminal</text>
 
-  <!-- Line 1: prompt + command -->
-  <text x="20" y="64" class="terminal prompt">$</text>
-  <text x="34" y="64" class="terminal cmd">agentshift convert ./weather-skill --from openclaw --to claude-code --output ./weather-claude</text>
+  <!-- Line 1: blank prompt -->
+  <text x="20" y="68" class="prompt">❯</text>
+  <text x="36" y="68" class="comment"> # Step 1: grab a skill from your OpenClaw install</text>
 
-  <!-- Line 2: success output -->
-  <text x="20" y="88" class="terminal success">✓</text>
-  <text x="34" y="88" class="terminal cmd">Parsed   ./weather-skill/SKILL.md</text>
-  <text x="400" y="88" class="terminal comment">(openclaw)</text>
+  <!-- Line 2: cp command -->
+  <text x="20" y="92" class="prompt">❯</text>
+  <g class="cmd1">
+    <text x="36" y="92" class="cmd">cp -r ~/.openclaw/skills/weather ./weather-skill</text>
+  </g>
 
-  <text x="20" y="108" class="terminal success">✓</text>
-  <text x="34" y="108" class="terminal cmd">IR       identity · tools · knowledge · triggers</text>
+  <!-- Line 3: convert command -->
+  <text x="20" y="116" class="prompt">❯</text>
+  <g class="cmd1">
+    <text x="36" y="116" class="cmd">agentshift convert ./weather-skill <tspan class="key">--from</tspan> <tspan class="str">openclaw</tspan> <tspan class="key">--to</tspan> <tspan class="str">claude-code</tspan> <tspan class="key">--output</tspan> <tspan class="str">./weather-claude</tspan></text>
+  </g>
 
-  <text x="20" y="128" class="terminal success">✓</text>
-  <text x="34" y="128" class="terminal cmd">Emitted  ./weather-claude/CLAUDE.md</text>
-  <text x="400" y="128" class="terminal comment">(claude-code)</text>
+  <!-- Output of convert -->
+  <g class="cmd1-out">
+    <text x="20" y="140" class="dim">  AgentShift converting ./weather-skill (openclaw) → claude-code</text>
+    <text x="20" y="160" class="success">  ✓ Converted weather → ./weather-claude</text>
+  </g>
 
-  <text x="20" y="148" class="terminal success">✓</text>
-  <text x="34" y="148" class="terminal cmd">Emitted  ./weather-claude/settings.json</text>
-
-  <!-- Blank line -->
-
-  <!-- Line 3: cat CLAUDE.md -->
-  <text x="20" y="180" class="terminal prompt">$</text>
-  <text x="34" y="180" class="terminal cmd">cat ./weather-claude/CLAUDE.md</text>
+  <!-- Line 4: cat CLAUDE.md -->
+  <g class="cmd2">
+    <text x="20" y="188" class="prompt">❯</text>
+    <text x="36" y="188" class="cmd">cat ./weather-claude/CLAUDE.md</text>
+  </g>
 
   <!-- CLAUDE.md output -->
-  <text x="20" y="204" class="terminal key"># weather</text>
+  <g class="cmd2-out">
+    <text x="20" y="212" class="key"># weather</text>
+    <text x="20" y="230" class="dim">Get current weather and forecasts via wttr.in.</text>
+    <text x="20" y="248" class="dim">No API key needed.</text>
+    <text x="20" y="266" class="key">## Instructions</text>
+    <text x="20" y="284" class="dim">Use `curl wttr.in/&lt;city&gt;?format=3` for one-line summaries.</text>
+    <text x="20" y="302" class="key">## Tools</text>
+    <text x="20" y="320" class="dim">- <tspan class="val">curl</tspan> (shell): Run curl commands</text>
+  </g>
 
-  <text x="20" y="224" class="terminal output">Get current weather and forecasts via wttr.in. No API key needed.</text>
+  <!-- Line 5: cat settings.json -->
+  <g class="cmd3">
+    <text x="20" y="348" class="prompt">❯</text>
+    <text x="36" y="348" class="cmd">cat ./weather-claude/settings.json</text>
+  </g>
 
-  <text x="20" y="248" class="terminal key">## Tools</text>
-  <text x="20" y="268" class="terminal cmd">- <tspan class="val">bash</tspan> (shell): Run shell commands</text>
+  <!-- settings.json output -->
+  <g class="cmd3-out">
+    <text x="20" y="372" class="dim">{</text>
+    <text x="20" y="390" class="dim">  <tspan class="key">"permissions"</tspan>: {</text>
+    <text x="20" y="408" class="dim">    <tspan class="key">"allow"</tspan>: [<tspan class="str">"Bash(curl:*)"</tspan>]</text>
+    <text x="20" y="426" class="dim">  }</text>
+    <text x="20" y="444" class="dim">}</text>
+  </g>
 
-  <!-- Line 4: settings.json -->
-  <text x="20" y="300" class="terminal prompt">$</text>
-  <text x="34" y="300" class="terminal cmd">cat ./weather-claude/settings.json</text>
-  <text x="20" y="322" class="terminal output">{ "permissions": { "allow": ["Bash(bash:*)"] } }</text>
+  <!-- Final prompt with blinking cursor -->
+  <g class="cmd3-out">
+    <text x="20" y="465" class="prompt">❯</text>
+    <rect x="36" y="452" width="8" height="14" class="cursor cursor-anim"/>
+  </g>
 </svg>
