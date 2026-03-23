@@ -1,147 +1,134 @@
-# AgentShift
+<h1 align="center">AgentShift</h1>
+<p align="center"><em>Convert AI agents between platforms. Define once, run anywhere.</em></p>
 
-**Convert AI agents between platforms.** Define your agent once, deploy it anywhere.
+<p align="center">
+  <img src="docs/demo-placeholder.svg" alt="AgentShift demo" width="700">
+</p>
 
-AgentShift is a CLI transpiler that takes an AI agent definition from one platform and generates deployment-ready configurations for others. No more vendor lock-in for your agents.
+<p align="center">
+  <a href="https://github.com/ogkranthi/agentshift/actions"><img src="https://github.com/ogkranthi/agentshift/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://pypi.org/project/agentshift/"><img src="https://img.shields.io/pypi/v/agentshift" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/agentshift/"><img src="https://img.shields.io/pypi/pyversions/agentshift" alt="Python versions"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
+</p>
 
-```
-OpenClaw ──┐
-            ├──→ IR ──→ Microsoft Copilot
-Claude Code ┘          → AWS Bedrock
-                       → GCP Vertex AI
-                       → Claude Code
-```
+---
 
-## The Problem
+Your OpenClaw skill, your Bedrock Agent, your Copilot — they all speak different dialects.
+**AgentShift is the translator.**
 
-AI agents are locked into their originating platforms. An OpenClaw skill can't run on Microsoft Copilot. A Bedrock Agent can't be moved to Vertex AI. Despite 60-70% of an agent being inherently portable, **no tool exists** that converts agents between platforms.
-
-## How It Works
-
-AgentShift parses your agent into a universal **Intermediate Representation (IR)**, then emits platform-specific configurations:
-
-```bash
-# Convert an OpenClaw skill to Microsoft Copilot
-agentshift convert --to copilot ./my-skill/
-
-# Convert to all supported targets at once
-agentshift convert --to all ./my-skill/
-
-# See what ports cleanly vs. what needs manual work
-agentshift diff ./my-skill/ --targets copilot,bedrock,vertex
-
-# Validate generated config against platform schema
-agentshift validate ./output/copilot/ --target copilot
-```
-
-### Portability Matrix
-
-```
-$ agentshift diff ./my-skill/ --targets copilot,bedrock
-
-┌─────────────────┬──────────┬─────────┬─────────┐
-│ Component        │ OpenClaw │ Copilot │ Bedrock │
-├─────────────────┼──────────┼─────────┼─────────┤
-│ Instructions     │ ✅ 100%  │ ✅ 100% │ ✅ 100% │
-│ Tool: web_search │ ✅       │ ✅ auto │ ✅ auto │
-│ Tool: cron       │ ✅       │ ⚠️ stub │ ⚠️ stub │
-│ Knowledge (3)    │ ✅       │ ⚠️ stub │ ⚠️ stub │
-│ Telegram channel │ ✅       │ ❌ none │ ❌ none │
-├─────────────────┼──────────┼─────────┼─────────┤
-│ Portability      │          │ 62%     │ 58%     │
-└─────────────────┴──────────┴─────────┴─────────┘
-```
-
-## Supported Platforms
-
-| Platform | Parser (read) | Emitter (write) | Status |
-|----------|:---:|:---:|--------|
-| OpenClaw | ✅ | ✅ | In development |
-| Claude Code | ✅ | ✅ | In development |
-| Microsoft Copilot | — | ✅ | In development |
-| AWS Bedrock | — | ✅ | In development |
-| GCP Vertex AI | — | ✅ | In development |
-| LangGraph | — | — | Planned |
-| CrewAI | — | — | Planned |
-
-## Quick Start
-
-### Install
+## Install
 
 ```bash
+# pip
 pip install agentshift
+
+# from source
+git clone https://github.com/ogkranthi/agentshift.git
+cd agentshift && pip install -e .
 ```
 
-### Convert your first agent
+## Usage
 
 ```bash
-# Option A: Use an OpenClaw built-in skill
+# Copy a built-in OpenClaw skill and convert it to Claude Code
 cp -r ~/.nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/weather ./weather-skill
 agentshift convert ./weather-skill --from openclaw --to claude-code --output ./weather-claude
 
-# Option B: Use any skill you have installed
+# Convert any skill you have installed
 agentshift convert ~/.openclaw/skills/my-skill --from openclaw --to claude-code --output ./my-skill-claude
 
-# See what was generated
+# Inspect the output
 cat ./weather-claude/CLAUDE.md
 cat ./weather-claude/settings.json
 ```
 
-### See a real conversion
+## How it works
 
-The [examples/](examples/) directory has 4 real before/after conversions:
+AgentShift parses your agent into a universal **Intermediate Representation (IR)**, then emits platform-specific configs.
 
-| Skill | Why interesting |
-|-------|----------------|
-| [weather](examples/weather-to-claude-code/) | Simplest case — bash-only, no API key |
-| [github](examples/github-to-claude-code/) | Tool-heavy: `gh` CLI across PRs, issues, CI |
-| [slack](examples/slack-to-claude-code/) | MCP-based — shows MCP tool → `mcp__slack__*` permission mapping |
-| [notion](examples/notion-to-claude-code/) | API-rich with structured knowledge |
-
-Each folder has `input/SKILL.md` (original) and `output/` (converted).
-
-## Installation
-
-```bash
-pip install agentshift
+```
+  1. Parse  →  SKILL.md · CLAUDE.md · manifest.json · instruction.txt
+               ↓
+  2. IR     →  identity · tools · knowledge · triggers · constraints
+               ↓
+  3. Emit   →  Claude Code  ✅  |  Copilot  🔜  |  Bedrock  🔜  |  Vertex AI  🔜
 ```
 
-### From source
+The IR is the core abstraction — captured in `specs/ir-schema.json`. Adding a new platform means writing one parser and/or one emitter. Nothing else changes.
+
+## Supported platforms
+
+| Platform | Read (parser) | Write (emitter) | Status |
+|---|:---:|:---:|---|
+| OpenClaw | ✅ | ✅ | **Works today** |
+| Claude Code | ✅ | ✅ | **Works today** |
+| Microsoft Copilot | — | — | Coming soon |
+| AWS Bedrock | — | — | Coming soon |
+| GCP Vertex AI | — | — | Coming soon |
+| LangGraph | — | — | Planned |
+| CrewAI | — | — | Planned |
+
+## See a real conversion
+
+The [`examples/`](examples/) directory has 4 complete before/after conversions.
+
+**Input** — `examples/weather-to-claude-code/input/SKILL.md` (OpenClaw):
+
+```yaml
+---
+name: weather
+description: "Get current weather and forecasts via wttr.in. No API key needed."
+metadata: { "openclaw": { "emoji": "☔", "requires": { "bins": ["curl"] } } }
+---
+
+# Weather Skill
+
+## Commands
+
+```bash
+curl "wttr.in/London?format=3"      # one-line summary
+curl "wttr.in/London"               # 3-day forecast
+curl "wttr.in/London?format=j1"     # JSON output
+```
+```
+
+**Output** — `examples/weather-to-claude-code/output/CLAUDE.md` (Claude Code):
+
+```markdown
+# weather
+
+Get current weather and forecasts via wttr.in. No API key needed.
+
+## Instructions
+...
+
+## Tools
+- **bash** (shell): Run shell commands
+```
+
+**Output** — `examples/weather-to-claude-code/output/settings.json`:
+
+```json
+{ "permissions": { "allow": ["Bash(bash:*)"] } }
+```
+
+More examples: [github](examples/github-to-claude-code/) · [slack](examples/slack-to-claude-code/) · [notion](examples/notion-to-claude-code/)
+
+## Contributing
+
+Contributions welcome — especially new platform parsers/emitters.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, architecture, and PR guidelines.
 
 ```bash
 git clone https://github.com/ogkranthi/agentshift.git
 cd agentshift
-python3 -m venv .venv
-source .venv/bin/activate
 pip install -e ".[dev]"
+agentshift --help
 ```
 
-## Contributing
-
-We welcome contributions! The most impactful way to contribute is adding support for a new platform.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and guidelines.
-
-### Adding a New Platform
-
-Each platform needs:
-1. A **format spec** documenting the agent definition format
-2. A **parser** (read from the platform) and/or **emitter** (write to the platform)
-3. **Tests** and a **test fixture** with a real agent definition
-
-Open a [Platform Request](https://github.com/ogkranthi/agentshift/issues/new?template=platform_request.yml) to discuss your approach.
-
-## Architecture
-
-```
-Source Agent → Parser → IR (Intermediate Representation) → Emitter → Target Config
-```
-
-The **IR** is the core — a universal agent model that captures identity, instructions, tools, knowledge, triggers, channels, and constraints. Adding a new platform = writing one parser and/or one emitter. See `specs/ir-schema.json` for the full schema.
-
-## Project Status
-
-AgentShift is in active development. The nightly build crew (autonomous OpenClaw agents) works on it every night. Track progress in [BACKLOG.md](BACKLOG.md).
+Open a [Platform Request](https://github.com/ogkranthi/agentshift/issues/new?template=platform_request.yml) to discuss adding a new target.
 
 ## License
 
