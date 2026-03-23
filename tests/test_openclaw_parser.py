@@ -26,8 +26,9 @@ def test_parse_tool_heavy_skill():
     ir = parse_skill_dir(FIXTURES / "tool-heavy-skill")
     assert isinstance(ir, AgentIR)
     tool_names = [t.name for t in ir.tools]
-    # bash extracted from ```bash block
-    assert "bash" in tool_names
+    # specific binaries extracted from ```bash block
+    assert "gh" in tool_names
+    assert "curl" in tool_names
     # MCP tools extracted from body mentions
     assert "slack" in tool_names
     assert "github" in tool_names
@@ -38,7 +39,8 @@ def test_parse_tool_heavy_skill():
 def test_parse_tool_heavy_skill_kinds():
     ir = parse_skill_dir(FIXTURES / "tool-heavy-skill")
     kinds = {t.name: t.kind for t in ir.tools}
-    assert kinds["bash"] == "shell"
+    assert kinds["gh"] == "shell"
+    assert kinds["curl"] == "shell"
     assert kinds["slack"] == "mcp"
     assert kinds["github"] == "mcp"
     assert kinds["linear"] == "mcp"

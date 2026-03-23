@@ -128,23 +128,118 @@ def _split_frontmatter(raw: str) -> tuple[str, str]:
     return frontmatter, body
 
 
+_SHELL_BUILTINS: frozenset[str] = frozenset(
+    [
+        "if", "for", "while", "until", "do", "done", "then", "else", "elif",
+        "fi", "case", "esac", "function", "return", "exit", "break", "continue",
+        "echo", "export", "cd", "source", ".", "set", "read", "local", "declare",
+        "typeset", "eval", "exec", "test", "true", "false", "[", "[[", "]]", "]",
+        "shift", "unset", "wait", "trap", "printf", "type", "alias", "unalias",
+        "let", "select", "time", "in",
+    ]
+)
+
+_KNOWN_MCP_TOOLS: frozenset[str] = frozenset(
+    [
+        "slack", "github", "notion", "discord", "trello", "linear", "jira",
+        "asana", "figma", "zoom", "calendar",
+    ]
+)
+
+
 def _extract_tools(body: str) -> list[Tool]:
     """Heuristically extract tool references from the markdown body."""
     tools: list[Tool] = []
     seen: set[str] = set()
 
-    # Detect bash/shell usage
-    if re.search(r"```bash|`bash |Bash\b|shell command", body, re.IGNORECASE):
+    # --- Shell binaries from ```bash / ```sh / ```shell code blocks ---
+    bash_block_re = re.compile(r"```(?:bash|sh|shell)\n(.*?)```", re.DOTALL | re.IGNORECASE)
+    _heredoc_start_re = re.compile(r"<<[-]?\s*['\"]?([A-Z_][A-Z0-9_]*)['\"]?")
+    found_bash_block = False
+    for block_match in bash_block_re.finditer(body):
+        found_bash_block = True
+        heredoc_terminator: str | None = None
+        for line in block_match.group(1).splitlines():
+            stripped = line.strip()
+            # Heredoc end
+            if heredoc_terminator is not None:
+                if stripped == heredoc_terminator:
+                    heredoc_terminator = None
+                continue
+            if not stripped or stripped.startswith("#"):
+                continue
+            # Detect heredoc start on this line (e.g. <<'EOF' or <<"HTML")
+            hdoc = _heredoc_start_re.search(stripped)
+            if hdoc:
+                heredoc_terminator = hdoc.group(1)
+            tokens = stripped.split()
+            if not tokens:
+                continue
+            token = tokens[0]
+            # Handle inline env-var assignments like VAR=val command
+            while "=" in token and not token.startswith("-"):
+                tokens = tokens[1:]
+                if not tokens:
+                    break
+                token = tokens[0]
+            if not tokens:
+                continue
+            # Handle sudo / env / command prefix
+            if token in ("sudo", "env", "command") and len(tokens) > 1:
+                token = tokens[1]
+            # Must start with a letter
+            if not token or not re.match(r"^[a-zA-Z]", token):
+                continue
+            m = re.match(r"^([a-zA-Z][a-zA-Z0-9_.+-]*)", token)
+            if not m:
+                continue
+            binary = m.group(1).lower()
+            if binary in _SHELL_BUILTINS:
+                continue
+            if binary not in seen:
+                tools.append(Tool(name=binary, description=f"Run {binary} commands", kind="shell"))
+                seen.add(binary)
+
+    # Fallback: bash block existed but no specific binaries found → generic bash
+    if found_bash_block and not any(t.kind == "shell" for t in tools):
         tools.append(Tool(name="bash", description="Run shell commands", kind="shell"))
         seen.add("bash")
 
-    # Detect MCP-style tool names mentioned (e.g., "slack tool", "github tool")
-    mcp_pattern = re.compile(r"\b(slack|github|jira|linear|notion)\b.*?tool", re.IGNORECASE)
-    for m in mcp_pattern.finditer(body):
-        tool_name = m.group(1).lower()
-        if tool_name not in seen:
-            tools.append(Tool(name=tool_name, description=f"{tool_name} MCP tool", kind="mcp"))
-            seen.add(tool_name)
+    # --- MCP tools from prose patterns ---
+    # Pattern 1: "`<name>` tool" or "<name> tool" where name is a known MCP service
+    mcp_name_alts = "|".join(re.escape(n) for n in sorted(_KNOWN_MCP_TOOLS))
+    prose_tool_re = re.compile(
+        rf"\b({mcp_name_alts})\b\s*tool", re.IGNORECASE
+    )
+    for m in prose_tool_re.finditer(body):
+        name = m.group(1).lower()
+        if name not in seen:
+            tools.append(Tool(name=name, description=f"{name} MCP tool", kind="mcp"))
+            seen.add(name)
+
+    # Pattern 2: "use `<name>`" or "use the `<name>`"
+    use_backtick_re = re.compile(r"use\s+(?:the\s+)?`([a-z][a-z0-9_-]*)`", re.IGNORECASE)
+    for m in use_backtick_re.finditer(body):
+        name = m.group(1).lower()
+        if name in _KNOWN_MCP_TOOLS and name not in seen:
+            tools.append(Tool(name=name, description=f"{name} MCP tool", kind="mcp"))
+            seen.add(name)
+
+    # Pattern 3: "`<name>` tool" (backtick-quoted)
+    backtick_tool_re = re.compile(r"`([a-z][a-z0-9_-]*)`\s+tool", re.IGNORECASE)
+    for m in backtick_tool_re.finditer(body):
+        name = m.group(1).lower()
+        if name in _KNOWN_MCP_TOOLS and name not in seen:
+            tools.append(Tool(name=name, description=f"{name} MCP tool", kind="mcp"))
+            seen.add(name)
+
+    # Pattern 4: "via `<name>`"
+    via_re = re.compile(r"via\s+`([a-z][a-z0-9_-]*)`", re.IGNORECASE)
+    for m in via_re.finditer(body):
+        name = m.group(1).lower()
+        if name in _KNOWN_MCP_TOOLS and name not in seen:
+            tools.append(Tool(name=name, description=f"{name} MCP tool", kind="mcp"))
+            seen.add(name)
 
     return tools
 
