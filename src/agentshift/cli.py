@@ -147,12 +147,16 @@ def diff(
 
 @app.command()
 def validate(
-    source: str = typer.Argument(help="Path to generated agent config"),
-    target: str = typer.Option(..., help="Target platform to validate against"),
+    source: str = typer.Argument(help="Path to generated agent output directory"),
+    target: str = typer.Option(..., help=f"Target platform: {', '.join(['claude-code', 'copilot', 'bedrock', 'm365', 'vertex'])}"),
+    as_json: bool = typer.Option(False, "--json", help="Emit machine-readable JSON report"),
 ) -> None:
     """Validate a generated config against the target platform's schema."""
-    console.print(f"Validating {source} for {target}")
-    console.print("[yellow]Not yet implemented.[/yellow]")
+    from agentshift.validators import validate_output
+
+    ok = validate_output(Path(source), target, as_json=as_json)
+    if not ok:
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":
