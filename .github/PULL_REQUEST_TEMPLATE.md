@@ -25,7 +25,7 @@
 
 - [ ] OpenClaw
 - [ ] Claude Code
-- [ ] Microsoft Copilot
+- [ ] GitHub Copilot
 - [ ] AWS Bedrock
 - [ ] GCP Vertex AI
 - [ ] None (infrastructure / docs)

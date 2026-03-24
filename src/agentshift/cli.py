@@ -7,11 +7,34 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
+import agentshift
+
 app = typer.Typer(
     name="agentshift",
     help="Convert AI agents between platforms. OpenClaw → Claude Code and more.",
     no_args_is_help=True,
 )
+
+
+def _version_callback(value: bool) -> None:
+    if value:
+        console.print(f"agentshift {agentshift.__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def main(
+    version: bool | None = typer.Option(
+        None,
+        "--version",
+        "-v",
+        callback=_version_callback,
+        is_eager=True,
+        help="Show version and exit.",
+    ),
+) -> None:
+    pass
+
 
 console = Console()
 
