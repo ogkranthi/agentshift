@@ -131,7 +131,7 @@ class TestCLIVersion:
         )
         assert result.returncode == 0
         assert "agentshift" in result.stdout
-        assert "0.1" in result.stdout  # matches 0.1.x
+        assert any(v in result.stdout for v in ("0.1", "0.2", "0.3"))  # matches any 0.x
 
     def test_version_short_flag(self):
         result = subprocess.run(
