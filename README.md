@@ -54,7 +54,7 @@ weather-claude/               weather-copilot/
               ↓
   IR      →  identity · tools · knowledge · triggers · constraints
               ↓
-  Emitter →  Claude Code ✅  |  Copilot ✅  |  Bedrock ✅  |  Vertex AI 🔜
+  Emitter →  Claude Code ✅  |  Copilot ✅  |  Bedrock ✅  |  M365 ✅  |  Vertex AI 🔜
 ```
 
 ## See portability before converting
@@ -80,6 +80,7 @@ Portability                    100%             92%           38%
 | Claude Code | ✅ | ✅ | **Works today** |
 | GitHub Copilot | — | ✅ | **Works today** |
 | AWS Bedrock | — | ✅ | **Works today** |
+| Microsoft 365 Copilot | — | ✅ | **Works today** |
 | GCP Vertex AI | — | — | Coming soon |
 | LangGraph | — | — | Planned |
 | CrewAI | — | — | Planned |
