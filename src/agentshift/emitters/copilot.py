@@ -174,7 +174,7 @@ def _write_readme(ir: AgentIR, output_dir: Path) -> None:
         for name in mcp_names:
             lines += [
                 f'  "{name}": {{',
-                f'    "command": "npx",',
+                '    "command": "npx",',
                 f'    "args": ["-y", "@modelcontextprotocol/server-{name}"]',
                 "  },",
             ]

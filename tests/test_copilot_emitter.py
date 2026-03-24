@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -14,8 +13,6 @@ from agentshift.ir import (
     Metadata,
     Persona,
     Tool,
-    Trigger,
-    TriggerDelivery,
 )
 
 FIXTURES = Path(__file__).parent / "fixtures"
