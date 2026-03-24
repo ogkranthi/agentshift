@@ -120,14 +120,26 @@ def convert(
 
 @app.command()
 def diff(
-    source: str = typer.Argument(help="Path to source agent"),
-    targets: str = typer.Option(
-        "all", help="Comma-separated targets: claude-code,copilot,bedrock,vertex"
-    ),
+    source: Path = typer.Argument(help="Path to source agent directory"),
+    from_platform: str = typer.Option("openclaw", "--from", help="Source platform"),
+    targets: str = typer.Option("all", "--targets", help="Comma-separated targets or 'all'"),
 ) -> None:
     """Show portability matrix — what converts cleanly vs. what needs manual work."""
-    console.print(f"Diffing {source} against {targets}")
-    console.print("[yellow]Not yet implemented.[/yellow]")
+    from agentshift.diff import PLATFORM_SUPPORT, render_diff_table
+
+    parse_fn = _get_parser(from_platform)
+    try:
+        ir = parse_fn(source)
+    except FileNotFoundError as e:
+        console.print(f"[red]Parse error:[/red] {e}")
+        raise typer.Exit(1) from e
+
+    target_list = (
+        list(PLATFORM_SUPPORT.keys())
+        if targets == "all"
+        else [t.strip() for t in targets.split(",")]
+    )
+    render_diff_table(ir, target_list)
 
 
 @app.command()
