@@ -496,3 +496,69 @@ class TestBedrockRealSkills:
         shell_tools = [t for t in ir.tools if t.kind == "shell"]
         for tool in shell_tools:
             assert f"/{tool.name}/run" in schema["paths"]
+
+
+class TestBedrockCloudFormationYAMLValidity:
+    """CloudFormation YAML must parse with CF-aware loader (handles !Ref, !GetAtt)."""
+
+    def _cf_load(self, path):
+        import yaml
+
+        class CFLoader(yaml.SafeLoader):
+            pass
+
+        def cf_constructor(loader, tag_suffix, node):
+            return f"{tag_suffix} {loader.construct_scalar(node)}"
+
+        CFLoader.add_multi_constructor("!", cf_constructor)
+        with open(path) as f:
+            return yaml.load(f, Loader=CFLoader)
+
+    def test_cloudformation_yaml_valid(self, tmp_path):
+        ir = make_simple_ir()
+        emit(ir, tmp_path)
+        data = self._cf_load(tmp_path / "cloudformation.yaml")
+        assert "Resources" in data
+        assert "Parameters" in data
+        assert "Outputs" in data
+
+    def test_cloudformation_has_agent_resource(self, tmp_path):
+        ir = make_simple_ir()
+        emit(ir, tmp_path)
+        data = self._cf_load(tmp_path / "cloudformation.yaml")
+        resources = data["Resources"]
+        agent_keys = [k for k in resources if "Agent" in k and "Alias" not in k]
+        assert len(agent_keys) == 1
+
+    def test_cloudformation_descriptions_no_yaml_colons(self, tmp_path):
+        """Parameter descriptions with colons must be quoted."""
+        ir = make_simple_ir()
+        emit(ir, tmp_path)
+        # If this parses without error, descriptions are properly quoted
+        data = self._cf_load(tmp_path / "cloudformation.yaml")
+        params = data["Parameters"]
+        assert "AgentName" in params
+        assert "Environment" in params
+        assert "AgentRoleArn" in params
+
+    def test_github_skill_cloudformation_valid(self, tmp_path):
+        from agentshift.parsers.openclaw import parse_skill_dir
+
+        skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
+        if not skill.exists():
+            pytest.skip("github skill not installed")
+        ir = parse_skill_dir(skill)
+        emit(ir, tmp_path)
+        data = self._cf_load(tmp_path / "cloudformation.yaml")
+        assert "GithubAgent" in data["Resources"]
+
+    def test_pregnancy_cloudformation_valid(self, tmp_path):
+        from agentshift.parsers.openclaw import parse_skill_dir
+
+        skill = Path.home() / ".openclaw/skills/pregnancy-companion"
+        if not skill.exists():
+            pytest.skip("pregnancy-companion not installed")
+        ir = parse_skill_dir(skill)
+        emit(ir, tmp_path)
+        data = self._cf_load(tmp_path / "cloudformation.yaml")
+        assert "Resources" in data
