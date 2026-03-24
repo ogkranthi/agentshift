@@ -20,6 +20,9 @@
 | A05 | P1 | @architect | in-progress | Document Bedrock agent config + OpenAPI action group format |
 | A06 | P1 | @architect | in-progress | Document Vertex AI Agent Builder config format |
 | A07 | P1 | @architect | in-progress | Write MCP-to-OpenAPI mapping specification |
+| A05 | P1 | @architect | pr-created | Document Bedrock agent config + OpenAPI action group format |
+| A06 | P1 | @architect | pr-created | Document Vertex AI Agent Builder config format |
+| A07 | P1 | @architect | pr-created | Write MCP-to-OpenAPI mapping specification |
 | D01 | P0 | @dev | merged | Set up Python project scaffold (pyproject.toml, src layout, CLI entry point) |
 | D02 | P0 | @dev | merged | Implement IR model as Python dataclasses (based on A01 spec) |
 | D03 | P0 | @dev | merged | Implement OpenClaw parser (SKILL.md → IR) |
