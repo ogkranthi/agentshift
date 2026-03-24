@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AgentShift-generated Bedrock agent — github
+
+Parameters:
+  AgentName:
+    Type: String
+    Default: github
+    Description: Name for the Bedrock agent (default: github)
+  Environment:
+    Type: String
+    Default: prod
+    Description: Deployment environment (e.g. prod, staging)
+  AgentRoleArn:
+    Type: String
+    Description: IAM Role ARN with bedrock:InvokeModel permissions (required)
+
+Resources:
+  GithubAgent:
+    Type: AWS::Bedrock::Agent
+    Properties:
+      AgentName: !Sub "${AgentName}-${Environment}"
+      AgentResourceRoleArn: !Ref AgentRoleArn
+      Description: "GitHub operations via `gh` CLI: issues, PRs, CI runs, code review, API queries. Use when: (1) checking PR status or CI, (2) creating/commenting on issues, (3) listing/filtering PRs or issues, (4) view"
+      Instruction: "# GitHub Skill\n\nUse the `gh` CLI to interact with GitHub repositories, issues, PRs, and CI.\n\n## When to Use\n\n✅ **USE this skill when:**\n\n- Checking PR status, reviews, or merge readiness\n- Viewing CI/workflow run status and logs\n- Creating, closing, or commenting on issues\n- Creating or merging pull requests\n- Querying GitHub API for repository data\n- Listing repos, releases, or collaborators\n\n## When NOT to Use\n\n❌ **DON'T use this skill when:**\n\n- Local git operations (commit, push, pull, branch) → use `git` directly\n- Non-GitHub repos (GitLab, Bitbucket, self-hosted) → different CLIs\n- Cloning repositories → use `git clone`\n- Reviewing actual code changes → use `coding-agent` skill\n- Complex multi-file diffs → use `coding-agent` or read files directly\n\n## Setup\n\n```bash\n# Authenticate (one-time)\ngh auth login\n\n# Verify\ngh auth status\n```\n\n## Common Commands\n\n### Pull Requests\n\n```bash\n# List PRs\ngh pr list --repo owner/repo\n\n# Check CI status\ngh pr checks 55 --repo owner/repo\n\n# View PR details\ngh pr view 55 --repo owner/repo\n\n# Create PR\ngh pr create --title \"feat: add feature\" --body \"Description\"\n\n# Merge PR\ngh pr merge 55 --squash --repo owner/repo\n```\n\n### Issues\n\n```bash\n# List issues\ngh issue list --repo owner/repo --state open\n\n# Create issue\ngh issue create --title \"Bug: something broken\" --body \"Details...\"\n\n# Close issue\ngh issue close 42 --repo owner/repo\n```\n\n### CI/Workflow Runs\n\n```bash\n# List recent runs\ngh run list --repo owner/repo --limit 10\n\n# View specific run\ngh run view <run-id> --repo owner/repo\n\n# View failed step logs only\ngh run view <run-id> --repo owner/repo --log-failed\n\n# Re-run failed jobs\ngh run rerun <run-id> --failed --repo owner/repo\n```\n\n### API Queries\n\n```bash\n# Get PR with specific fields\ngh api repos/owner/repo/pulls/55 --jq '.title, .state, .user.login'\n\n# List all labels\ngh api repos/owner/repo/labels --jq '.[].name'\n\n# Get repo stats\ngh api repos/owner/repo --jq '{stars: .stargazers_count, forks: .forks_count}'\n```\n\n## JSON Output\n\nMost commands support `--json` for structured output with `--jq` filtering:\n\n```bash\ngh issue list --repo owner/repo --json number,title --jq '.[] | \"\\(.number): \\(.title)\"'\ngh pr list --json number,title,state,mergeable --jq '.[] | select(.mergeable == \"MERGEABLE\")'\n```\n\n## Templates\n\n### PR Review Summary\n\n```bash\n# Get PR overview for review\nPR=55 REPO=owner/repo\necho \"## PR #$PR Summary\"\ngh pr view $PR --repo $REPO --json title,body,author,additions,deletions,changedFiles \\\n  --jq '\"**\\(.title)** by @\\(.author.login)\\n\\n\\(.body)\\n\\n📊 +\\(.additions) -\\(.deletions) across \\(.changedFiles) files\"'\ngh pr checks $PR --repo $REPO\n```\n\n### Issue Triage\n\n```bash\n# Quick issue triage view\ngh issue list --repo owner/repo --state open --json number,title,labels,createdAt \\\n  --jq '.[] | \"[\\(.number)] \\(.title) - \\([.labels[].name] | join(\", \")) (\\(.createdAt[:10]))\"'\n```\n\n## Notes\n\n- Always specify `--repo owner/repo` when not in a git directory\n- Use URLs directly: `gh pr view https://github.com/owner/repo/pull/55`\n- Rate limits apply; use `gh api --cache 1h` for repeated queries"
+      FoundationModel: anthropic.claude-3-5-sonnet-20241022-v2:0
+      IdleSessionTTLInSeconds: 1800
+      AutoPrepare: true
+      ActionGroups:
+        - ActionGroupName: github-gh
+          Description: >-
+            Run gh commands
+          ActionGroupExecutor:
+            Lambda: arn:aws:lambda:us-east-1:123456789012:function:github-gh-handler  # TODO [agentshift]: Replace with real Lambda ARN for tool 'gh'
+          ActionGroupState: ENABLED
+          # TODO [agentshift]: Shell tool 'gh' has no native Bedrock equivalent.
+          # Implement this tool's logic in the action group Lambda above.
+        - ActionGroupName: github-git
+          Description: >-
+            Run git commands
+          ActionGroupExecutor:
+            Lambda: arn:aws:lambda:us-east-1:123456789012:function:github-git-handler  # TODO [agentshift]: Replace with real Lambda ARN for tool 'git'
+          ActionGroupState: ENABLED
+          # TODO [agentshift]: Shell tool 'git' has no native Bedrock equivalent.
+          # Implement this tool's logic in the action group Lambda above.
+
+  GithubAgentAlias:
+    Type: AWS::Bedrock::AgentAlias
+    Properties:
+      AgentId: !GetAtt GithubAgent.AgentId
+      AgentAliasName: live
+      Description: Production alias (managed by AgentShift)
+
+Outputs:
+  AgentId:
+    Value: !GetAtt GithubAgent.AgentId
+    Description: The Bedrock Agent ID
+  AgentArn:
+    Value: !GetAtt GithubAgent.AgentArn
+    Description: The Bedrock Agent ARN
+  AliasId:
+    Value: !GetAtt GithubAgentAlias.AgentAliasId
+    Description: The Bedrock Agent Alias ID

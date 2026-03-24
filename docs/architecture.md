@@ -98,12 +98,34 @@ Full schema: [`specs/ir-schema.json`](../specs/ir-schema.json)
 |---|---|---|---|---|---|
 | `name` | `SKILL.md` frontmatter `name` | `CLAUDE.md` H1 | `name` in frontmatter | agent name | display name |
 | `description` | `SKILL.md` frontmatter `description` | First paragraph | `description` in frontmatter | description | description |
-| `persona.system_prompt` | `SKILL.md` body | `CLAUDE.md` body | agent body | instruction field | instruction |
-| `tools[shell]` | `metadata.openclaw.requires.bins` | `Bash(<bin>:*)` in `settings.json` | `execute/runInTerminal` | action group | tool config |
-| `tools[mcp]` | `TOOLS.md` MCP entries | `mcp__<name>__*` in `settings.json` | manual MCP config in VS Code | — | — |
-| `knowledge[file]` | `knowledge/` directory | `Read(<path>)` permission | `read/readFile` tool | knowledge base | data store |
-| `triggers[cron]` | `jobs.json` schedule | Cloud Scheduled Tasks | ❌ not supported | EventBridge | Cloud Scheduler |
+| `persona.system_prompt` | `SKILL.md` body | `CLAUDE.md` body | agent body | `instruction.txt` (≤4,000 chars) | instruction |
+| `tools[shell]` | `metadata.openclaw.requires.bins` | `Bash(<bin>:*)` in `settings.json` | `execute/runInTerminal` | Lambda action group (stub) | tool config |
+| `tools[mcp]` | `TOOLS.md` MCP entries | `mcp__<name>__*` in `settings.json` | manual MCP config in VS Code | action group (stub) | — |
+| `knowledge[file]` | `knowledge/` directory | `Read(<path>)` permission | `read/readFile` tool | S3 knowledge base (stub) | data store |
+| `triggers[cron]` | `jobs.json` schedule | Cloud Scheduled Tasks | ❌ not supported | EventBridge rule (stub) | Cloud Scheduler |
 | `constraints.supported_os` | `metadata.openclaw.os` | `settings.json` `supportedOs` | — | — | — |
+
+---
+
+## Adding AWS Bedrock
+
+The Bedrock emitter produces three files:
+
+```
+github-bedrock/
+├── instruction.txt        ← system prompt (≤4,000 chars, Bedrock instruction field)
+├── instruction-full.txt   ← only written if the prompt was truncated
+├── openapi.json           ← OpenAPI 3.0 action group schema for each tool
+├── cloudformation.yaml    ← full CF template (Agent + Alias + ActionGroups)
+└── README.md              ← prerequisites + deploy command
+```
+
+| File | Purpose |
+|---|---|
+| `instruction.txt` | Pasted directly into the Bedrock Agent instruction field |
+| `openapi.json` | Defines the action group API — one operation per shell tool |
+| `cloudformation.yaml` | End-to-end infrastructure: Agent, Alias, ActionGroup, IAM role |
+| `README.md` | Step-by-step deploy instructions for the converted skill |
 
 ---
 

@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AgentShift-generated Bedrock agent — weather
+
+Parameters:
+  AgentName:
+    Type: String
+    Default: weather
+    Description: Name for the Bedrock agent (default: weather)
+  Environment:
+    Type: String
+    Default: prod
+    Description: Deployment environment (e.g. prod, staging)
+  AgentRoleArn:
+    Type: String
+    Description: IAM Role ARN with bedrock:InvokeModel permissions (required)
+
+Resources:
+  WeatherAgent:
+    Type: AWS::Bedrock::Agent
+    Properties:
+      AgentName: !Sub "${AgentName}-${Environment}"
+      AgentResourceRoleArn: !Ref AgentRoleArn
+      Description: "Get current weather and forecasts via wttr.in or Open-Meteo. Use when: user asks about weather, temperature, or forecasts for any location. NOT for: historical weather data, severe weather alerts, or "
+      Instruction: "# Weather Skill\n\nGet current weather conditions and forecasts.\n\n## When to Use\n\n✅ **USE this skill when:**\n\n- \"What's the weather?\"\n- \"Will it rain today/tomorrow?\"\n- \"Temperature in [city]\"\n- \"Weather forecast for the week\"\n- Travel planning weather checks\n\n## When NOT to Use\n\n❌ **DON'T use this skill when:**\n\n- Historical weather data → use weather archives/APIs\n- Climate analysis or trends → use specialized data sources\n- Hyper-local microclimate data → use local sensors\n- Severe weather alerts → check official NWS sources\n- Aviation/marine weather → use specialized services (METAR, etc.)\n\n## Location\n\nAlways include a city, region, or airport code in weather queries.\n\n## Commands\n\n### Current Weather\n\n```bash\n# One-line summary\ncurl \"wttr.in/London?format=3\"\n\n# Detailed current conditions\ncurl \"wttr.in/London?0\"\n\n# Specific city\ncurl \"wttr.in/New+York?format=3\"\n```\n\n### Forecasts\n\n```bash\n# 3-day forecast\ncurl \"wttr.in/London\"\n\n# Week forecast\ncurl \"wttr.in/London?format=v2\"\n\n# Specific day (0=today, 1=tomorrow, 2=day after)\ncurl \"wttr.in/London?1\"\n```\n\n### Format Options\n\n```bash\n# One-liner\ncurl \"wttr.in/London?format=%l:+%c+%t+%w\"\n\n# JSON output\ncurl \"wttr.in/London?format=j1\"\n\n# PNG image\ncurl \"wttr.in/London.png\"\n```\n\n### Format Codes\n\n- `%c` — Weather condition emoji\n- `%t` — Temperature\n- `%f` — \"Feels like\"\n- `%w` — Wind\n- `%h` — Humidity\n- `%p` — Precipitation\n- `%l` — Location\n\n## Quick Responses\n\n**\"What's the weather?\"**\n\n```bash\ncurl -s \"wttr.in/London?format=%l:+%c+%t+(feels+like+%f),+%w+wind,+%h+humidity\"\n```\n\n**\"Will it rain?\"**\n\n```bash\ncurl -s \"wttr.in/London?format=%l:+%c+%p\"\n```\n\n**\"Weekend forecast\"**\n\n```bash\ncurl \"wttr.in/London?format=v2\"\n```\n\n## Notes\n\n- No API key needed (uses wttr.in)\n- Rate limited; don't spam requests\n- Works for most global cities\n- Supports airport codes: `curl wttr.in/ORD`"
+      FoundationModel: anthropic.claude-3-5-sonnet-20241022-v2:0
+      IdleSessionTTLInSeconds: 1800
+      AutoPrepare: true
+      ActionGroups:
+        - ActionGroupName: weather-curl
+          Description: >-
+            Run curl commands
+          ActionGroupExecutor:
+            Lambda: arn:aws:lambda:us-east-1:123456789012:function:weather-curl-handler  # TODO [agentshift]: Replace with real Lambda ARN for tool 'curl'
+          ActionGroupState: ENABLED
+          # TODO [agentshift]: Shell tool 'curl' has no native Bedrock equivalent.
+          # Implement this tool's logic in the action group Lambda above.
+
+  WeatherAgentAlias:
+    Type: AWS::Bedrock::AgentAlias
+    Properties:
+      AgentId: !GetAtt WeatherAgent.AgentId
+      AgentAliasName: live
+      Description: Production alias (managed by AgentShift)
+
+Outputs:
+  AgentId:
+    Value: !GetAtt WeatherAgent.AgentId
+    Description: The Bedrock Agent ID
+  AgentArn:
+    Value: !GetAtt WeatherAgent.AgentArn
+    Description: The Bedrock Agent ARN
+  AliasId:
+    Value: !GetAtt WeatherAgentAlias.AgentAliasId
+    Description: The Bedrock Agent Alias ID

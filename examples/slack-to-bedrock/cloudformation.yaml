@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AgentShift-generated Bedrock agent — slack
+
+Parameters:
+  AgentName:
+    Type: String
+    Default: slack
+    Description: Name for the Bedrock agent (default: slack)
+  Environment:
+    Type: String
+    Default: prod
+    Description: Deployment environment (e.g. prod, staging)
+  AgentRoleArn:
+    Type: String
+    Description: IAM Role ARN with bedrock:InvokeModel permissions (required)
+
+Resources:
+  SlackAgent:
+    Type: AWS::Bedrock::Agent
+    Properties:
+      AgentName: !Sub "${AgentName}-${Environment}"
+      AgentResourceRoleArn: !Ref AgentRoleArn
+      Description: "Use when you need to control Slack from OpenClaw via the slack tool, including reacting to messages or pinning/unpinning items in Slack channels or DMs."
+      Instruction: "# Slack Actions\n\n## Overview\n\nUse `slack` to react, manage pins, send/edit/delete messages, and fetch member info. The tool uses the bot token configured for OpenClaw.\n\n## Inputs to collect\n\n- `channelId` and `messageId` (Slack message timestamp, e.g. `1712023032.1234`).\n- For reactions, an `emoji` (Unicode or `:name:`).\n- For message sends, a `to` target (`channel:<id>` or `user:<id>`) and `content`.\n\nMessage context lines include `slack message id` and `channel` fields you can reuse directly.\n\n## Actions\n\n### Action groups\n\n| Action group | Default | Notes                  |\n| ------------ | ------- | ---------------------- |\n| reactions    | enabled | React + list reactions |\n| messages     | enabled | Read/send/edit/delete  |\n| pins         | enabled | Pin/unpin/list         |\n| memberInfo   | enabled | Member info            |\n| emojiList    | enabled | Custom emoji list      |\n\n### React to a message\n\n```json\n{\n  \"action\": \"react\",\n  \"channelId\": \"C123\",\n  \"messageId\": \"1712023032.1234\",\n  \"emoji\": \"✅\"\n}\n```\n\n### List reactions\n\n```json\n{\n  \"action\": \"reactions\",\n  \"channelId\": \"C123\",\n  \"messageId\": \"1712023032.1234\"\n}\n```\n\n### Send a message\n\n```json\n{\n  \"action\": \"sendMessage\",\n  \"to\": \"channel:C123\",\n  \"content\": \"Hello from OpenClaw\"\n}\n```\n\n### Edit a message\n\n```json\n{\n  \"action\": \"editMessage\",\n  \"channelId\": \"C123\",\n  \"messageId\": \"1712023032.1234\",\n  \"content\": \"Updated text\"\n}\n```\n\n### Delete a message\n\n```json\n{\n  \"action\": \"deleteMessage\",\n  \"channelId\": \"C123\",\n  \"messageId\": \"1712023032.1234\"\n}\n```\n\n### Read recent messages\n\n```json\n{\n  \"action\": \"readMessages\",\n  \"channelId\": \"C123\",\n  \"limit\": 20\n}\n```\n\n### Pin a message\n\n```json\n{\n  \"action\": \"pinMessage\",\n  \"channelId\": \"C123\",\n  \"messageId\": \"1712023032.1234\"\n}\n```\n\n### Unpin a message\n\n```json\n{\n  \"action\": \"unpinMessage\",\n  \"channelId\": \"C123\",\n  \"messageId\": \"1712023032.1234\"\n}\n```\n\n### List pinned items\n\n```json\n{\n  \"action\": \"listPins\",\n  \"channelId\": \"C123\"\n}\n```\n\n### Member info\n\n```json\n{\n  \"action\": \"memberInfo\",\n  \"userId\": \"U123\"\n}\n```\n\n### Emoji list\n\n```json\n{\n  \"action\": \"emojiList\"\n}\n```\n\n## Ideas to try\n\n- React with ✅ to mark completed tasks.\n- Pin key decisions or weekly status updates."
+      FoundationModel: anthropic.claude-3-5-sonnet-20241022-v2:0
+      IdleSessionTTLInSeconds: 1800
+      AutoPrepare: true
+      ActionGroups:
+        - ActionGroupName: slack-slack
+          Description: >-
+            slack MCP tool
+          ActionGroupExecutor:
+            Lambda: arn:aws:lambda:us-east-1:123456789012:function:slack-slack-handler  # TODO [agentshift]: Replace with real Lambda ARN for tool 'slack'
+          ActionGroupState: ENABLED
+          # TODO [agentshift]: MCP tool 'slack' has no Bedrock equivalent.
+          # Implement this functionality in the action group Lambda or remove it.
+          # Original IR tool: name=slack, kind=mcp, description='slack MCP tool'
+
+  SlackAgentAlias:
+    Type: AWS::Bedrock::AgentAlias
+    Properties:
+      AgentId: !GetAtt SlackAgent.AgentId
+      AgentAliasName: live
+      Description: Production alias (managed by AgentShift)
+
+Outputs:
+  AgentId:
+    Value: !GetAtt SlackAgent.AgentId
+    Description: The Bedrock Agent ID
+  AgentArn:
+    Value: !GetAtt SlackAgent.AgentArn
+    Description: The Bedrock Agent ARN
+  AliasId:
+    Value: !GetAtt SlackAgentAlias.AgentAliasId
+    Description: The Bedrock Agent Alias ID

@@ -1,0 +1,60 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "slack Actions",
+    "description": "Action group schema for the slack Bedrock agent.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/slack/action": {
+      "post": {
+        "operationId": "slack_action",
+        "description": "slack MCP tool",
+        "x-agentshift-stub": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "description": "The slack action to invoke."
+                  },
+                  "params": {
+                    "type": "object",
+                    "description": "Parameters for the action."
+                  }
+                },
+                "required": [
+                  "action"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Action result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

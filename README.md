@@ -11,7 +11,7 @@
 
 ---
 
-Your OpenClaw skill shouldn't be locked to one platform. **AgentShift converts it to Claude Code, GitHub Copilot, and more.**
+Your OpenClaw skill shouldn't be locked to one platform. **AgentShift converts it to Claude Code, GitHub Copilot, AWS Bedrock, and more.**
 
 ## Install
 
@@ -32,6 +32,13 @@ agentshift convert ~/.openclaw/skills/weather --from openclaw --to claude-code -
 
 # → GitHub Copilot
 agentshift convert ~/.openclaw/skills/weather --from openclaw --to copilot --output ./weather-copilot
+
+# → AWS Bedrock
+agentshift convert ~/.openclaw/skills/weather --from openclaw --to bedrock --output ./weather-bedrock
+
+# Convert to ALL supported targets at once
+agentshift convert ~/.openclaw/skills/weather --from openclaw --to all --output ./weather-all
+# → weather-all/claude-code/  weather-all/copilot/  weather-all/bedrock/
 ```
 
 ```
@@ -47,7 +54,22 @@ weather-claude/               weather-copilot/
               ↓
   IR      →  identity · tools · knowledge · triggers · constraints
               ↓
-  Emitter →  Claude Code ✅  |  Copilot ✅  |  Bedrock 🔜  |  Vertex AI 🔜
+  Emitter →  Claude Code ✅  |  Copilot ✅  |  Bedrock ✅  |  Vertex AI 🔜
+```
+
+## See portability before converting
+
+```bash
+agentshift diff ~/.openclaw/skills/github --from openclaw
+```
+
+```
+Component          Source    claude-code      copilot        bedrock
+─────────────────────────────────────────────────────────────────────
+Instructions         ✅       ✅ 100%         ✅ 100%      ✅ 100%
+Tools (shell: 2)     ✅    ✅ Bash(bin:*)   ✅ terminal   ⚠️  Lambda*
+─────────────────────────────────────────────────────────────────────
+Portability                    100%             92%           38%
 ```
 
 ## Supported platforms
@@ -57,7 +79,7 @@ weather-claude/               weather-copilot/
 | OpenClaw | ✅ | ✅ | **Works today** |
 | Claude Code | ✅ | ✅ | **Works today** |
 | GitHub Copilot | — | ✅ | **Works today** |
-| AWS Bedrock | — | — | Coming soon |
+| AWS Bedrock | — | ✅ | **Works today** |
 | GCP Vertex AI | — | — | Coming soon |
 | LangGraph | — | — | Planned |
 | CrewAI | — | — | Planned |
@@ -68,6 +90,7 @@ weather-claude/               weather-copilot/
 |---|---|---|
 | Claude Code | [docs/claude-code.md](docs/claude-code.md) | [examples/weather-to-claude-code](examples/weather-to-claude-code/) |
 | GitHub Copilot | [docs/copilot.md](docs/copilot.md) | [examples/github-to-copilot](examples/github-to-copilot/) |
+| **AWS Bedrock** | **[docs/bedrock.md](docs/bedrock.md)** | **[examples/github-to-bedrock](examples/github-to-bedrock/)** |
 | Architecture | [docs/architecture.md](docs/architecture.md) | — |
 
 ## Contributing
