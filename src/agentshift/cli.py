@@ -148,7 +148,10 @@ def diff(
 @app.command()
 def validate(
     source: str = typer.Argument(help="Path to generated agent output directory"),
-    target: str = typer.Option(..., help=f"Target platform: {', '.join(['claude-code', 'copilot', 'bedrock', 'm365', 'vertex'])}"),
+    target: str = typer.Option(
+        ...,
+        help=f"Target platform: {', '.join(['claude-code', 'copilot', 'bedrock', 'm365', 'vertex'])}",
+    ),
     as_json: bool = typer.Option(False, "--json", help="Emit machine-readable JSON report"),
 ) -> None:
     """Validate a generated config against the target platform's schema."""

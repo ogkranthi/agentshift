@@ -21,12 +21,16 @@ AGENTSHIFT = [str(_VENV_BIN)] if _VENV_BIN.exists() else [sys.executable, "-m", 
 # ---------------------------------------------------------------------------
 
 
-def run_validate(output_dir: Path, target: str, extra: list[str] | None = None) -> subprocess.CompletedProcess[str]:
+def run_validate(
+    output_dir: Path, target: str, extra: list[str] | None = None
+) -> subprocess.CompletedProcess[str]:
     cmd = [*AGENTSHIFT, "validate", str(output_dir), "--target", target, *(extra or [])]
     return subprocess.run(cmd, capture_output=True, text=True)
 
 
-def make_claude_code_dir(tmp_path: Path, *, claude_md: str = "# Agent\nDo stuff.", settings: dict | None = None) -> Path:
+def make_claude_code_dir(
+    tmp_path: Path, *, claude_md: str = "# Agent\nDo stuff.", settings: dict | None = None
+) -> Path:
     (tmp_path / "CLAUDE.md").write_text(claude_md, encoding="utf-8")
     if settings is None:
         settings = {"permissions": {"allow": ["Bash(git:*)"], "deny": []}}
@@ -34,7 +38,9 @@ def make_claude_code_dir(tmp_path: Path, *, claude_md: str = "# Agent\nDo stuff.
     return tmp_path
 
 
-def make_copilot_dir(tmp_path: Path, *, frontmatter: dict | None = None, name: str = "myagent") -> Path:
+def make_copilot_dir(
+    tmp_path: Path, *, frontmatter: dict | None = None, name: str = "myagent"
+) -> Path:
     if frontmatter is None:
         frontmatter = {
             "name": "My Agent",
@@ -48,7 +54,9 @@ def make_copilot_dir(tmp_path: Path, *, frontmatter: dict | None = None, name: s
     return tmp_path
 
 
-def make_bedrock_dir(tmp_path: Path, instruction: str = "Be helpful.", extra_cf: dict | None = None) -> Path:
+def make_bedrock_dir(
+    tmp_path: Path, instruction: str = "Be helpful.", extra_cf: dict | None = None
+) -> Path:
     (tmp_path / "instruction.txt").write_text(instruction, encoding="utf-8")
     openapi = {"openapi": "3.0.0", "info": {"title": "Agent", "version": "1.0"}, "paths": {}}
     (tmp_path / "openapi.json").write_text(json.dumps(openapi), encoding="utf-8")
@@ -240,7 +248,10 @@ class TestBedrockValidator:
 
     def test_no_bedrock_agent_resource_fails(self, tmp_path):
         make_bedrock_dir(tmp_path)
-        cf = {"AWSTemplateFormatVersion": "2010-09-09", "Resources": {"MyBucket": {"Type": "AWS::S3::Bucket"}}}
+        cf = {
+            "AWSTemplateFormatVersion": "2010-09-09",
+            "Resources": {"MyBucket": {"Type": "AWS::S3::Bucket"}},
+        }
         (tmp_path / "cloudformation.yaml").write_text(yaml.dump(cf), encoding="utf-8")
         report = run_validation(tmp_path, "bedrock")
         assert not report.ok
@@ -276,7 +287,9 @@ class TestM365Validator:
 
     def test_manifest_missing_copilot_agents_fails(self, tmp_path):
         make_m365_dir(tmp_path)
-        (tmp_path / "manifest.json").write_text(json.dumps({"manifestVersion": "1.0"}), encoding="utf-8")
+        (tmp_path / "manifest.json").write_text(
+            json.dumps({"manifestVersion": "1.0"}), encoding="utf-8"
+        )
         report = run_validation(tmp_path, "m365")
         assert not report.ok
 

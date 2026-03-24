@@ -300,9 +300,7 @@ def _validate_bedrock(output_dir: Path) -> ValidationReport:
                 if isinstance(v, dict) and v.get("Type") == "AWS::Bedrock::Agent"
             ]
             if bedrock_agents:
-                report.checks.append(
-                    CheckResult("Resources has AWS::Bedrock::Agent", True, "")
-                )
+                report.checks.append(CheckResult("Resources has AWS::Bedrock::Agent", True, ""))
             else:
                 report.checks.append(
                     CheckResult(
@@ -335,23 +333,17 @@ def _validate_m365(output_dir: Path) -> ValidationReport:
             report.checks.append(CheckResult("declarative-agent.json valid JSON", True, ""))
         except json.JSONDecodeError as e:
             report.checks.append(
-                CheckResult(
-                    "declarative-agent.json valid JSON", False, f"JSON parse error: {e}"
-                )
+                CheckResult("declarative-agent.json valid JSON", False, f"JSON parse error: {e}")
             )
     else:
         report.checks.append(
-            CheckResult(
-                "declarative-agent.json exists", False, "declarative-agent.json not found"
-            )
+            CheckResult("declarative-agent.json exists", False, "declarative-agent.json not found")
         )
 
     if da is not None:
         for key in ("$schema", "version", "name", "description", "instructions"):
             if key in da:
-                report.checks.append(
-                    CheckResult(f"declarative-agent.json has '{key}'", True, "")
-                )
+                report.checks.append(CheckResult(f"declarative-agent.json has '{key}'", True, ""))
             else:
                 report.checks.append(
                     CheckResult(
@@ -363,9 +355,7 @@ def _validate_m365(output_dir: Path) -> ValidationReport:
 
         instructions = da.get("instructions", "")
         if isinstance(instructions, str) and len(instructions) <= 8000:
-            report.checks.append(
-                CheckResult("instructions length <= 8000", True, "")
-            )
+            report.checks.append(CheckResult("instructions length <= 8000", True, ""))
         elif isinstance(instructions, str):
             report.checks.append(
                 CheckResult(
@@ -387,9 +377,7 @@ def _validate_m365(output_dir: Path) -> ValidationReport:
                 CheckResult("manifest.json valid JSON", False, f"JSON parse error: {e}")
             )
     else:
-        report.checks.append(
-            CheckResult("manifest.json exists", False, "manifest.json not found")
-        )
+        report.checks.append(CheckResult("manifest.json exists", False, "manifest.json not found"))
 
     if manifest is not None:
         if "copilotAgents" in manifest:
@@ -495,9 +483,7 @@ def run_validation(output_dir: Path, platform: str) -> ValidationReport:
     """Run platform-specific validation and return a ValidationReport."""
     platform = platform.lower()
     if platform not in _VALIDATORS:
-        raise ValueError(
-            f"Unknown platform: {platform!r}. Supported: {', '.join(_VALIDATORS)}"
-        )
+        raise ValueError(f"Unknown platform: {platform!r}. Supported: {', '.join(_VALIDATORS)}")
     return _VALIDATORS[platform](output_dir)
 
 
