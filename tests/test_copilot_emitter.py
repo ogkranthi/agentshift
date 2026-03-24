@@ -8,7 +8,15 @@ from pathlib import Path
 import pytest
 
 from agentshift.emitters.copilot import emit
-from agentshift.ir import AgentIR, KnowledgeSource, Metadata, Persona, Tool, Trigger, TriggerDelivery
+from agentshift.ir import (
+    AgentIR,
+    KnowledgeSource,
+    Metadata,
+    Persona,
+    Tool,
+    Trigger,
+    TriggerDelivery,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -87,9 +95,13 @@ class TestCopilotEmitterTools:
         assert "slack" in content
 
     def test_knowledge_adds_read_file(self, tmp_path):
-        ir = make_simple_ir(knowledge=[
-            KnowledgeSource(name="guide", kind="file", path="~/.openclaw/skills/x/knowledge/guide.md")
-        ])
+        ir = make_simple_ir(
+            knowledge=[
+                KnowledgeSource(
+                    name="guide", kind="file", path="~/.openclaw/skills/x/knowledge/guide.md"
+                )
+            ]
+        )
         emit(ir, tmp_path)
         content = (tmp_path / "test-skill.agent.md").read_text()
         assert "read/readFile" in content
@@ -137,6 +149,7 @@ class TestCopilotEmitterReadme:
 class TestCopilotEmitterRealSkills:
     def test_github_skill_converts(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
+
         skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
         if not skill.exists():
             pytest.skip("github skill not installed")
@@ -148,6 +161,7 @@ class TestCopilotEmitterRealSkills:
 
     def test_slack_skill_converts(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
+
         skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/slack"
         if not skill.exists():
             pytest.skip("slack skill not installed")
@@ -158,6 +172,7 @@ class TestCopilotEmitterRealSkills:
 
     def test_weather_skill_converts(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
+
         skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/weather"
         if not skill.exists():
             pytest.skip("weather skill not installed")

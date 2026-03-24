@@ -174,34 +174,87 @@ def _extract_triggers(skill_dir: Path, agent_name: str) -> list[Trigger]:
                 account_id=account_id,
             )
 
-        triggers.append(Trigger(
-            id=job_id,
-            kind="cron",
-            cron_expr=cron_expr,
-            message=message,
-            session_target=session_target,
-            delivery=delivery,
-            enabled=True,
-        ))
+        triggers.append(
+            Trigger(
+                id=job_id,
+                kind="cron",
+                cron_expr=cron_expr,
+                message=message,
+                session_target=session_target,
+                delivery=delivery,
+                enabled=True,
+            )
+        )
 
     return triggers
 
 
 _SHELL_BUILTINS: frozenset[str] = frozenset(
     [
-        "if", "for", "while", "until", "do", "done", "then", "else", "elif",
-        "fi", "case", "esac", "function", "return", "exit", "break", "continue",
-        "echo", "export", "cd", "source", ".", "set", "read", "local", "declare",
-        "typeset", "eval", "exec", "test", "true", "false", "[", "[[", "]]", "]",
-        "shift", "unset", "wait", "trap", "printf", "type", "alias", "unalias",
-        "let", "select", "time", "in",
+        "if",
+        "for",
+        "while",
+        "until",
+        "do",
+        "done",
+        "then",
+        "else",
+        "elif",
+        "fi",
+        "case",
+        "esac",
+        "function",
+        "return",
+        "exit",
+        "break",
+        "continue",
+        "echo",
+        "export",
+        "cd",
+        "source",
+        ".",
+        "set",
+        "read",
+        "local",
+        "declare",
+        "typeset",
+        "eval",
+        "exec",
+        "test",
+        "true",
+        "false",
+        "[",
+        "[[",
+        "]]",
+        "]",
+        "shift",
+        "unset",
+        "wait",
+        "trap",
+        "printf",
+        "type",
+        "alias",
+        "unalias",
+        "let",
+        "select",
+        "time",
+        "in",
     ]
 )
 
 _KNOWN_MCP_TOOLS: frozenset[str] = frozenset(
     [
-        "slack", "github", "notion", "discord", "trello", "linear", "jira",
-        "asana", "figma", "zoom", "calendar",
+        "slack",
+        "github",
+        "notion",
+        "discord",
+        "trello",
+        "linear",
+        "jira",
+        "asana",
+        "figma",
+        "zoom",
+        "calendar",
     ]
 )
 
@@ -267,9 +320,7 @@ def _extract_tools(body: str) -> list[Tool]:
     # --- MCP tools from prose patterns ---
     # Pattern 1: "`<name>` tool" or "<name> tool" where name is a known MCP service
     mcp_name_alts = "|".join(re.escape(n) for n in sorted(_KNOWN_MCP_TOOLS))
-    prose_tool_re = re.compile(
-        rf"\b({mcp_name_alts})\b\s*tool", re.IGNORECASE
-    )
+    prose_tool_re = re.compile(rf"\b({mcp_name_alts})\b\s*tool", re.IGNORECASE)
     for m in prose_tool_re.finditer(body):
         name = m.group(1).lower()
         if name not in seen:
@@ -310,11 +361,13 @@ def _extract_tools(body: str) -> list[Tool]:
             for cm in channel_re.finditer(block):
                 channel_name = cm.group(1).lower()
                 if channel_name not in seen:
-                    tools.append(Tool(
-                        name=channel_name,
-                        description=f"{channel_name} messaging channel (OpenClaw message tool)",
-                        kind="mcp",
-                    ))
+                    tools.append(
+                        Tool(
+                            name=channel_name,
+                            description=f"{channel_name} messaging channel (OpenClaw message tool)",
+                            kind="mcp",
+                        )
+                    )
                     seen.add(channel_name)
 
     # --- Prose backtick CLI extraction ---

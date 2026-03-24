@@ -165,7 +165,9 @@ def _write_schedules_md(ir: AgentIR, output_dir: Path) -> None:
         lines.append("```")
         lines.append("# In any Claude Code session:")
         if trigger.cron_expr:
-            lines.append(f"/schedule cron({trigger.cron_expr}) {(trigger.message or '').splitlines()[0][:80]}")
+            lines.append(
+                f"/schedule cron({trigger.cron_expr}) {(trigger.message or '').splitlines()[0][:80]}"
+            )
         lines.append("# Or visit: https://claude.ai/code/scheduled → New scheduled task")
         lines.append("```")
         lines.append("")
