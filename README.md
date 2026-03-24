@@ -2,6 +2,7 @@
 <p align="center"><em>Convert AI agents between platforms. Define once, run anywhere.</em></p>
 
 <p align="center">
+  <a href="https://agentshift.sh"><img src="https://img.shields.io/badge/website-agentshift.sh-blue" alt="Website"></a>
   <a href="https://github.com/ogkranthi/agentshift/actions"><img src="https://github.com/ogkranthi/agentshift/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://pypi.org/project/agentshift/"><img src="https://img.shields.io/pypi/v/agentshift" alt="PyPI version"></a>
   <a href="https://pypi.org/project/agentshift/"><img src="https://img.shields.io/pypi/pyversions/agentshift" alt="Python versions"></a>

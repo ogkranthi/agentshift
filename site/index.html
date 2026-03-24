@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentShift — Convert AI Agents Between Platforms</title>
+  <meta name="description" content="Define your AI agent once, run it anywhere. AgentShift converts agents between OpenClaw, Claude Code, GitHub Copilot, AWS Bedrock, and GCP Vertex AI.">
+  <meta property="og:title" content="AgentShift — Convert AI Agents Between Platforms">
+  <meta property="og:description" content="Define your AI agent once, run it anywhere. CLI transpiler for AI agent portability.">
+  <meta property="og:url" content="https://agentshift.sh">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">AgentShift</a>
+      <div class="nav-links">
+        <a href="#platforms">Platforms</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="https://github.com/ogkranthi/agentshift" target="_blank">GitHub</a>
+        <a href="https://github.com/ogkranthi/agentshift/blob/main/CONTRIBUTING.md" target="_blank">Contribute</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-badge">Open Source &middot; Apache 2.0</div>
+    <h1>Define once,<br>run <span class="highlight">anywhere</span>.</h1>
+    <p class="hero-sub">AgentShift converts AI agents between platforms.<br>Your OpenClaw skill shouldn't be locked to one ecosystem.</p>
+    <div class="hero-install">
+      <code>pip install agentshift</code>
+      <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install agentshift');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
+    </div>
+    <div class="hero-actions">
+      <a href="https://github.com/ogkranthi/agentshift" class="btn btn-primary">View on GitHub</a>
+      <a href="https://github.com/ogkranthi/agentshift/blob/main/README.md" class="btn btn-secondary">Read the docs</a>
+    </div>
+  </section>
+
+  <section class="terminal-demo">
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">agentshift</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line"><span class="prompt">$</span> agentshift convert --from openclaw --to claude-code ./my-skill/</div>
+        <div class="terminal-output">
+&#x2714; Parsed OpenClaw skill: weather-assistant<br>
+&#x2714; Generated Claude Code config<br>
+<br>
+weather-claude/<br>
+&#x251C;&#x2500;&#x2500; CLAUDE.md<br>
+&#x2514;&#x2500;&#x2500; settings.json<br>
+        </div>
+        <div class="terminal-line"><span class="prompt">$</span> agentshift convert --from openclaw --to copilot ./my-skill/</div>
+        <div class="terminal-output">
+&#x2714; Parsed OpenClaw skill: weather-assistant<br>
+&#x2714; Generated GitHub Copilot config<br>
+<br>
+weather-copilot/<br>
+&#x251C;&#x2500;&#x2500; weather.agent.md<br>
+&#x2514;&#x2500;&#x2500; README.md<br>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="platforms" class="platforms">
+    <h2>Supported platforms</h2>
+    <p class="section-sub">Parse from source platforms, emit to targets. Adding a new platform = one parser + one emitter.</p>
+    <div class="platform-grid">
+      <div class="platform-card">
+        <div class="platform-name">OpenClaw</div>
+        <div class="platform-tags">
+          <span class="tag tag-green">Parser</span>
+          <span class="tag tag-blue">Emitter</span>
+        </div>
+        <div class="platform-status live">Works today</div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-name">Claude Code</div>
+        <div class="platform-tags">
+          <span class="tag tag-green">Parser</span>
+          <span class="tag tag-blue">Emitter</span>
+        </div>
+        <div class="platform-status live">Works today</div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-name">GitHub Copilot</div>
+        <div class="platform-tags">
+          <span class="tag tag-blue">Emitter</span>
+        </div>
+        <div class="platform-status live">Works today</div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-name">AWS Bedrock</div>
+        <div class="platform-tags">
+          <span class="tag tag-blue">Emitter</span>
+        </div>
+        <div class="platform-status soon">Coming soon</div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-name">GCP Vertex AI</div>
+        <div class="platform-tags">
+          <span class="tag tag-blue">Emitter</span>
+        </div>
+        <div class="platform-status soon">Coming soon</div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-name">LangGraph</div>
+        <div class="platform-tags">
+          <span class="tag tag-gray">Planned</span>
+        </div>
+        <div class="platform-status planned">Planned</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works" class="architecture">
+    <h2>How it works</h2>
+    <p class="section-sub">Every agent passes through a universal Intermediate Representation — the core innovation that makes N-to-N conversion possible.</p>
+    <div class="arch-flow">
+      <div class="arch-step">
+        <div class="arch-label">Source</div>
+        <div class="arch-box">Parser</div>
+        <div class="arch-desc">Read from any<br>supported platform</div>
+      </div>
+      <div class="arch-arrow">&rarr;</div>
+      <div class="arch-step">
+        <div class="arch-label">Universal</div>
+        <div class="arch-box arch-ir">IR</div>
+        <div class="arch-desc">Identity &middot; Tools &middot; Knowledge<br>Triggers &middot; Constraints</div>
+      </div>
+      <div class="arch-arrow">&rarr;</div>
+      <div class="arch-step">
+        <div class="arch-label">Target</div>
+        <div class="arch-box">Emitter</div>
+        <div class="arch-desc">Generate deployment-ready<br>platform configs</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="portability">
+    <h2>Know what ports &mdash; and what doesn't</h2>
+    <p class="section-sub">The <code>agentshift diff</code> command shows exactly what converts cleanly vs. what needs manual work.</p>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">agentshift diff</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line"><span class="prompt">$</span> agentshift diff ./my-skill/ --targets copilot,bedrock</div>
+        <div class="terminal-output diff-output">
+<br>
+ Component        &nbsp;OpenClaw &nbsp;Copilot &nbsp;Bedrock<br>
+&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;<br>
+ Instructions &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="g">&#x2714; 100%</span> &nbsp;&nbsp;<span class="g">&#x2714; 100%</span> &nbsp;<span class="g">&#x2714; 100%</span><br>
+ Tool: web_search &nbsp;<span class="g">&#x2714;</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="g">&#x2714; auto</span> &nbsp;<span class="g">&#x2714; auto</span><br>
+ Tool: cron &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="g">&#x2714;</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="y">&#x26A0; stub</span> &nbsp;<span class="y">&#x26A0; stub</span><br>
+ Knowledge (3) &nbsp;&nbsp;&nbsp;&nbsp;<span class="g">&#x2714;</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="y">&#x26A0; stub</span> &nbsp;<span class="y">&#x26A0; stub</span><br>
+ Telegram channel &nbsp;<span class="g">&#x2714;</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="r">&#x2718; none</span> &nbsp;<span class="r">&#x2718; none</span><br>
+ Auth &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;local &nbsp;&nbsp;&nbsp;<span class="y">&#x26A0; stub</span> &nbsp;<span class="y">&#x26A0; stub</span><br>
+&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;<br>
+ Portability &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="g">62%</span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="y">58%</span><br>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="why">
+    <h2>Why AgentShift?</h2>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon">&#x1F512;</div>
+        <h3>No more lock-in</h3>
+        <p>60-70% of an agent is inherently portable &mdash; instructions, tools, knowledge. Don't rewrite it for every platform.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">&#x26A1;</div>
+        <h3>Generate, don't deploy</h3>
+        <p>AgentShift generates deployment-ready configs. You review, customize, and deploy on your terms.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">&#x1F50D;</div>
+        <h3>Portability scoring</h3>
+        <p><code>agentshift diff</code> tells you exactly what ports cleanly and what needs manual work. No surprises.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">&#x1F9E9;</div>
+        <h3>Extensible</h3>
+        <p>Adding a new platform = one parser + one emitter. The IR handles the rest. Contributions welcome.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Get started in 30 seconds</h2>
+    <div class="hero-install">
+      <code>pip install agentshift</code>
+      <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install agentshift');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
+    </div>
+    <div class="hero-actions">
+      <a href="https://github.com/ogkranthi/agentshift" class="btn btn-primary">Star on GitHub</a>
+      <a href="https://github.com/ogkranthi/agentshift/issues/new?template=platform_request.yml" class="btn btn-secondary">Request a platform</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-logo">AgentShift</span>
+        <span class="footer-license">Apache 2.0 &middot; Built by <a href="https://github.com/ogkranthi">Kranthi Kumar</a></span>
+      </div>
+      <div class="footer-right">
+        <a href="https://github.com/ogkranthi/agentshift">GitHub</a>
+        <a href="https://pypi.org/project/agentshift/">PyPI</a>
+        <a href="https://github.com/ogkranthi/agentshift/blob/main/CONTRIBUTING.md">Contribute</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
