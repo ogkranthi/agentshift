@@ -17,9 +17,9 @@
 | A02 | P0 | @architect | merged | Document OpenClaw SKILL.md format spec with examples |
 | A03 | P0 | @architect | merged | Document Claude Code format spec (SKILL.md + CLAUDE.md + settings.json) |
 | A04 | P1 | @architect | merged | Document Copilot declarative agent manifest schema 1.6 |
-| A05 | P1 | @architect | ready | Document Bedrock agent config + OpenAPI action group format |
-| A06 | P1 | @architect | ready | Document Vertex AI Agent Builder config format |
-| A07 | P1 | @architect | ready | Write MCP-to-OpenAPI mapping specification |
+| A05 | P1 | @architect | pr-created | Document Bedrock agent config + OpenAPI action group format |
+| A06 | P1 | @architect | pr-created | Document Vertex AI Agent Builder config format |
+| A07 | P1 | @architect | pr-created | Write MCP-to-OpenAPI mapping specification |
 | D01 | P0 | @dev | merged | Set up Python project scaffold (pyproject.toml, src layout, CLI entry point) |
 | D02 | P0 | @dev | merged | Implement IR model as Python dataclasses (based on A01 spec) |
 | D03 | P0 | @dev | merged | Implement OpenClaw parser (SKILL.md → IR) |
