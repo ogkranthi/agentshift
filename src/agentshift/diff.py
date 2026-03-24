@@ -60,6 +60,15 @@ PLATFORM_SUPPORT: dict[str, dict[str, str]] = {
         "triggers_delivery": NONE,
         "constraints": STUB,
     },
+    "m365": {
+        "instructions": FULL,
+        "tools_shell": NONE,
+        "tools_mcp": PARTIAL,
+        "knowledge": PARTIAL,
+        "triggers_cron": NONE,
+        "triggers_delivery": NONE,
+        "constraints": STUB,
+    },
 }
 
 FIDELITY_SCORE = {FULL: 100, PARTIAL: 60, STUB: 20, NONE: 0}
@@ -132,6 +141,29 @@ _NOTES: dict[str, dict[str, dict[str, str]]] = {
         },
         "triggers_cron": {
             NONE: "No scheduled triggers (chat-only)",
+        },
+        "triggers_delivery": {
+            NONE: "No proactive delivery support",
+        },
+        "constraints": {
+            STUB: "No direct OS/binary constraint equivalent",
+        },
+    },
+    "m365": {
+        "instructions": {
+            FULL: "8,000 character limit — instructions truncated if exceeded",
+        },
+        "tools_shell": {
+            NONE: "No shell access in M365 Declarative Agents — shell tools dropped",
+        },
+        "tools_mcp": {
+            PARTIAL: "Only Teams/Email/Graph MCP tools map to capabilities; others dropped",
+        },
+        "knowledge": {
+            PARTIAL: "URL-based WebSearch supported; local files dropped",
+        },
+        "triggers_cron": {
+            NONE: "No scheduled triggers in M365 Declarative Agents",
         },
         "triggers_delivery": {
             NONE: "No proactive delivery support",

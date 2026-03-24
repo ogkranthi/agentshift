@@ -27,6 +27,7 @@ _EMITTERS = {
     "claude-code": "agentshift.emitters.claude_code:emit",
     "copilot": "agentshift.emitters.copilot:emit",
     "bedrock": "agentshift.emitters.bedrock:emit",
+    "m365": "agentshift.emitters.m365:emit",
 }
 
 
