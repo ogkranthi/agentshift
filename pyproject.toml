@@ -14,11 +14,6 @@ authors = [
 ]
 keywords = ["ai", "agents", "portability", "transpiler", "openclaw", "copilot", "bedrock"]
 
-[project.urls]
-Homepage = "https://agentshift.sh"
-Documentation = "https://agentshift.sh/docs"
-Repository = "https://github.com/ogkranthi/agentshift"
-"Bug Tracker" = "https://github.com/ogkranthi/agentshift/issues"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -34,6 +29,12 @@ dependencies = [
     "jsonschema>=4.20",
     "pydantic>=2.0",
 ]
+
+[project.urls]
+Homepage = "https://agentshift.sh"
+Documentation = "https://agentshift.sh/docs"
+Repository = "https://github.com/ogkranthi/agentshift"
+"Bug Tracker" = "https://github.com/ogkranthi/agentshift/issues"
 
 [project.optional-dependencies]
 dev = [
