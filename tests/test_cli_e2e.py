@@ -119,3 +119,24 @@ class TestCLIErrors:
     def test_stdout_contains_skill_name(self, tmp_path):
         result = run_convert(FIXTURES / "simple-skill", tmp_path)
         assert "weather" in result.stdout.lower()
+
+
+class TestCLIVersion:
+    def test_version_flag(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "agentshift", "--version"],
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 0
+        assert "agentshift" in result.stdout
+        assert "0.1" in result.stdout  # matches 0.1.x
+
+    def test_version_short_flag(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "agentshift", "-v"],
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 0
+        assert "agentshift" in result.stdout
