@@ -17,6 +17,9 @@
 | A02 | P0 | @architect | merged | Document OpenClaw SKILL.md format spec with examples |
 | A03 | P0 | @architect | merged | Document Claude Code format spec (SKILL.md + CLAUDE.md + settings.json) |
 | A04 | P1 | @architect | merged | Document Copilot declarative agent manifest schema 1.6 |
+| A05 | P1 | @architect | in-progress | Document Bedrock agent config + OpenAPI action group format |
+| A06 | P1 | @architect | in-progress | Document Vertex AI Agent Builder config format |
+| A07 | P1 | @architect | in-progress | Write MCP-to-OpenAPI mapping specification |
 | A05 | P1 | @architect | pr-created | Document Bedrock agent config + OpenAPI action group format |
 | A06 | P1 | @architect | pr-created | Document Vertex AI Agent Builder config format |
 | A07 | P1 | @architect | pr-created | Write MCP-to-OpenAPI mapping specification |
