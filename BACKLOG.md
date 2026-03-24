@@ -39,7 +39,7 @@
 | ID | Priority | Owner | Status | Title |
 |----|----------|-------|--------|-------|
 | D07 | P1 | @dev | merged | Implement Copilot emitter (IR → .agent.md) |
-| D08 | P1 | @dev | ready | Implement Bedrock emitter (IR → instruction + OpenAPI + CloudFormation) |
+| D08 | P1 | @dev | merged | Implement Bedrock emitter (IR → instruction + OpenAPI + CloudFormation) |
 | D09 | P1 | @dev | ready | Implement Vertex AI emitter (IR → Agent Builder config) |
 | D10 | P1 | @dev | ready | Handle platform constraints (instruction length limits, etc.) |
 | T05 | P1 | @tester | ready | Write emitter tests for all cloud targets |
