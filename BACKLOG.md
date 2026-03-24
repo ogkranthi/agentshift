@@ -40,8 +40,8 @@
 |----|----------|-------|--------|-------|
 | D07 | P1 | @dev | merged | Implement Copilot emitter (IR → .agent.md) |
 | D08 | P1 | @dev | merged | Implement Bedrock emitter (IR → instruction + OpenAPI + CloudFormation) |
-| D09 | P1 | @dev | ready | Implement Vertex AI emitter (IR → Agent Builder config) |
-| D10 | P1 | @dev | ready | Handle platform constraints (instruction length limits, etc.) |
+| D09 | P1 | @dev | merged | Implement Vertex AI emitter (IR → Agent Builder config) |
+| D10 | P1 | @dev | merged | Handle platform constraints (instruction length limits, etc.) |
 | T05 | P1 | @tester | ready | Write emitter tests for all cloud targets |
 | T06 | P1 | @tester | ready | Validate generated Copilot manifest against JSON schema |
 
@@ -50,9 +50,9 @@
 | ID | Priority | Owner | Status | Title |
 |----|----------|-------|--------|-------|
 | D11 | P1 | @dev | ready | Implement MCP-to-OpenAPI converter |
-| D12 | P1 | @dev | ready | Implement `agentshift diff` command with rich table output |
-| D13 | P1 | @dev | ready | Implement `agentshift validate` command |
+| D12 | P1 | @dev | merged | Implement `agentshift diff` command with rich table output |
+| D13 | P1 | @dev | merged | Implement `agentshift validate` command |
 | D14 | P1 | @dev | ready | Generate auth/trigger/data binding stubs with TODO comments |
-| T07 | P1 | @tester | ready | Write diff accuracy tests |
-| T08 | P1 | @tester | ready | Write CLI integration tests (end-to-end) |
-| T09 | P1 | @tester | ready | Full integration test: pregnancy-companion → all 4 targets |
+| T07 | P1 | @tester | merged | Write diff accuracy tests |
+| T08 | P1 | @tester | merged | Write CLI integration tests (end-to-end) |
+| T09 | P1 | @tester | merged | Full integration test: pregnancy-companion → all 4 targets |

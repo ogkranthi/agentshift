@@ -11,7 +11,7 @@
 
 ---
 
-Your OpenClaw skill shouldn't be locked to one platform. **AgentShift converts it to Claude Code, GitHub Copilot, AWS Bedrock, and more.**
+Your OpenClaw skill shouldn't be locked to one platform. **AgentShift converts it to Claude Code, GitHub Copilot, AWS Bedrock, Microsoft 365 Copilot, GCP Vertex AI, and more.**
 
 ## Install
 
@@ -37,8 +37,13 @@ agentshift convert ~/.openclaw/skills/weather --from openclaw --to copilot --out
 agentshift convert ~/.openclaw/skills/weather --from openclaw --to bedrock --output ./weather-bedrock
 
 # Convert to ALL supported targets at once
-agentshift convert ~/.openclaw/skills/weather --from openclaw --to all --output ./weather-all
-# → weather-all/claude-code/  weather-all/copilot/  weather-all/bedrock/
+agentshift convert ./my-skill --from openclaw --to all --output ./output
+# → output/claude-code/  output/copilot/  output/bedrock/  output/m365/  output/vertex/
+```
+
+```bash
+# Validate generated output before deploying
+agentshift validate ./output/bedrock --target bedrock
 ```
 
 ```
@@ -54,7 +59,7 @@ weather-claude/               weather-copilot/
               ↓
   IR      →  identity · tools · knowledge · triggers · constraints
               ↓
-  Emitter →  Claude Code ✅  |  Copilot ✅  |  Bedrock ✅  |  M365 ✅  |  Vertex AI 🔜
+  Emitter →  Claude Code ✅  |  Copilot ✅  |  Bedrock ✅  |  M365 ✅  |  Vertex AI ✅
 ```
 
 ## See portability before converting
@@ -81,7 +86,7 @@ Portability                    100%             92%           38%
 | GitHub Copilot | — | ✅ | **Works today** |
 | AWS Bedrock | — | ✅ | **Works today** |
 | Microsoft 365 Copilot | — | ✅ | **Works today** |
-| GCP Vertex AI | — | — | Coming soon |
+| GCP Vertex AI | — | ✅ | **Works today** |
 | LangGraph | — | — | Planned |
 | CrewAI | — | — | Planned |
 
@@ -91,7 +96,9 @@ Portability                    100%             92%           38%
 |---|---|---|
 | Claude Code | [docs/claude-code.md](docs/claude-code.md) | [examples/weather-to-claude-code](examples/weather-to-claude-code/) |
 | GitHub Copilot | [docs/copilot.md](docs/copilot.md) | [examples/github-to-copilot](examples/github-to-copilot/) |
-| **AWS Bedrock** | **[docs/bedrock.md](docs/bedrock.md)** | **[examples/github-to-bedrock](examples/github-to-bedrock/)** |
+| AWS Bedrock | [docs/bedrock.md](docs/bedrock.md) | [examples/github-to-bedrock](examples/github-to-bedrock/) |
+| Microsoft 365 | [docs/m365.md](docs/m365.md) | [examples/github-to-m365](examples/github-to-m365/) |
+| GCP Vertex AI | [docs/vertex.md](docs/vertex.md) | [examples/github-to-vertex](examples/github-to-vertex/) |
 | Architecture | [docs/architecture.md](docs/architecture.md) | — |
 
 ## Contributing
