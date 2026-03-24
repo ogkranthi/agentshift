@@ -69,6 +69,15 @@ PLATFORM_SUPPORT: dict[str, dict[str, str]] = {
         "triggers_delivery": NONE,
         "constraints": STUB,
     },
+    "vertex": {
+        "instructions": FULL,
+        "tools_shell": STUB,
+        "tools_mcp": STUB,
+        "knowledge": STUB,
+        "triggers_cron": STUB,
+        "triggers_delivery": NONE,
+        "constraints": STUB,
+    },
 }
 
 FIDELITY_SCORE = {FULL: 100, PARTIAL: 60, STUB: 20, NONE: 0}
@@ -164,6 +173,29 @@ _NOTES: dict[str, dict[str, dict[str, str]]] = {
         },
         "triggers_cron": {
             NONE: "No scheduled triggers in M365 Declarative Agents",
+        },
+        "triggers_delivery": {
+            NONE: "No proactive delivery support",
+        },
+        "constraints": {
+            STUB: "No direct OS/binary constraint equivalent",
+        },
+    },
+    "vertex": {
+        "instructions": {
+            FULL: "8,000 character limit — goal field in agent.json",
+        },
+        "tools_shell": {
+            STUB: "Shell tools stubbed — implement as Cloud Function or Cloud Run service",
+        },
+        "tools_mcp": {
+            STUB: "MCP tools stubbed — implement as MCP-compatible endpoint",
+        },
+        "knowledge": {
+            STUB: "Knowledge sources stubbed — requires Vertex AI Search data store",
+        },
+        "triggers_cron": {
+            STUB: "Cloud Scheduler stubs generated — manual wiring required",
         },
         "triggers_delivery": {
             NONE: "No proactive delivery support",
