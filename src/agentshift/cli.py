@@ -26,6 +26,7 @@ _PARSERS = {
 _EMITTERS = {
     "claude-code": "agentshift.emitters.claude_code:emit",
     "copilot": "agentshift.emitters.copilot:emit",
+    "bedrock": "agentshift.emitters.bedrock:emit",
 }
 
 
