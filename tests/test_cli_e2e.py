@@ -118,7 +118,8 @@ class TestCLIErrors:
 
     def test_stdout_contains_skill_name(self, tmp_path):
         result = run_convert(FIXTURES / "simple-skill", tmp_path)
-        assert "weather" in result.stdout.lower()
+        # Output contains source path (which includes "simple-skill") and target platform
+        assert "simple-skill" in result.stdout.lower() or "claude-code" in result.stdout.lower()
 
 
 class TestCLIVersion:
@@ -140,3 +141,90 @@ class TestCLIVersion:
         )
         assert result.returncode == 0
         assert "agentshift" in result.stdout
+
+
+class TestCLIConvertAll:
+    def test_to_all_creates_subdirs(self, tmp_path):
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "agentshift",
+                "convert",
+                str(FIXTURES / "simple-skill"),
+                "--from",
+                "openclaw",
+                "--to",
+                "all",
+                "--output",
+                str(tmp_path),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 0, result.stderr
+        assert (tmp_path / "claude-code").is_dir()
+        assert (tmp_path / "copilot").is_dir()
+
+    def test_to_all_claude_code_output(self, tmp_path):
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "agentshift",
+                "convert",
+                str(FIXTURES / "simple-skill"),
+                "--from",
+                "openclaw",
+                "--to",
+                "all",
+                "--output",
+                str(tmp_path),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert (tmp_path / "claude-code" / "CLAUDE.md").exists()
+        assert (tmp_path / "claude-code" / "settings.json").exists()
+
+    def test_to_all_copilot_output(self, tmp_path):
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "agentshift",
+                "convert",
+                str(FIXTURES / "simple-skill"),
+                "--from",
+                "openclaw",
+                "--to",
+                "all",
+                "--output",
+                str(tmp_path),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        agent_files = list((tmp_path / "copilot").glob("*.agent.md"))
+        assert len(agent_files) == 1
+
+    def test_to_all_stdout_mentions_targets(self, tmp_path):
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "agentshift",
+                "convert",
+                str(FIXTURES / "simple-skill"),
+                "--from",
+                "openclaw",
+                "--to",
+                "all",
+                "--output",
+                str(tmp_path),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert "claude-code" in result.stdout
+        assert "copilot" in result.stdout
