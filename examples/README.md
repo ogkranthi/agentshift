@@ -1,89 +1,97 @@
 # Examples
 
-Real skill conversions from OpenClaw to Claude Code format. Each example shows the original `SKILL.md` alongside the generated `CLAUDE.md` + `settings.json`.
+Real skill conversions from OpenClaw to Claude Code and GitHub Copilot format. Each example shows the original skill alongside the generated output files.
 
 ---
 
-## weather → Claude Code
+## Claude Code examples
 
-A simple, tool-light skill using `curl` to hit wttr.in. Good starting point.
+### weather → Claude Code
+
+A simple, tool-light skill using `curl` to hit wttr.in.
 
 **Files**
 - `weather-to-claude-code/input/SKILL.md` — original OpenClaw skill
 - `weather-to-claude-code/output/CLAUDE.md` — converted agent instructions
-- `weather-to-claude-code/output/settings.json` — Claude Code permissions
+- `weather-to-claude-code/output/settings.json` — tool permissions
 
-**What changed:** Instructions passed through intact. Tool detection picked up `bash` → emitted `Bash(bash:*)` permission.
+**What changed:** Instructions passed through intact. Bash tool detected → `Bash(bash:*)` permission emitted.
 
 ---
 
-## github → Claude Code
+### github → Claude Code
 
 A tool-heavy skill using the `gh` CLI for PRs, issues, and CI runs.
 
 **Files**
 - `github-to-claude-code/input/SKILL.md` — original OpenClaw skill
 - `github-to-claude-code/output/CLAUDE.md` — converted agent instructions
-- `github-to-claude-code/output/settings.json` — Claude Code permissions
-
-**What changed:** `gh` CLI usage detected as bash tool → `Bash(bash:*)` permission emitted.
+- `github-to-claude-code/output/settings.json` — tool permissions
 
 ---
 
-## slack → Claude Code
+### slack → Claude Code
 
 An MCP-based skill using the `slack` message tool — no bash, all MCP.
 
 **Files**
 - `slack-to-claude-code/input/SKILL.md` — original OpenClaw skill
 - `slack-to-claude-code/output/CLAUDE.md` — converted agent instructions
-- `slack-to-claude-code/output/settings.json` — Claude Code permissions
+- `slack-to-claude-code/output/settings.json` — tool permissions
 
-**What changed:** MCP `slack` tool detected → `mcp__slack__*` permission emitted instead of bash. Shows how tool type affects the output.
+**What changed:** MCP `slack` tool detected → `mcp__slack__*` permission emitted instead of bash.
 
 ---
 
-## notion → Claude Code
+### notion → Claude Code
 
 A knowledge-rich skill using the Notion API for pages, databases, and blocks.
 
 **Files**
 - `notion-to-claude-code/input/SKILL.md` — original OpenClaw skill
 - `notion-to-claude-code/output/CLAUDE.md` — converted agent instructions
-- `notion-to-claude-code/output/settings.json` — Claude Code permissions
+- `notion-to-claude-code/output/settings.json` — tool permissions
 
-**What changed:** API-heavy instructions passed through. Bash tool detected for curl-based API calls.
+---
+
+## Copilot examples
+
+### weather → Copilot
+
+**Files**
+- `weather-to-copilot/weather.agent.md` — Copilot agent definition
+- `weather-to-copilot/README.md` — VS Code installation steps
+
+**What changed:** Instructions preserved. Shell usage → `execute/runInTerminal` tool. Model list added from AgentShift defaults.
+
+---
+
+### github → Copilot
+
+**Files**
+- `github-to-copilot/github.agent.md` — Copilot agent definition
+- `github-to-copilot/README.md` — VS Code installation steps
+
+---
+
+### slack → Copilot
+
+**Files**
+- `slack-to-copilot/slack.agent.md` — Copilot agent definition
+- `slack-to-copilot/README.md` — VS Code installation steps
+
+**What changed:** MCP tool noted in body; no native Copilot MCP mapping — requires manual VS Code MCP config.
 
 ---
 
 ## Try it yourself
 
-**Step 1: Get a skill** (pick one of these)
-
-Option A — Use an installed OpenClaw skill:
 ```bash
-ls ~/.nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/
-```
+# Convert any installed OpenClaw skill
+agentshift convert ~/.openclaw/skills/<name> --from openclaw --to claude-code --output ./out-claude
+agentshift convert ~/.openclaw/skills/<name> --from openclaw --to copilot --output ./out-copilot
 
-Option B — Copy this example:
-```bash
-cp -r examples/weather-to-claude-code/input my-skill
-```
-
-Option C — Pull from ClaWHub (when available):
-```bash
-openclaw skill install <skill-name>
-cp -r ~/.openclaw/skills/<skill-name> my-skill
-```
-
-**Step 2: Convert it**
-```bash
-agentshift convert my-skill --from openclaw --to claude-code --output my-skill-claude
-```
-
-**Step 3: See what changed**
-```bash
-diff examples/weather-to-claude-code/input/SKILL.md my-skill-claude/CLAUDE.md
-cat my-skill-claude/CLAUDE.md
-cat my-skill-claude/settings.json
+# See what you got
+cat out-claude/CLAUDE.md
+cat out-copilot/<name>.agent.md
 ```

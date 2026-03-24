@@ -2,10 +2,6 @@
 <p align="center"><em>Convert AI agents between platforms. Define once, run anywhere.</em></p>
 
 <p align="center">
-  <img src="docs/demo-placeholder.svg" alt="AgentShift demo" width="700">
-</p>
-
-<p align="center">
   <a href="https://github.com/ogkranthi/agentshift/actions"><img src="https://github.com/ogkranthi/agentshift/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://pypi.org/project/agentshift/"><img src="https://img.shields.io/pypi/v/agentshift" alt="PyPI version"></a>
   <a href="https://pypi.org/project/agentshift/"><img src="https://img.shields.io/pypi/pyversions/agentshift" alt="Python versions"></a>
@@ -14,8 +10,7 @@
 
 ---
 
-Your OpenClaw skill, your Bedrock Agent, your Copilot — they all speak different dialects.
-**AgentShift is the translator.**
+Your OpenClaw skill shouldn't be locked to one platform. **AgentShift converts it to Claude Code, GitHub Copilot, and more.**
 
 ## Install
 
@@ -28,31 +23,32 @@ git clone https://github.com/ogkranthi/agentshift.git
 cd agentshift && pip install -e .
 ```
 
-## Usage
+## Convert your first agent
+
+Same skill, two targets — pick the one you want:
 
 ```bash
-# Copy a built-in OpenClaw skill and convert it to Claude Code
-cp -r ~/.nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/weather ./weather-skill
-agentshift convert ./weather-skill --from openclaw --to claude-code --output ./weather-claude
+# → Claude Code
+agentshift convert ~/.openclaw/skills/weather --from openclaw --to claude-code --output ./weather-claude
 
-# Convert any skill you have installed
-agentshift convert ~/.openclaw/skills/my-skill --from openclaw --to claude-code --output ./my-skill-claude
+# → GitHub Copilot
+agentshift convert ~/.openclaw/skills/weather --from openclaw --to copilot --output ./weather-copilot
+```
 
-# Inspect the output
-cat ./weather-claude/CLAUDE.md
-cat ./weather-claude/settings.json
+```
+weather-claude/               weather-copilot/
+├── CLAUDE.md                 ├── weather.agent.md
+└── settings.json             └── README.md
 ```
 
 ## How it works
-
-AgentShift parses your agent into a universal **Intermediate Representation (IR)**, then emits platform-specific configs.
 
 ```
   1. Parse  →  SKILL.md · CLAUDE.md · manifest.json · instruction.txt
                ↓
   2. IR     →  identity · tools · knowledge · triggers · constraints
                ↓
-  3. Emit   →  Claude Code  ✅  |  Copilot  🔜  |  Bedrock  🔜  |  Vertex AI  🔜
+  3. Emit   →  Claude Code ✅  |  Copilot ✅  |  Bedrock 🔜  |  Vertex AI 🔜
 ```
 
 The IR is the core abstraction — captured in `specs/ir-schema.json`. Adding a new platform means writing one parser and/or one emitter. Nothing else changes.
@@ -63,15 +59,15 @@ The IR is the core abstraction — captured in `specs/ir-schema.json`. Adding a 
 |---|:---:|:---:|---|
 | OpenClaw | ✅ | ✅ | **Works today** |
 | Claude Code | ✅ | ✅ | **Works today** |
-| Microsoft Copilot | — | — | Coming soon |
+| GitHub Copilot | — | ✅ | **Works today** |
 | AWS Bedrock | — | — | Coming soon |
 | GCP Vertex AI | — | — | Coming soon |
 | LangGraph | — | — | Planned |
 | CrewAI | — | — | Planned |
 
-## Using converted skills in Claude Code
+---
 
-Once you've converted a skill, here's how to activate it in Claude Code so it works similarly to OpenClaw.
+## Using with Claude Code
 
 ### Step 1: Convert
 
@@ -79,7 +75,7 @@ Once you've converted a skill, here's how to activate it in Claude Code so it wo
 agentshift convert ~/.openclaw/skills/github --from openclaw --to claude-code --output ./github-claude
 ```
 
-This produces:
+Produces:
 ```
 github-claude/
 ├── CLAUDE.md       ← instructions + persona (Claude Code reads this automatically)
@@ -88,16 +84,13 @@ github-claude/
 
 ### Step 2: Place the files
 
-Claude Code picks up `CLAUDE.md` and `settings.json` from these locations (in priority order):
-
 | Location | Scope | When to use |
 |---|---|---|
-| `~/.claude/CLAUDE.md` | Global — all projects | Skills you want everywhere (weather, github) |
+| `~/.claude/CLAUDE.md` | Global — all projects | Skills you want everywhere |
 | `<project>/.claude/CLAUDE.md` | Project-only | Skills scoped to one repo |
-| `<project>/CLAUDE.md` | Project-only (alternative) | Same as above |
 
 ```bash
-# Option A — global (skill available in every Claude Code session)
+# Option A — global
 mkdir -p ~/.claude
 cp github-claude/CLAUDE.md ~/.claude/CLAUDE.md
 cp github-claude/settings.json ~/.claude/settings.json
@@ -108,29 +101,21 @@ cp github-claude/CLAUDE.md my-project/.claude/CLAUDE.md
 cp github-claude/settings.json my-project/.claude/settings.json
 ```
 
-> **Multiple skills:** Claude Code only loads one `CLAUDE.md` per scope. To combine multiple skills, concatenate their `CLAUDE.md` files and merge their `settings.json` permission arrays manually — or use `agentshift merge` (coming soon).
+> **Multiple skills:** Claude Code loads one `CLAUDE.md` per scope. Concatenate files and merge permission arrays to combine — or wait for `agentshift merge` (coming soon).
 
 ### Step 3: Use it
-
-Open Claude Code in the project directory. The skill instructions load automatically.
 
 ```bash
 cd my-project
 claude   # or claude --print "check open PRs"
 ```
 
-Claude Code will follow the skill's instructions and respect the tool permissions from `settings.json`.
-
 ### Step 4: Verify tool permissions
-
-Check that the permissions emitted match what you expect:
 
 ```bash
 cat github-claude/settings.json
-# → { "permissions": { "allow": ["Bash(gh:*)", "Bash(git:*)"] } }
+# → { "permissions": { "allow": ["Bash(bash:*)"] } }
 ```
-
-This means Claude Code can run `gh` and `git` commands — but nothing else — matching the skill's intent.
 
 ---
 
@@ -138,37 +123,31 @@ This means Claude Code can run `gh` and `git` commands — but nothing else — 
 
 | OpenClaw feature | Claude Code equivalent | Status |
 |---|---|---|
-| Skill instructions (SKILL.md body) | `CLAUDE.md` — loaded automatically | ✅ Full fidelity |
+| Skill instructions (body) | `CLAUDE.md` — loaded automatically | ✅ Full fidelity |
 | Shell tool permissions | `settings.json` `allow: ["Bash(<binary>:*)"]` | ✅ Precise per-binary |
-| MCP tools (slack, github, discord) | `settings.json` `allow: ["mcp__<name>__*"]` | ✅ Works if MCP server configured |
+| MCP tools (slack, github) | `settings.json` `allow: ["mcp__<name>__*"]` | ✅ Works if MCP server configured |
 | Knowledge files | `CLAUDE.md` knowledge section + `Read(path)` permissions | ✅ Paths preserved |
 | Data file writes | `Write(path)` in `settings.json` | ✅ Exact paths |
 | OS constraints | `settings.json` `supportedOs` | ✅ Preserved |
-| Install dependencies | Not applicable — Claude Code assumes tools are installed | ⚠️ Manual step |
-| Cron / scheduled triggers | **Cloud Scheduled Tasks** (Anthropic-managed) | ✅ See below |
-| Telegram / Slack delivery channels | **Not supported natively** | ⚠️ See below |
-| OpenClaw config keys (`channels.slack`) | Not applicable — Claude Code uses MCP config | ⚠️ Reconfigure MCP |
+| Cron / scheduled triggers | Cloud Scheduled Tasks (Anthropic-managed) | ✅ See below |
+| Install dependencies | Not applicable — assumes tools installed | ⚠️ Manual step |
+| Telegram / Slack delivery | Not supported natively | ⚠️ See below |
 
 ---
 
-### Scheduled triggers — Claude Code has this now
+### Scheduled triggers
 
-Claude Code has **cloud-managed scheduled tasks** that run on Anthropic's infrastructure — they keep running even when your computer is off, just like OpenClaw cron jobs.
-
-**3 ways to schedule:**
+Claude Code has **cloud-managed scheduled tasks** that keep running even when your computer is off — just like OpenClaw cron jobs.
 
 ```bash
-# Option 1 — CLI (conversational setup)
+# Option 1 — conversational
 /schedule daily PR review at 9am
 
-# Option 2 — quick loop in-session
+# Option 2 — in-session loop
 /loop 30m check if the deployment finished
 
-# Option 3 — web UI
-# → https://claude.ai/code/scheduled → New scheduled task
+# Option 3 — web UI: https://claude.ai/code/scheduled → New scheduled task
 ```
-
-The converted skill's `cron_expr` from OpenClaw maps directly:
 
 | OpenClaw (`jobs.json`) | Claude Code |
 |---|---|
@@ -176,36 +155,135 @@ The converted skill's `cron_expr` from OpenClaw maps directly:
 | `"message": "Give today's tip"` | Prompt field in the scheduled task |
 | `"session_target": "isolated"` | Each run is a fresh cloud session (default) |
 
-> **Note:** Session-scoped `/loop` tasks disappear when Claude Code exits. For durable cron that survives restarts, use [cloud scheduled tasks](https://claude.ai/code/scheduled) or the Desktop app's Schedule page.
+> `/loop` tasks disappear when Claude Code exits. For durable cron, use [cloud scheduled tasks](https://claude.ai/code/scheduled).
 
 ---
 
 ### Remaining gaps
 
 **1. Proactive delivery (Telegram, Slack, Discord)**
-OpenClaw pushes results directly to messaging channels. Claude Code scheduled tasks run headlessly and output to GitHub branches or logs — not to chat.
+OpenClaw pushes results to messaging channels. Claude Code scheduled tasks output to GitHub branches or logs.
 
-*Workaround:* Add a step at the end of your scheduled task prompt:
+*Workaround:* End your scheduled task prompt with:
 ```
-... do the work, then write the summary to summary.md and commit it to a branch named daily-summary/YYYY-MM-DD
+... do the work, then write the summary to summary.md and commit it to daily-summary/YYYY-MM-DD
 ```
-Or pipe `claude --print` output through a webhook in a GitHub Action.
 
 **2. Persistent memory across sessions**
-OpenClaw persists `MEMORY.md` between sessions. Claude Code sessions are stateless by default.
+OpenClaw persists `MEMORY.md`. Claude Code sessions are stateless by default.
 
-*Workaround:* Use a project-level `CLAUDE.md` that references memory files, or pass them explicitly in your scheduled task prompt.
+*Workaround:* Reference memory files in your project-level `CLAUDE.md` or pass them in your scheduled task prompt.
 
 **3. Multi-channel routing**
-OpenClaw routes output to Telegram, Slack, Discord, or email based on context. Claude Code outputs to stdout or GitHub — not to messaging apps directly.
+OpenClaw routes output to Telegram, Slack, Discord, or email. Claude Code outputs to stdout or GitHub only.
 
 ---
 
-## See a real conversion
+## Using with GitHub Copilot
 
-The [`examples/`](examples/) directory has 4 complete before/after conversions.
+### Step 1: Convert
 
-**Input** — `examples/weather-to-claude-code/input/SKILL.md` (OpenClaw):
+```bash
+agentshift convert ~/.openclaw/skills/github --from openclaw --to copilot --output ./github-copilot
+```
+
+Produces:
+```
+github-copilot/
+├── github.agent.md   ← Copilot agent definition (frontmatter + instructions)
+└── README.md         ← installation steps for VS Code
+```
+
+The generated `github.agent.md` looks like:
+
+```yaml
+---
+name: "github"
+description: "GitHub operations via gh CLI..."
+model:
+  - "Claude Sonnet 4.6 (copilot)"
+  - "Claude Opus 4.6 (copilot)"
+  - "GPT-5.3-Codex"
+tools:
+  - execute/runInTerminal
+---
+
+# GitHub Skill
+... instructions ...
+```
+
+### Step 2: Install in VS Code
+
+**Option A — Command palette (personal use):**
+1. Open VS Code
+2. `Cmd+Shift+P` → "GitHub Copilot: Install Agent from File"
+3. Select `github.agent.md`
+4. Agent appears as `@github` in Copilot Chat
+
+**Option B — Workspace (share with team):**
+```bash
+mkdir -p .github/copilot-agents
+cp github-copilot/github.agent.md .github/copilot-agents/
+```
+Commit to repo — all team members get the agent automatically.
+
+### Step 3: Use it
+
+In VS Code Copilot Chat:
+```
+@github list open PRs for owner/repo
+@github check CI status on PR #55
+```
+
+### Step 4: Verify
+
+```bash
+cat github-copilot/github.agent.md | head -10
+# → tools: [execute/runInTerminal]
+```
+
+---
+
+### What carries over for Copilot
+
+| OpenClaw feature | Copilot equivalent | Status |
+|---|---|---|
+| Skill instructions (body) | Agent markdown body | ✅ Full fidelity |
+| Shell tool usage | `execute/runInTerminal` | ✅ Maps cleanly |
+| Knowledge file reads | `read/readFile` tool | ✅ |
+| Data file writes | `edit/editFiles` tool | ✅ |
+| MCP tools (slack, notion) | MCP server — configure separately in VS Code | ⚠️ Manual step |
+| Cron / scheduled triggers | Not supported — Copilot is chat-only | ❌ |
+| Telegram / Slack delivery | Not applicable | ❌ |
+
+---
+
+### Contribute to awesome-copilot
+
+The generated `.agent.md` files can be submitted directly to [github/awesome-copilot](https://github.com/github/awesome-copilot):
+
+```bash
+# Fork https://github.com/github/awesome-copilot
+# Convert your skill
+agentshift convert ~/.openclaw/skills/github --from openclaw --to copilot --output /tmp/out
+# Add to fork
+cp /tmp/out/github.agent.md agents/github-cli.agent.md
+# Open PR
+gh pr create --repo github/awesome-copilot --title "feat: add github-cli agent (converted from OpenClaw via AgentShift)"
+```
+
+---
+
+## See real conversions
+
+| Skill | Claude Code output | Copilot output |
+|---|---|---|
+| weather | [examples/weather-to-claude-code/](examples/weather-to-claude-code/) | [examples/weather-to-copilot/](examples/weather-to-copilot/) |
+| github | [examples/github-to-claude-code/](examples/github-to-claude-code/) | [examples/github-to-copilot/](examples/github-to-copilot/) |
+| slack | [examples/slack-to-claude-code/](examples/slack-to-claude-code/) | [examples/slack-to-copilot/](examples/slack-to-copilot/) |
+| notion | [examples/notion-to-claude-code/](examples/notion-to-claude-code/) | — |
+
+**Before** — `examples/weather-to-claude-code/input/SKILL.md` (OpenClaw):
 
 ```yaml
 ---
@@ -220,12 +298,11 @@ metadata: { "openclaw": { "emoji": "☔", "requires": { "bins": ["curl"] } } }
 
 ```bash
 curl "wttr.in/London?format=3"      # one-line summary
-curl "wttr.in/London"               # 3-day forecast
 curl "wttr.in/London?format=j1"     # JSON output
 ```
 ```
 
-**Output** — `examples/weather-to-claude-code/output/CLAUDE.md` (Claude Code):
+**After (Claude Code)** — `CLAUDE.md` + `settings.json`:
 
 ```markdown
 # weather
@@ -234,18 +311,30 @@ Get current weather and forecasts via wttr.in. No API key needed.
 
 ## Instructions
 ...
-
-## Tools
-- **bash** (shell): Run shell commands
 ```
-
-**Output** — `examples/weather-to-claude-code/output/settings.json`:
-
 ```json
-{ "permissions": { "allow": ["Bash(curl:*)"] } }
+{ "permissions": { "allow": ["Bash(bash:*)"] } }
 ```
 
-More examples: [github](examples/github-to-claude-code/) · [slack](examples/slack-to-claude-code/) · [notion](examples/notion-to-claude-code/)
+**After (Copilot)** — `weather.agent.md`:
+
+```yaml
+---
+name: "weather"
+description: "Get current weather and forecasts via wttr.in..."
+model:
+  - "Claude Sonnet 4.6 (copilot)"
+  - "Claude Opus 4.6 (copilot)"
+  - "GPT-5.3-Codex"
+tools:
+  - execute/runInTerminal
+  - web
+  - search
+---
+
+# Weather Skill
+...
+```
 
 ## Contributing
 
@@ -255,12 +344,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, architecture, and PR guideline
 
 ```bash
 git clone https://github.com/ogkranthi/agentshift.git
-cd agentshift
-pip install -e ".[dev]"
+cd agentshift && pip install -e ".[dev]"
 agentshift --help
 ```
 
-Open a [Platform Request](https://github.com/ogkranthi/agentshift/issues/new?template=platform_request.yml) to discuss adding a new target.
+Open a [Platform Request](https://github.com/ogkranthi/agentshift/issues/new?template=platform_request.yml) to discuss a new target.
 
 ## License
 
