@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agentshift"
-version = "0.3.0"
+version = "1.0.0"
 description = "CLI transpiler for converting AI agents between platforms"
 readme = "README.md"
 license = "Apache-2.0"
@@ -15,7 +15,7 @@ authors = [
 keywords = ["ai", "agents", "portability", "transpiler", "openclaw", "copilot", "bedrock"]
 
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3.11",

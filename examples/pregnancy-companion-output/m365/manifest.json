@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.17",
+  "version": "1.0.0",
+  "id": "00ce7202-88fe-4c1d-ba06-919939013163",
+  "name": {
+    "short": "pregnancy-companion",
+    "full": "24/7 pregnancy companion — answers questions, tracks symptoms, gives weekly updates, and supports a "
+  },
+  "description": {
+    "short": "24/7 pregnancy companion — answers questions, tracks symptoms, gives weekly upda",
+    "full": "24/7 pregnancy companion — answers questions, tracks symptoms, gives weekly updates, and supports a healthy pregnancy journey"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "accentColor": "#6264A7",
+  "copilotAgents": {
+    "declarativeAgents": [
+      {
+        "id": "declarativeAgent",
+        "file": "declarative-agent.json"
+      }
+    ]
+  },
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": []
+}
