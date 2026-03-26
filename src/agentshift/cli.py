@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import json
 from pathlib import Path
 
 import typer
@@ -143,6 +144,47 @@ def diff(
         else [t.strip() for t in targets.split(",")]
     )
     render_diff_table(ir, target_list)
+
+
+@app.command(name="mcp-to-openapi")
+def mcp_to_openapi(
+    source: Path = typer.Argument(help="Path to source agent directory"),
+    from_platform: str = typer.Option(
+        "openclaw", "--from", help=f"Source platform: {', '.join(_PARSERS)}"
+    ),
+    output: Path | None = typer.Option(
+        None, "--output", "-o", help="Output file path (default: print to stdout)"
+    ),
+) -> None:
+    """Generate OpenAPI 3.0 schema from MCP/shell tools in the source agent."""
+    from agentshift.mcp_converter import mcp_to_openapi as _mcp_to_openapi
+
+    parse_fn = _get_parser(from_platform)
+    try:
+        ir = parse_fn(source)
+    except FileNotFoundError as e:
+        console.print(f"[red]Parse error:[/red] {e}")
+        raise typer.Exit(1) from e
+
+    mcp_tools = [
+        {
+            "name": tool.name,
+            "description": tool.description or tool.name,
+            "inputSchema": tool.parameters or {"type": "object", "properties": {}},
+        }
+        for tool in ir.tools
+        if tool.kind in ("mcp", "shell")
+    ]
+
+    schema = _mcp_to_openapi(mcp_tools, server_name=ir.name, title=f"{ir.name} Tools")
+    output_json = json.dumps(schema, indent=2)
+
+    if output:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(output_json, encoding="utf-8")
+        console.print(f"[green]✓[/green] OpenAPI schema → [cyan]{output}[/cyan]")
+    else:
+        console.print(output_json)
 
 
 @app.command()
