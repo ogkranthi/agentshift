@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 
@@ -155,14 +156,16 @@ class TestCopilotAgentMdSchema:
     - Frontmatter parses as clean YAML
     """
 
-    _SKILLS_UNDER_TEST = [
+    _SKILLS_UNDER_TEST: ClassVar[list[str]] = [
         "github",
         "slack",
         "weather",
         "pregnancy-companion",
     ]
-    _SKILL_BASE = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills"
-    _LOCAL_SKILLS = Path.home() / ".openclaw/skills"
+    _SKILL_BASE: ClassVar[Path] = (
+        Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills"
+    )
+    _LOCAL_SKILLS: ClassVar[Path] = Path.home() / ".openclaw/skills"
 
     # -----------------------------------------------------------------------
     # Helpers

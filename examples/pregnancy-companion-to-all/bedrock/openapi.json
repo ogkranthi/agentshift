@@ -1,0 +1,9 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "pregnancy-companion Actions",
+    "description": "Action group schema for the pregnancy-companion Bedrock agent.",
+    "version": "1.0.0"
+  },
+  "paths": {}
+}

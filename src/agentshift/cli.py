@@ -121,7 +121,7 @@ def _parse_with_errors(parse_fn, source: Path):
         if state.verbose:
             err_console.print(traceback.format_exc())
         raise typer.Exit(1) from e
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         err_console.print(f"[red]Unexpected error while parsing:[/red] {e}")
         if state.verbose:
             err_console.print(traceback.format_exc())
@@ -130,8 +130,10 @@ def _parse_with_errors(parse_fn, source: Path):
         raise typer.Exit(1) from e
 
     if state.verbose:
-        console.print(f"[dim]Parsed IR:[/dim] name={ir.name!r}, tools={len(ir.tools)}, "
-                      f"knowledge={len(ir.knowledge)}, triggers={len(ir.triggers)}")
+        console.print(
+            f"[dim]Parsed IR:[/dim] name={ir.name!r}, tools={len(ir.tools)}, "
+            f"knowledge={len(ir.knowledge)}, triggers={len(ir.triggers)}"
+        )
     return ir
 
 
@@ -159,7 +161,7 @@ def convert(
     else:
         if to_platform not in _EMITTERS:
             err_console.print(f"[red]Unknown target platform:[/red] {to_platform!r}")
-            suggestion = _did_you_mean(to_platform, list(_EMITTERS) + ["all"])
+            suggestion = _did_you_mean(to_platform, [*list(_EMITTERS), "all"])
             if suggestion:
                 err_console.print(f"  Did you mean [bold]{suggestion}[/bold]?")
             err_console.print(f"  Supported targets: {', '.join(_EMITTERS)}, all")
@@ -179,7 +181,7 @@ def convert(
         target_dir = output / target if to_platform == "all" else output
         try:
             emit_fn(ir, target_dir)
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             err_console.print(f"  [red]✗[/red] [bold]{target}[/bold] failed: {e}")
             if state.verbose:
                 err_console.print(traceback.format_exc())

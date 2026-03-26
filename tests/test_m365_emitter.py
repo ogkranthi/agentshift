@@ -507,9 +507,7 @@ class TestM365McpCapabilitiesDetailed:
         assert "Email" in cap_names
 
     def test_graph_connectors_has_connections_field(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="graph", description="MS Graph", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="graph", description="MS Graph", kind="mcp")])
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
         caps = doc.get("capabilities", [])
@@ -517,9 +515,7 @@ class TestM365McpCapabilitiesDetailed:
         assert "connections" in gc
 
     def test_graph_connectors_connection_has_todo_placeholder(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="notion", description="Notion", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="notion", description="Notion", kind="mcp")])
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
         caps = doc.get("capabilities", [])
@@ -528,9 +524,7 @@ class TestM365McpCapabilitiesDetailed:
         assert any("TODO" in str(conn.get("connectionId", "")) for conn in connections)
 
     def test_graph_connectors_readme_has_setup_note(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="graph", description="MS Graph", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="graph", description="MS Graph", kind="mcp")])
         emit(ir, tmp_path)
         readme = (tmp_path / "README.md").read_text()
         assert "Graph Connector" in readme or "connection" in readme.lower()

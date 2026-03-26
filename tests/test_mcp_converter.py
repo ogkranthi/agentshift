@@ -5,9 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
-from agentshift.ir import Tool, ToolAuth
+from agentshift.ir import Tool
 from agentshift.mcp_converter import (
     _build_summary,
     _normalize_null_types,
@@ -40,42 +38,84 @@ class TestMcpToOpenapi:
         assert schema["paths"] == {}
 
     def test_single_tool_creates_path(self):
-        tools = [{"name": "search", "description": "Search files", "inputSchema": {"type": "object", "properties": {}}}]
+        tools = [
+            {
+                "name": "search",
+                "description": "Search files",
+                "inputSchema": {"type": "object", "properties": {}},
+            }
+        ]
         schema = mcp_to_openapi(tools)
         assert "/search" in schema["paths"]
 
     def test_path_has_post_operation(self):
-        tools = [{"name": "read_file", "description": "Read a file", "inputSchema": {"type": "object", "properties": {}}}]
+        tools = [
+            {
+                "name": "read_file",
+                "description": "Read a file",
+                "inputSchema": {"type": "object", "properties": {}},
+            }
+        ]
         schema = mcp_to_openapi(tools)
         assert "post" in schema["paths"]["/read_file"]
 
     def test_operation_id_matches_tool_name(self):
-        tools = [{"name": "my_tool", "description": "My tool", "inputSchema": {"type": "object", "properties": {}}}]
+        tools = [
+            {
+                "name": "my_tool",
+                "description": "My tool",
+                "inputSchema": {"type": "object", "properties": {}},
+            }
+        ]
         schema = mcp_to_openapi(tools)
         op = schema["paths"]["/my_tool"]["post"]
         assert op["operationId"] == "my_tool"
 
     def test_description_in_operation(self):
-        tools = [{"name": "tool", "description": "Does something useful.", "inputSchema": {"type": "object", "properties": {}}}]
+        tools = [
+            {
+                "name": "tool",
+                "description": "Does something useful.",
+                "inputSchema": {"type": "object", "properties": {}},
+            }
+        ]
         schema = mcp_to_openapi(tools)
         op = schema["paths"]["/tool"]["post"]
         assert "Does something useful" in op["description"]
 
     def test_request_body_present(self):
-        tools = [{"name": "tool", "description": "Tool", "inputSchema": {"type": "object", "properties": {"x": {"type": "string"}}}}]
+        tools = [
+            {
+                "name": "tool",
+                "description": "Tool",
+                "inputSchema": {"type": "object", "properties": {"x": {"type": "string"}}},
+            }
+        ]
         schema = mcp_to_openapi(tools)
         op = schema["paths"]["/tool"]["post"]
         assert "requestBody" in op
         assert op["requestBody"]["required"] is True
 
     def test_responses_200_present(self):
-        tools = [{"name": "tool", "description": "Tool", "inputSchema": {"type": "object", "properties": {}}}]
+        tools = [
+            {
+                "name": "tool",
+                "description": "Tool",
+                "inputSchema": {"type": "object", "properties": {}},
+            }
+        ]
         schema = mcp_to_openapi(tools)
         op = schema["paths"]["/tool"]["post"]
         assert "200" in op["responses"]
 
     def test_responses_400_and_500_present(self):
-        tools = [{"name": "tool", "description": "Tool", "inputSchema": {"type": "object", "properties": {}}}]
+        tools = [
+            {
+                "name": "tool",
+                "description": "Tool",
+                "inputSchema": {"type": "object", "properties": {}},
+            }
+        ]
         schema = mcp_to_openapi(tools)
         op = schema["paths"]["/tool"]["post"]
         assert "400" in op["responses"]
@@ -87,9 +127,17 @@ class TestMcpToOpenapi:
         assert "ToolResult" in schema["components"]["schemas"]
 
     def test_tool_result_ref_in_200_response(self):
-        tools = [{"name": "tool", "description": "Tool", "inputSchema": {"type": "object", "properties": {}}}]
+        tools = [
+            {
+                "name": "tool",
+                "description": "Tool",
+                "inputSchema": {"type": "object", "properties": {}},
+            }
+        ]
         schema = mcp_to_openapi(tools)
-        resp_schema = schema["paths"]["/tool"]["post"]["responses"]["200"]["content"]["application/json"]["schema"]
+        resp_schema = schema["paths"]["/tool"]["post"]["responses"]["200"]["content"][
+            "application/json"
+        ]["schema"]
         assert resp_schema == {"$ref": "#/components/schemas/ToolResult"}
 
     def test_server_name_in_info(self):
@@ -264,7 +312,11 @@ class TestIrToolToOpenapiPath:
         assert "weather" in path_item["post"]["description"].lower()
 
     def test_tool_with_parameters(self):
-        params = {"type": "object", "properties": {"city": {"type": "string"}}, "required": ["city"]}
+        params = {
+            "type": "object",
+            "properties": {"city": {"type": "string"}},
+            "required": ["city"],
+        }
         tool = Tool(name="weather", description="Weather tool", kind="mcp", parameters=params)
         _, path_item = ir_tool_to_openapi_path(tool)
         body_schema = path_item["post"]["requestBody"]["content"]["application/json"]["schema"]

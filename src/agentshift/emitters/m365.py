@@ -256,9 +256,7 @@ def _write_readme(ir: AgentIR, output_dir: Path) -> None:
         t.name for t in ir.tools if t.kind == "mcp" and t.name.lower() not in _MCP_CAPABILITY_MAP
     ]
     gc_tools = [
-        t.name
-        for t in ir.tools
-        if t.kind == "mcp" and t.name.lower() in ("graph", "notion")
+        t.name for t in ir.tools if t.kind == "mcp" and t.name.lower() in ("graph", "notion")
     ]
 
     lines: list[str] = [

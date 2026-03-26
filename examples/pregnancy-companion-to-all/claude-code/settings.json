@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(~/.openclaw/skills/pregnancy-companion/knowledge/appointments.md)",
+      "Read(~/.openclaw/skills/pregnancy-companion/knowledge/exercise.md)",
+      "Read(~/.openclaw/skills/pregnancy-companion/knowledge/nutrition.md)",
+      "Read(~/.openclaw/skills/pregnancy-companion/knowledge/warning-signs.md)",
+      "Read(~/.openclaw/skills/pregnancy-companion/knowledge/week-by-week.md)",
+      "Write(~/.openclaw/skills/pregnancy-companion/data/symptoms-log.md)",
+      "Write(~/.openclaw/skills/pregnancy-companion/data/weight-log.md)",
+      "Write(~/.openclaw/skills/pregnancy-companion/data/questions-for-doctor.md)"
+    ]
+  },
+  "supportedOs": [
+    "darwin",
+    "linux"
+  ]
+}

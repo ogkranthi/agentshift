@@ -469,9 +469,7 @@ class TestVertexInstructionExtraction:
         assert len(data["instructions"]) == 20
 
     def test_empty_prompt_yields_empty_instructions(self, tmp_path):
-        ir = make_simple_ir(
-            description="My agent", persona=Persona(system_prompt=None)
-        )
+        ir = make_simple_ir(description="My agent", persona=Persona(system_prompt=None))
         emit(ir, tmp_path)
         data = json.loads((tmp_path / "agent.json").read_text())
         assert data["instructions"] == []

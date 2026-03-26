@@ -550,9 +550,7 @@ class TestBedrockKnowledgeSourcesDetailed:
 
     def test_knowledge_source_name_in_cf(self, tmp_path):
         ir = make_simple_ir(
-            knowledge=[
-                KnowledgeSource(name="pregnancy-guide", kind="file", path="/tmp/pg.md")
-            ]
+            knowledge=[KnowledgeSource(name="pregnancy-guide", kind="file", path="/tmp/pg.md")]
         )
         emit(ir, tmp_path)
         cf = (tmp_path / "cloudformation.yaml").read_text()

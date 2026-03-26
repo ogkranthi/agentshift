@@ -46,11 +46,11 @@
 
 | ID | Priority | Owner | Status | Title |
 |----|----------|-------|--------|-------|
-| D15 | P1 | @dev | ready | Error handling polish — structured errors, edge cases, helpful messages |
-| D16 | P1 | @dev | ready | PyPI release prep — version 1.0.0, classifiers, CHANGELOG.md |
-| D17 | P1 | @dev | ready | Examples directory — convert pregnancy-companion to all targets, document results |
-| T10 | P1 | @tester | ready | Smoke test generated configs against real platform schemas |
-| A08 | P2 | @architect | ready | Draft CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md |
+| D15 | P1 | @dev | merged | Error handling polish — structured errors, edge cases, helpful messages |
+| D16 | P1 | @dev | merged | PyPI release prep — version 1.0.0, classifiers, CHANGELOG.md |
+| D17 | P1 | @dev | merged | Examples directory — convert pregnancy-companion to all targets, document results |
+| T10 | P1 | @tester | merged | Smoke test generated configs against real platform schemas |
+| A08 | P2 | @architect | merged | Draft CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md |
 
 ## Week 3: Diff + Validate
 
