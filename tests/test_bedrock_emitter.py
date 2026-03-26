@@ -498,6 +498,195 @@ class TestBedrockRealSkills:
             assert f"/{tool.name}/run" in schema["paths"]
 
 
+class TestBedrockInstructionBoundary:
+    """Additional instruction truncation edge-case tests."""
+
+    def test_instruction_at_exactly_4000_chars_not_truncated(self, tmp_path):
+        prompt = "x" * 4000
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        content = (tmp_path / "instruction.txt").read_text()
+        assert "AGENTSHIFT" not in content
+        assert not (tmp_path / "instruction-full.txt").exists()
+
+    def test_instruction_at_4001_chars_is_truncated(self, tmp_path):
+        prompt = "x" * 4001
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        content = (tmp_path / "instruction.txt").read_text()
+        assert "AGENTSHIFT" in content
+
+    def test_instruction_full_txt_exact_match(self, tmp_path):
+        long_prompt = "Word number %d. " * 400  # ~5600 chars
+        long_prompt = long_prompt % tuple(range(400))
+        ir = make_simple_ir(persona=Persona(system_prompt=long_prompt))
+        emit(ir, tmp_path)
+        full = (tmp_path / "instruction-full.txt").read_text()
+        assert full.strip() == long_prompt.strip()
+
+    def test_instruction_full_txt_longer_than_instruction_txt(self, tmp_path):
+        long_prompt = "This is a sentence. " * 300
+        ir = make_simple_ir(persona=Persona(system_prompt=long_prompt))
+        emit(ir, tmp_path)
+        short_len = len((tmp_path / "instruction.txt").read_text())
+        full_len = len((tmp_path / "instruction-full.txt").read_text())
+        assert full_len > short_len
+
+
+class TestBedrockKnowledgeSourcesDetailed:
+    """More detailed knowledge source tests for CloudFormation output."""
+
+    def test_multiple_knowledge_sources_each_have_kb_placeholder(self, tmp_path):
+        ir = make_simple_ir(
+            knowledge=[
+                KnowledgeSource(name="guide1", kind="file", path="/tmp/guide1.md"),
+                KnowledgeSource(name="guide2", kind="url", path="https://example.com"),
+            ]
+        )
+        emit(ir, tmp_path)
+        cf = (tmp_path / "cloudformation.yaml").read_text()
+        # Each KB entry has "KnowledgeBaseId: kb-PLACEHOLDER-TODO" once
+        assert cf.count("KnowledgeBaseId: kb-PLACEHOLDER-TODO") == 2
+
+    def test_knowledge_source_name_in_cf(self, tmp_path):
+        ir = make_simple_ir(
+            knowledge=[
+                KnowledgeSource(name="pregnancy-guide", kind="file", path="/tmp/pg.md")
+            ]
+        )
+        emit(ir, tmp_path)
+        cf = (tmp_path / "cloudformation.yaml").read_text()
+        assert "pregnancy-guide" in cf
+
+    def test_knowledge_source_description_in_cf(self, tmp_path):
+        ir = make_simple_ir(
+            knowledge=[
+                KnowledgeSource(
+                    name="kb1", kind="file", path="/tmp/kb1.md", description="My knowledge base"
+                )
+            ]
+        )
+        emit(ir, tmp_path)
+        cf = (tmp_path / "cloudformation.yaml").read_text()
+        assert "My knowledge base" in cf
+
+    def test_knowledge_source_replace_todo_in_cf(self, tmp_path):
+        ir = make_simple_ir(
+            knowledge=[KnowledgeSource(name="guide", kind="file", path="/tmp/guide.md")]
+        )
+        emit(ir, tmp_path)
+        cf = (tmp_path / "cloudformation.yaml").read_text()
+        assert "Replace kb-PLACEHOLDER-TODO" in cf
+
+
+class TestBedrockMcpToolsOpenApiDetailed:
+    """More detailed MCP tools in openapi.json tests."""
+
+    def test_mcp_tool_request_body_has_action_field(self, tmp_path):
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
+        emit(ir, tmp_path)
+        schema = json.loads((tmp_path / "openapi.json").read_text())
+        post = schema["paths"]["/slack/action"]["post"]
+        props = post["requestBody"]["content"]["application/json"]["schema"]["properties"]
+        assert "action" in props
+
+    def test_mcp_tool_request_body_has_params_field(self, tmp_path):
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
+        emit(ir, tmp_path)
+        schema = json.loads((tmp_path / "openapi.json").read_text())
+        post = schema["paths"]["/slack/action"]["post"]
+        props = post["requestBody"]["content"]["application/json"]["schema"]["properties"]
+        assert "params" in props
+
+    def test_mcp_tool_action_is_required(self, tmp_path):
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
+        emit(ir, tmp_path)
+        schema = json.loads((tmp_path / "openapi.json").read_text())
+        post = schema["paths"]["/slack/action"]["post"]
+        required = post["requestBody"]["content"]["application/json"]["schema"].get("required", [])
+        assert "action" in required
+
+    def test_shell_tool_request_body_has_command_field(self, tmp_path):
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
+        emit(ir, tmp_path)
+        schema = json.loads((tmp_path / "openapi.json").read_text())
+        post = schema["paths"]["/gh/run"]["post"]
+        props = post["requestBody"]["content"]["application/json"]["schema"]["properties"]
+        assert "command" in props
+
+    def test_shell_tool_command_is_required(self, tmp_path):
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
+        emit(ir, tmp_path)
+        schema = json.loads((tmp_path / "openapi.json").read_text())
+        post = schema["paths"]["/gh/run"]["post"]
+        required = post["requestBody"]["content"]["application/json"]["schema"].get("required", [])
+        assert "command" in required
+
+    def test_mcp_tool_has_200_response(self, tmp_path):
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
+        emit(ir, tmp_path)
+        schema = json.loads((tmp_path / "openapi.json").read_text())
+        post = schema["paths"]["/slack/action"]["post"]
+        assert "200" in post["responses"]
+
+
+class TestBedrockAuthTodo:
+    """Tests for auth-specific TODO comments when tool.auth.type != 'none'."""
+
+    def test_tool_with_api_key_auth_generates_todo(self, tmp_path):
+        from agentshift.ir import ToolAuth
+
+        ir = make_simple_ir(
+            tools=[
+                Tool(
+                    name="slack",
+                    description="Slack MCP",
+                    kind="mcp",
+                    auth=ToolAuth(type="api_key", env_var="SLACK_API_KEY"),
+                )
+            ]
+        )
+        emit(ir, tmp_path)
+        cf = (tmp_path / "cloudformation.yaml").read_text()
+        assert "SLACK_API_KEY" in cf
+        assert "Auth" in cf or "auth" in cf.lower()
+
+    def test_tool_with_bearer_auth_generates_todo(self, tmp_path):
+        from agentshift.ir import ToolAuth
+
+        ir = make_simple_ir(
+            tools=[
+                Tool(
+                    name="github",
+                    description="GitHub API",
+                    kind="shell",
+                    auth=ToolAuth(type="bearer", env_var="GITHUB_TOKEN"),
+                )
+            ]
+        )
+        emit(ir, tmp_path)
+        cf = (tmp_path / "cloudformation.yaml").read_text()
+        assert "GITHUB_TOKEN" in cf
+
+    def test_tool_with_no_auth_no_extra_todo(self, tmp_path):
+        from agentshift.ir import ToolAuth
+
+        ir = make_simple_ir(
+            tools=[
+                Tool(
+                    name="gh",
+                    description="GitHub CLI",
+                    kind="shell",
+                    auth=ToolAuth(type="none"),
+                )
+            ]
+        )
+        emit(ir, tmp_path)
+        cf = (tmp_path / "cloudformation.yaml").read_text()
+        # Should not have auth-specific TODO
+        assert "Auth setup required" not in cf
+
+
 class TestBedrockCloudFormationYAMLValidity:
     """CloudFormation YAML must parse with CF-aware loader (handles !Ref, !GetAtt)."""
 
