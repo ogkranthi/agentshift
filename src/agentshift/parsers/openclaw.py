@@ -24,14 +24,34 @@ from agentshift.ir import (
 
 def parse_skill_dir(path: Path) -> AgentIR:
     """Parse an OpenClaw skill directory and return an AgentIR."""
+    if not path.is_dir():
+        raise FileNotFoundError(
+            f"Source directory not found: {path}. "
+            "Provide the path to a directory containing SKILL.md."
+        )
     skill_md = path / "SKILL.md"
     if not skill_md.exists():
-        raise FileNotFoundError(f"No SKILL.md found in {path}")
+        raise FileNotFoundError(
+            f"No SKILL.md found in {path}. "
+            "An OpenClaw skill directory must contain a SKILL.md file."
+        )
 
     raw = skill_md.read_text(encoding="utf-8")
+    if not raw.strip():
+        raise ValueError(
+            f"SKILL.md in {path} is empty. "
+            "Add a YAML frontmatter block (---\\nname: my-skill\\n---) and skill description."
+        )
+
     frontmatter, body = _split_frontmatter(raw)
 
-    fm = yaml.safe_load(frontmatter) or {}
+    try:
+        fm = yaml.safe_load(frontmatter) or {}
+    except yaml.YAMLError as e:
+        raise ValueError(
+            f"SKILL.md in {path} has invalid YAML frontmatter: {e}. "
+            "Ensure the block between '---' delimiters is valid YAML."
+        ) from e
 
     name = fm.get("name", path.name)
     description = fm.get("description", "") or _extract_description_from_body(body)
