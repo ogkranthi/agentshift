@@ -305,6 +305,17 @@ def _write_cloudformation(ir: AgentIR, output_dir: Path, instruction: str, trunc
                 lines.append(
                     f"          # Original IR tool: name={tool.name}, kind=mcp, description={tool.description!r}"
                 )
+            if tool.auth and tool.auth.type != "none":
+                auth_type = tool.auth.type
+                env_var = tool.auth.env_var or f"{tool.name.upper().replace('-', '_')}_API_KEY"
+                lines.append(
+                    f"          # TODO [agentshift]: Auth setup required for '{tool.name}': {auth_type}."
+                )
+                lines.append(
+                    f"          # Set environment variable '{env_var}' in Lambda function configuration."
+                )
+                if tool.auth.notes:
+                    lines.append(f"          # Auth notes: {tool.auth.notes}")
 
     # KnowledgeBases
     if ir.knowledge:

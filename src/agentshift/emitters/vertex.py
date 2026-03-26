@@ -67,12 +67,13 @@ def _map_tools(ir: AgentIR) -> list[dict]:
                 }
             )
         elif tool.kind == "mcp":
+            desc = tool.description or f"Invoke action on {tool.name} MCP tool."
             tools.append(
                 {
                     "name": tool.name,
                     "type": "FUNCTION",
-                    "description": tool.description or f"Invoke action on {tool.name} MCP tool.",
-                    "x-agentshift-stub": "Implement as MCP-compatible endpoint",
+                    "description": desc,
+                    "x-agentshift-stub": f"Implement as MCP-compatible endpoint. {desc[:200]}",
                 }
             )
         elif tool.kind == "openapi":

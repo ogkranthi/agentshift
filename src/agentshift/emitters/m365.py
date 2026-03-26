@@ -30,8 +30,14 @@ _TEAMS_MANIFEST_SCHEMA = (
 _MCP_CAPABILITY_MAP: dict[str, dict] = {
     "teams": {"name": "TeamsMessages"},
     "email": {"name": "Email"},
-    "notion": {"name": "GraphConnectors", "connections": []},
-    "graph": {"name": "GraphConnectors", "connections": []},
+    "notion": {
+        "name": "GraphConnectors",
+        "connections": [{"connectionId": "TODO-replace-with-graph-connection-id"}],
+    },
+    "graph": {
+        "name": "GraphConnectors",
+        "connections": [{"connectionId": "TODO-replace-with-graph-connection-id"}],
+    },
 }
 
 # Shell tool command patterns that imply web access
@@ -249,6 +255,11 @@ def _write_readme(ir: AgentIR, output_dir: Path) -> None:
     dropped_mcp = [
         t.name for t in ir.tools if t.kind == "mcp" and t.name.lower() not in _MCP_CAPABILITY_MAP
     ]
+    gc_tools = [
+        t.name
+        for t in ir.tools
+        if t.kind == "mcp" and t.name.lower() in ("graph", "notion")
+    ]
 
     lines: list[str] = [
         f"# {ir.name} — Microsoft 365 Declarative Agent",
@@ -267,11 +278,24 @@ def _write_readme(ir: AgentIR, output_dir: Path) -> None:
         "",
     ]
 
-    if dropped_shell or dropped_mcp:
+    if dropped_shell or dropped_mcp or gc_tools:
         lines += [
             "## Conversion Notes",
             "",
         ]
+        if gc_tools:
+            lines += [
+                "### Graph Connectors Setup",
+                "",
+                "The following tools map to Microsoft Graph Connectors and require a real connection ID:",
+                "",
+            ]
+            for name in gc_tools:
+                lines.append(
+                    f"- `{name}` — TODO: replace `TODO-replace-with-graph-connection-id` in"
+                    f" `declarative-agent.json` with the real connection ID from Microsoft 365 Admin Center"
+                )
+            lines.append("")
         if dropped_shell:
             lines += [
                 "### Dropped Shell Tools",

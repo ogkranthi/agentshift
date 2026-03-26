@@ -449,6 +449,175 @@ class TestConversationStarters:
 # ---------------------------------------------------------------------------
 
 
+class TestM365InstructionTruncationDetailed:
+    """More precise instruction truncation edge-case tests."""
+
+    def test_instruction_at_exactly_8000_chars_not_truncated(self, tmp_path):
+        prompt = "x" * 8000
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        assert "AGENTSHIFT" not in doc["instructions"]
+        assert not (tmp_path / "instructions-full.txt").exists()
+
+    def test_instruction_at_8001_chars_is_truncated(self, tmp_path):
+        prompt = "x" * 8001
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        assert "AGENTSHIFT" in doc["instructions"]
+
+    def test_truncated_instructions_within_8000(self, tmp_path):
+        prompt = "This is a sentence. " * 500  # ~10,000 chars
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        assert len(doc["instructions"]) <= 8000
+
+    def test_instructions_full_txt_exact_content(self, tmp_path):
+        prompt = "This is a sentence. " * 500
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        full = (tmp_path / "instructions-full.txt").read_text()
+        assert full.strip() == prompt.strip()
+
+    def test_truncation_notice_contains_m365_limit_text(self, tmp_path):
+        prompt = "x" * 9000
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        assert "8,000" in doc["instructions"] or "truncated" in doc["instructions"].lower()
+
+
+class TestM365McpCapabilitiesDetailed:
+    """More thorough tests for MCP tool → capability mapping."""
+
+    def test_teams_and_email_both_in_capabilities(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[
+                Tool(name="teams", description="Teams", kind="mcp"),
+                Tool(name="email", description="Email", kind="mcp"),
+            ]
+        )
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        caps = doc.get("capabilities", [])
+        cap_names = {c["name"] for c in caps}
+        assert "TeamsMessages" in cap_names
+        assert "Email" in cap_names
+
+    def test_graph_connectors_has_connections_field(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[Tool(name="graph", description="MS Graph", kind="mcp")]
+        )
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        caps = doc.get("capabilities", [])
+        gc = next(c for c in caps if c["name"] == "GraphConnectors")
+        assert "connections" in gc
+
+    def test_graph_connectors_connection_has_todo_placeholder(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[Tool(name="notion", description="Notion", kind="mcp")]
+        )
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        caps = doc.get("capabilities", [])
+        gc = next(c for c in caps if c["name"] == "GraphConnectors")
+        connections = gc.get("connections", [])
+        assert any("TODO" in str(conn.get("connectionId", "")) for conn in connections)
+
+    def test_graph_connectors_readme_has_setup_note(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[Tool(name="graph", description="MS Graph", kind="mcp")]
+        )
+        emit(ir, tmp_path)
+        readme = (tmp_path / "README.md").read_text()
+        assert "Graph Connector" in readme or "connection" in readme.lower()
+
+    def test_all_four_mcp_tools_create_capabilities(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[
+                Tool(name="teams", description="Teams", kind="mcp"),
+                Tool(name="email", description="Email", kind="mcp"),
+                Tool(name="graph", description="Graph", kind="mcp"),
+                Tool(name="notion", description="Notion", kind="mcp"),
+            ]
+        )
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        caps = doc.get("capabilities", [])
+        cap_names = {c["name"] for c in caps}
+        assert "TeamsMessages" in cap_names
+        assert "Email" in cap_names
+        assert "GraphConnectors" in cap_names
+
+    def test_no_duplicate_graph_connectors(self, tmp_path):
+        # Both graph and notion map to GraphConnectors; should only appear once
+        ir = make_simple_ir(
+            tools=[
+                Tool(name="graph", description="Graph", kind="mcp"),
+                Tool(name="notion", description="Notion", kind="mcp"),
+            ]
+        )
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        caps = doc.get("capabilities", [])
+        gc_caps = [c for c in caps if c["name"] == "GraphConnectors"]
+        assert len(gc_caps) == 1
+
+
+class TestM365WebSearchCapabilityDetailed:
+    """More thorough WebSearch capability tests."""
+
+    def test_two_url_knowledge_sources_both_in_sites(self, tmp_path):
+        ir = make_simple_ir(
+            knowledge=[
+                KnowledgeSource(name="docs1", kind="url", path="https://docs1.example.com"),
+                KnowledgeSource(name="docs2", kind="url", path="https://docs2.example.com"),
+            ]
+        )
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        caps = doc.get("capabilities", [])
+        ws = next(c for c in caps if c["name"] == "WebSearch")
+        urls = {s["url"] for s in ws.get("sites", [])}
+        assert "https://docs1.example.com" in urls
+        assert "https://docs2.example.com" in urls
+
+    def test_file_knowledge_does_not_generate_websearch(self, tmp_path):
+        ir = make_simple_ir(
+            knowledge=[KnowledgeSource(name="guide", kind="file", path="/tmp/guide.md")]
+        )
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        caps = doc.get("capabilities", [])
+        assert not any(c["name"] == "WebSearch" for c in caps)
+
+    def test_wget_tool_also_maps_to_websearch(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[Tool(name="wget", description="Download with wget", kind="shell")]
+        )
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        caps = doc.get("capabilities", [])
+        assert any(c["name"] == "WebSearch" for c in caps)
+
+    def test_curl_and_url_knowledge_merge_into_single_websearch(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[Tool(name="curl", description="HTTP curl", kind="shell")],
+            knowledge=[KnowledgeSource(name="site", kind="url", path="https://example.com")],
+        )
+        emit(ir, tmp_path)
+        doc = json.loads((tmp_path / "declarative-agent.json").read_text())
+        caps = doc.get("capabilities", [])
+        ws_caps = [c for c in caps if c["name"] == "WebSearch"]
+        assert len(ws_caps) == 1
+        # Should have the site merged in
+        ws = ws_caps[0]
+        assert any(s["url"] == "https://example.com" for s in ws.get("sites", []))
+
+
 class TestM365RealSkills:
     def test_github_skill_converts(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir

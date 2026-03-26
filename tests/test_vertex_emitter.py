@@ -280,6 +280,203 @@ class TestVertexReadme:
 # ---------------------------------------------------------------------------
 
 
+class TestVertexInstructionTruncation:
+    """Instruction/goal truncation boundary tests."""
+
+    def test_goal_at_exactly_8000_chars_not_truncated(self, tmp_path):
+        prompt = "x" * 8000
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        assert len(data["goal"]) == 8000
+
+    def test_goal_at_8001_chars_truncated_to_8000(self, tmp_path):
+        prompt = "x" * 8001
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        assert len(data["goal"]) == 8000
+
+    def test_instructions_skip_empty_lines(self, tmp_path):
+        prompt = "Line one.\n\n\nLine two.\n\n"
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        for instr in data["instructions"]:
+            assert instr.strip() != ""
+
+    def test_instructions_each_at_most_500_chars_from_long_line(self, tmp_path):
+        # A single 1000-char line should be truncated to 500 in instructions
+        prompt = "A" * 1000
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        for instr in data["instructions"]:
+            assert len(instr) <= 500
+
+    def test_goal_falls_back_to_description_length(self, tmp_path):
+        desc = "x" * 100
+        ir = make_simple_ir(description=desc, persona=Persona(system_prompt=None))
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        assert len(data["goal"]) == 100
+
+
+class TestVertexMultipleToolTypes:
+    """Tests with multiple tool types in a single agent."""
+
+    def test_all_three_tool_types_in_tools_list(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[
+                Tool(name="gh", description="GitHub CLI", kind="shell"),
+                Tool(name="slack", description="Slack MCP", kind="mcp"),
+                Tool(name="weather", description="Weather API", kind="openapi"),
+            ]
+        )
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        names = {t["name"] for t in data["tools"]}
+        assert "gh" in names
+        assert "slack" in names
+        assert "weather" in names
+
+    def test_shell_tool_type_is_function_in_mixed(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[
+                Tool(name="gh", description="GitHub CLI", kind="shell"),
+                Tool(name="slack", description="Slack MCP", kind="mcp"),
+                Tool(name="weather", description="Weather API", kind="openapi"),
+            ]
+        )
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        by_name = {t["name"]: t for t in data["tools"]}
+        assert by_name["gh"]["type"] == "FUNCTION"
+
+    def test_mcp_tool_type_is_function_in_mixed(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[
+                Tool(name="gh", description="GitHub CLI", kind="shell"),
+                Tool(name="slack", description="Slack MCP", kind="mcp"),
+                Tool(name="weather", description="Weather API", kind="openapi"),
+            ]
+        )
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        by_name = {t["name"]: t for t in data["tools"]}
+        assert by_name["slack"]["type"] == "FUNCTION"
+
+    def test_openapi_tool_type_is_open_api_in_mixed(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[
+                Tool(name="gh", description="GitHub CLI", kind="shell"),
+                Tool(name="slack", description="Slack MCP", kind="mcp"),
+                Tool(name="weather", description="Weather API", kind="openapi"),
+            ]
+        )
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        by_name = {t["name"]: t for t in data["tools"]}
+        assert by_name["weather"]["type"] == "OPEN_API"
+
+    def test_only_shell_and_mcp_get_stub_markers(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[
+                Tool(name="gh", description="GitHub CLI", kind="shell"),
+                Tool(name="slack", description="Slack MCP", kind="mcp"),
+                Tool(name="weather", description="Weather API", kind="openapi"),
+            ]
+        )
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        by_name = {t["name"]: t for t in data["tools"]}
+        assert "x-agentshift-stub" in by_name["gh"]
+        assert "x-agentshift-stub" in by_name["slack"]
+        assert "x-agentshift-stub" not in by_name["weather"]
+
+    def test_mcp_stub_includes_description(self, tmp_path):
+        ir = make_simple_ir(
+            tools=[Tool(name="slack", description="Send Slack messages via MCP", kind="mcp")]
+        )
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        tool = next(t for t in data["tools"] if t["name"] == "slack")
+        # D14: description should appear in the stub value
+        assert "Send Slack messages via MCP" in tool["x-agentshift-stub"]
+
+
+class TestVertexKnowledgeSources:
+    """Knowledge source handling in Vertex AI emitter."""
+
+    def test_single_knowledge_source_in_readme(self, tmp_path):
+        ir = make_simple_ir(
+            knowledge=[KnowledgeSource(name="my-docs", kind="file", path="/tmp/docs.md")]
+        )
+        emit(ir, tmp_path)
+        readme = (tmp_path / "README.md").read_text()
+        assert "my-docs" in readme
+
+    def test_multiple_knowledge_sources_all_in_readme(self, tmp_path):
+        ir = make_simple_ir(
+            knowledge=[
+                KnowledgeSource(name="guide1", kind="file", path="/tmp/guide1.md"),
+                KnowledgeSource(name="guide2", kind="url", path="https://example.com"),
+            ]
+        )
+        emit(ir, tmp_path)
+        readme = (tmp_path / "README.md").read_text()
+        assert "guide1" in readme
+        assert "guide2" in readme
+
+    def test_knowledge_source_readme_has_vertex_search_reference(self, tmp_path):
+        ir = make_simple_ir(
+            knowledge=[KnowledgeSource(name="docs", kind="file", path="/tmp/docs.md")]
+        )
+        emit(ir, tmp_path)
+        readme = (tmp_path / "README.md").read_text()
+        assert "Vertex AI" in readme or "data store" in readme.lower()
+
+    def test_no_knowledge_no_knowledge_section(self, tmp_path):
+        ir = make_simple_ir(knowledge=[])
+        emit(ir, tmp_path)
+        readme = (tmp_path / "README.md").read_text()
+        assert "## Knowledge" not in readme
+
+
+class TestVertexInstructionExtraction:
+    """Tests for how instructions are extracted from the system prompt."""
+
+    def test_multi_line_prompt_yields_multiple_instructions(self, tmp_path):
+        prompt = "Do step one.\nDo step two.\nDo step three."
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        assert len(data["instructions"]) == 3
+
+    def test_heading_lines_excluded(self, tmp_path):
+        prompt = "## Instructions\nDo step one.\n### Sub-heading\nDo step two."
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        for instr in data["instructions"]:
+            assert not instr.startswith("#")
+
+    def test_50_line_prompt_capped_at_20_instructions(self, tmp_path):
+        prompt = "\n".join(f"Instruction line {i}." for i in range(50))
+        ir = make_simple_ir(persona=Persona(system_prompt=prompt))
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        assert len(data["instructions"]) == 20
+
+    def test_empty_prompt_yields_empty_instructions(self, tmp_path):
+        ir = make_simple_ir(
+            description="My agent", persona=Persona(system_prompt=None)
+        )
+        emit(ir, tmp_path)
+        data = json.loads((tmp_path / "agent.json").read_text())
+        assert data["instructions"] == []
+
+
 class TestVertexRealSkills:
     _GITHUB_SKILL = (
         Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
