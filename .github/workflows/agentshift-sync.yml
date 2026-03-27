@@ -1,0 +1,177 @@
+name: AgentShift Sync
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "SKILL.md"
+      - "**/SKILL.md"
+
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: "Comma-separated list of target platforms (e.g. claude-code,copilot) or 'all'"
+        required: false
+        default: "all"
+      output_dir:
+        description: "Name of the output directory created inside each skill directory"
+        required: false
+        default: "agentshift-output"
+      skill_pattern:
+        description: "Glob pattern used to find SKILL.md files (relative to repo root)"
+        required: false
+        default: "**/SKILL.md"
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  sync:
+    name: Generate cloud configs from SKILL.md files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install agentshift
+        run: pip install -e "."
+
+      - name: Resolve workflow inputs
+        id: config
+        run: |
+          TARGETS="${{ github.event.inputs.targets || 'all' }}"
+          OUTPUT_DIR="${{ github.event.inputs.output_dir || 'agentshift-output' }}"
+          SKILL_PATTERN="${{ github.event.inputs.skill_pattern || '**/SKILL.md' }}"
+          echo "targets=$TARGETS" >> $GITHUB_OUTPUT
+          echo "output_dir=$OUTPUT_DIR" >> $GITHUB_OUTPUT
+          echo "skill_pattern=$SKILL_PATTERN" >> $GITHUB_OUTPUT
+          echo "Targets:       $TARGETS"
+          echo "Output dir:    $OUTPUT_DIR"
+          echo "Skill pattern: $SKILL_PATTERN"
+
+      - name: Find SKILL.md files
+        id: find_skills
+        run: |
+          PATTERN="${{ steps.config.outputs.skill_pattern }}"
+          # Find matching files, exclude agentshift's own test fixtures
+          mapfile -t FILES < <(find . -name "SKILL.md" -not -path "./tests/*" -not -path "./.git/*" | sort)
+          echo "Found ${#FILES[@]} SKILL.md file(s):"
+          printf '  %s\n' "${FILES[@]}"
+          # Store as newline-delimited list in a file for the next step
+          printf '%s\n' "${FILES[@]}" > /tmp/skill_files.txt
+          echo "count=${#FILES[@]}" >> $GITHUB_OUTPUT
+
+      - name: Convert skills to cloud configs
+        id: convert
+        run: |
+          TARGETS="${{ steps.config.outputs.targets }}"
+          OUTPUT_DIR="${{ steps.config.outputs.output_dir }}"
+          FAILED=()
+          SUCCEEDED=()
+
+          while IFS= read -r skill_file; do
+            [ -z "$skill_file" ] && continue
+            SKILL_DIR=$(dirname "$skill_file")
+            OUTPUT_PATH="$SKILL_DIR/$OUTPUT_DIR"
+            echo "::group::Converting $SKILL_DIR"
+            echo "Running: agentshift convert --from openclaw --to $TARGETS $SKILL_DIR --output $OUTPUT_PATH"
+            if agentshift convert --from openclaw --to "$TARGETS" "$SKILL_DIR" --output "$OUTPUT_PATH"; then
+              echo "✓ $SKILL_DIR succeeded"
+              SUCCEEDED+=("$SKILL_DIR")
+            else
+              echo "✗ $SKILL_DIR failed"
+              FAILED+=("$SKILL_DIR")
+            fi
+            echo "::endgroup::"
+          done < /tmp/skill_files.txt
+
+          echo "succeeded=${SUCCEEDED[*]}" >> $GITHUB_OUTPUT
+          echo "failed=${FAILED[*]}" >> $GITHUB_OUTPUT
+
+          if [ ${#FAILED[@]} -gt 0 ]; then
+            echo "has_failures=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_failures=false" >> $GITHUB_OUTPUT
+          fi
+
+          echo ""
+          echo "Summary: ${#SUCCEEDED[@]} succeeded, ${#FAILED[@]} failed"
+
+      - name: Commit and push generated configs
+        if: steps.convert.outputs.has_failures != 'true' || steps.convert.outputs.succeeded != ''
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Stage all generated output directories
+          OUTPUT_DIR="${{ steps.config.outputs.output_dir }}"
+          git add "**/$OUTPUT_DIR/" 2>/dev/null || true
+          # Also try direct add for any new files
+          find . -path "*/$OUTPUT_DIR/*" -not -path "./.git/*" | xargs git add 2>/dev/null || true
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit — configs are already up to date."
+          else
+            BRANCH="${{ github.ref_name }}"
+            git commit -m "chore: auto-generate cloud configs from SKILL.md [skip ci]
+
+            Targets: ${{ steps.config.outputs.targets }}
+            Output dir: ${{ steps.config.outputs.output_dir }}
+            Triggered by: ${{ github.sha }}"
+            git push origin "$BRANCH"
+            echo "✓ Pushed generated configs to $BRANCH"
+          fi
+
+      - name: Open failure issue
+        if: steps.convert.outputs.has_failures == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const failed = `${{ steps.convert.outputs.failed }}`;
+            const sha = context.sha.slice(0, 7);
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              `## ⚠️ AgentShift Sync Failed`,
+              ``,
+              `The AgentShift cloud config generation failed for one or more skills during run [\`${sha}\`](${runUrl}).`,
+              ``,
+              `### Failed skill directories`,
+              ``,
+              failed.split(' ').filter(Boolean).map(d => `- \`${d}\``).join('\n'),
+              ``,
+              `### Details`,
+              ``,
+              `- **Workflow run:** [View logs](${runUrl})`,
+              `- **Commit:** \`${context.sha}\``,
+              `- **Branch:** \`${context.ref}\``,
+              `- **Targets:** \`${{ steps.config.outputs.targets }}\``,
+              ``,
+              `### Next steps`,
+              ``,
+              `1. Check the [workflow logs](${runUrl}) for the full error output`,
+              `2. Verify that the failing SKILL.md files are valid OpenClaw skills`,
+              `3. Run \`agentshift convert --from openclaw --to all <skill_dir>\` locally to reproduce`,
+              `4. Fix any issues and push again`,
+              ``,
+              `_This issue was automatically opened by the AgentShift Sync workflow._`,
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `AgentShift Sync failed on ${sha}: ${failed.split(' ').filter(Boolean).length} skill(s) errored`,
+              body,
+              labels: ['bug', 'agentshift-sync'],
+            });
