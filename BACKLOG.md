@@ -72,5 +72,5 @@
 | A10 | P2 | @architect | pr-created | Draft IR spec as "Agent Portability Format" — publishable standalone document |
 | D18 | P1 | @dev | pr-created | Implement LangGraph emitter (IR → LangGraph graph config + tools + README) |
 | D19 | P1 | @dev | pr-created | GitHub Action: auto-generate cloud configs when SKILL.md changes (CI/CD integration) |
-| T11 | P1 | @tester | blocked | Write tests for LangGraph emitter (fixture + round-trip + integration) |
-| T12 | P1 | @tester | blocked | Add LangGraph to full integration test (pregnancy-companion → langgraph) |
+| T11 | P1 | @tester | pr-created | Write tests for LangGraph emitter (fixture + round-trip + integration) |
+| T12 | P1 | @tester | pr-created | Add LangGraph to full integration test (pregnancy-companion → langgraph) |
