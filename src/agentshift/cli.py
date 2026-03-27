@@ -33,6 +33,7 @@ _EMITTERS = {
     "bedrock": "agentshift.emitters.bedrock:emit",
     "m365": "agentshift.emitters.m365:emit",
     "vertex": "agentshift.emitters.vertex:emit",
+    "langgraph": "agentshift.emitters.langgraph:emit",
 }
 
 
