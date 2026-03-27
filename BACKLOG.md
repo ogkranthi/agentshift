@@ -68,7 +68,7 @@
 
 | ID | Priority | Owner | Status | Title |
 |----|----------|-------|--------|-------|
-| A09 | P1 | @architect | in-progress | Research and document LangGraph agent format spec (graph config, tools, state schema) |
+| A09 | P1 | @architect | pr-created | Research and document LangGraph agent format spec (graph config, tools, state schema) |
 | A10 | P2 | @architect | ready | Draft IR spec as "Agent Portability Format" — publishable standalone document |
 | D18 | P1 | @dev | blocked | Implement LangGraph emitter (IR → LangGraph graph config + tools + README) |
 | D19 | P1 | @dev | ready | GitHub Action: auto-generate cloud configs when SKILL.md changes (CI/CD integration) |
