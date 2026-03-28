@@ -66,7 +66,7 @@ def _build_instruction(ir: AgentIR) -> tuple[str, bool]:
             parts.append(f"Tone and style: {persona_section}")
 
         # Add any remaining sections not already handled (excluding guardrails, examples)
-        handled = set(INSTRUCTION_SECTION_ORDER) | {"guardrails", "persona", "examples", "preamble"}
+        handled = set(instruction_section_order) | {"guardrails", "persona", "examples", "preamble"}
         for key, val in sections.items():
             if key not in handled and val:
                 heading = key.replace("-", " ").title()
