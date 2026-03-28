@@ -97,6 +97,7 @@ class Persona(BaseModel):
     system_prompt: str | None = None
     personality_notes: str | None = None
     language: str = "en"
+    sections: dict[str, str] | None = None
 
 
 class Metadata(BaseModel):
