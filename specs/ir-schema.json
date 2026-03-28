@@ -63,6 +63,24 @@
           "type": "string",
           "description": "Primary language for responses. BCP-47 code. e.g. 'en', 'es'.",
           "default": "en"
+        },
+        "sections": {
+          "type": "object",
+          "description": "Optional structured decomposition of system_prompt into named semantic sections. Keys are section slugs (lowercase, hyphens). Values are the section body text (excluding the heading). sections is additive — system_prompt remains authoritative.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "examples": [
+            {
+              "overview": "You are a warm, knowledgeable pregnancy companion...",
+              "behavior": "Always respond with empathy...",
+              "guardrails": "Never provide medical diagnoses...",
+              "tools": "Use the calendar tool to track appointments..."
+            }
+          ]
         }
       }
     },

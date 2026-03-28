@@ -26,9 +26,12 @@ def emit(ir: AgentIR, output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     instruction, truncated = _build_instruction(ir)
+    guardrail_config = _build_guardrail_config(ir)
     _write_instruction(ir, output_dir, instruction, truncated)
+    if guardrail_config:
+        _write_guardrail_config(output_dir, guardrail_config)
     _write_openapi_json(ir, output_dir)
-    _write_cloudformation(ir, output_dir, instruction, truncated)
+    _write_cloudformation(ir, output_dir, instruction, truncated, guardrail_config)
     _write_readme(ir, output_dir)
 
 
@@ -38,10 +41,44 @@ def emit(ir: AgentIR, output_dir: Path) -> None:
 
 
 def _build_instruction(ir: AgentIR) -> tuple[str, bool]:
-    """Return (instruction_text, was_truncated)."""
-    raw = (ir.persona.system_prompt or "").strip()
-    if not raw:
-        raw = ir.description
+    """Return (instruction_text, was_truncated).
+
+    When persona.sections is present, assembles instruction from structured sections
+    per spec §5.1: overview + behavior + tools + knowledge + persona (style note).
+    Guardrails are routed to guardrailConfiguration separately.
+    Falls back to system_prompt when sections is absent.
+    """
+    sections = ir.persona.sections
+
+    if sections:
+        # Assemble instruction from sections in canonical order (excluding guardrails)
+        instruction_section_order = ["overview", "behavior", "tools", "knowledge"]
+        parts: list[str] = []
+        for key in instruction_section_order:
+            val = sections.get(key)
+            if val:
+                heading = key.replace("-", " ").title()
+                parts.append(f"## {heading}\n{val}")
+
+        # Append persona/style note
+        persona_section = sections.get("persona")
+        if persona_section:
+            parts.append(f"Tone and style: {persona_section}")
+
+        # Add any remaining sections not already handled (excluding guardrails, examples)
+        handled = set(INSTRUCTION_SECTION_ORDER) | {"guardrails", "persona", "examples", "preamble"}
+        for key, val in sections.items():
+            if key not in handled and val:
+                heading = key.replace("-", " ").title()
+                parts.append(f"## {heading}\n{val}")
+
+        raw = "\n\n".join(parts).strip()
+        if not raw:
+            raw = (ir.persona.system_prompt or "").strip() or ir.description
+    else:
+        raw = (ir.persona.system_prompt or "").strip()
+        if not raw:
+            raw = ir.description
 
     if len(raw) <= _MAX_INSTRUCTION_CHARS:
         return raw, False
@@ -68,11 +105,65 @@ def _build_instruction(ir: AgentIR) -> tuple[str, bool]:
     return truncated_text, True
 
 
+def _build_guardrail_config(ir: AgentIR) -> dict | None:
+    """Build Bedrock guardrailConfiguration from persona.sections['guardrails'].
+
+    Returns None when sections is absent or has no guardrails key.
+    """
+    sections = ir.persona.sections
+    if not sections:
+        return None
+    guardrails_text = sections.get("guardrails")
+    if not guardrails_text:
+        return None
+
+    # Parse sentences/lines as individual restrictions
+    sentences = re.split(r"[.!?\n]+", guardrails_text)
+    topics: list[dict] = []
+    seen_names: set[str] = set()
+
+    for sentence in sentences:
+        sentence = sentence.strip().strip("-").strip("*").strip()
+        if not sentence:
+            continue
+        # Build a slug topic name from first few words
+        words = re.findall(r"[a-z]+", sentence.lower())[:4]
+        if not words:
+            continue
+        name = "-".join(words)
+        if name in seen_names:
+            continue
+        seen_names.add(name)
+        topics.append(
+            {
+                "name": name,
+                "definition": sentence[:200],
+                "type": "DENY",
+            }
+        )
+
+    if not topics:
+        return None
+
+    return {
+        "topicPolicyConfig": {
+            "topicsConfig": topics,
+        }
+    }
+
+
 def _write_instruction(ir: AgentIR, output_dir: Path, instruction: str, truncated: bool) -> None:
     (output_dir / "instruction.txt").write_text(instruction, encoding="utf-8")
     if truncated:
         raw = (ir.persona.system_prompt or "").strip() or ir.description
         (output_dir / "instruction-full.txt").write_text(raw, encoding="utf-8")
+
+
+def _write_guardrail_config(output_dir: Path, guardrail_config: dict) -> None:
+    """Write guardrail-config.json when persona.sections['guardrails'] is present."""
+    (output_dir / "guardrail-config.json").write_text(
+        json.dumps(guardrail_config, indent=2), encoding="utf-8"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -215,7 +306,13 @@ def _escape_yaml_scalar(text: str) -> str:
     return text.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
 
 
-def _write_cloudformation(ir: AgentIR, output_dir: Path, instruction: str, truncated: bool) -> None:
+def _write_cloudformation(
+    ir: AgentIR,
+    output_dir: Path,
+    instruction: str,
+    truncated: bool,
+    guardrail_config: dict | None = None,
+) -> None:
     slug = _slug(ir.name)
     logical = _cf_logical_id(slug)
     agent_logical = f"{logical}Agent"
@@ -271,6 +368,12 @@ def _write_cloudformation(ir: AgentIR, output_dir: Path, instruction: str, trunc
     lines.append(f"      FoundationModel: {foundation_model}")
     lines.append("      IdleSessionTTLInSeconds: 1800")
     lines.append("      AutoPrepare: true")
+    if guardrail_config:
+        lines.append("      # Guardrail config generated from persona.sections['guardrails']")
+        lines.append("      # See guardrail-config.json for the full guardrailConfiguration payload.")
+        lines.append("      # TODO [agentshift]: Create a Bedrock Guardrail resource and reference it here.")
+        lines.append("      # GuardrailConfiguration:")
+        lines.append("      #   GuardrailIdentifier: !Ref GuardrailPlaceholder")
 
     # ActionGroups — one per shell or mcp tool
     action_tools = [t for t in ir.tools if t.kind in ("shell", "mcp")]

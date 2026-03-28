@@ -20,6 +20,7 @@ from agentshift.ir import (
     Trigger,
     TriggerDelivery,
 )
+from agentshift.sections import extract_sections
 
 
 def parse_skill_dir(path: Path) -> AgentIR:
@@ -94,7 +95,12 @@ def parse_skill_dir(path: Path) -> AgentIR:
         required_config_keys=required_config_keys,
     )
 
-    persona = Persona(system_prompt=body.strip() if body.strip() else None)
+    prompt_text = body.strip() if body.strip() else None
+    sections = extract_sections(prompt_text) if prompt_text else None
+    persona = Persona(
+        system_prompt=prompt_text,
+        sections=sections if sections else None,
+    )
 
     metadata = Metadata(
         source_platform="openclaw",

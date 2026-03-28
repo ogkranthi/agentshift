@@ -32,10 +32,70 @@ def emit(ir: AgentIR, output_dir: Path) -> None:
 
 
 def _build_goal(ir: AgentIR) -> str:
+    """Build the Vertex AI goal field.
+
+    When persona.sections is present, uses sections['overview'] as the goal.
+    Falls back to system_prompt when sections is absent.
+    """
+    sections = ir.persona.sections
+    if sections:
+        overview = sections.get("overview")
+        if overview:
+            return overview[:_MAX_GOAL_CHARS]
+
     raw = (ir.persona.system_prompt or "").strip()
     if not raw:
         raw = ir.description
     return raw[:_MAX_GOAL_CHARS]
+
+
+def _build_structured_instructions(ir: AgentIR) -> list[str]:
+    """Build instructions from persona.sections when available.
+
+    Per spec §5.2:
+    - behavior + persona + tools + knowledge → instructions body
+    - guardrails → appended as "Restrictions:" block
+    - examples → omitted
+
+    Returns list of instruction strings (≤ 500 chars each, max 20).
+    """
+    sections = ir.persona.sections
+    if not sections:
+        return []
+
+    parts: list[str] = []
+
+    # Primary instruction sections
+    for key in ["behavior", "persona", "tools", "knowledge"]:
+        val = sections.get(key)
+        if val:
+            heading = key.replace("-", " ").title()
+            parts.append(f"{heading}:\n{val}")
+
+    # Custom sections (not overview, guardrails, examples, preamble)
+    skip = {"overview", "behavior", "persona", "tools", "knowledge", "guardrails", "examples", "preamble"}
+    for key, val in sections.items():
+        if key not in skip and val:
+            heading = key.replace("-", " ").title()
+            parts.append(f"{heading}:\n{val}")
+
+    # Guardrails appended as "Restrictions:" block
+    guardrails = sections.get("guardrails")
+    if guardrails:
+        parts.append(f"Restrictions:\n{guardrails}")
+
+    # Split into individual lines for the instructions array
+    instructions: list[str] = []
+    for part in parts:
+        for line in part.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            instructions.append(line[:_MAX_INSTRUCTION_CHARS])
+            if len(instructions) >= _MAX_INSTRUCTIONS:
+                return instructions
+
+    return instructions
 
 
 def _extract_instructions(system_prompt: str) -> list[str]:
@@ -89,8 +149,12 @@ def _map_tools(ir: AgentIR) -> list[dict]:
 
 def _write_agent_json(ir: AgentIR, output_dir: Path) -> None:
     goal = _build_goal(ir)
-    raw_prompt = (ir.persona.system_prompt or "").strip()
-    instructions = _extract_instructions(raw_prompt) if raw_prompt else []
+    sections = ir.persona.sections
+    if sections:
+        instructions = _build_structured_instructions(ir)
+    else:
+        raw_prompt = (ir.persona.system_prompt or "").strip()
+        instructions = _extract_instructions(raw_prompt) if raw_prompt else []
 
     config = {
         "displayName": ir.name,

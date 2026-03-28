@@ -69,8 +69,8 @@
 | ID | Priority | Owner | Status | Title |
 |----|----------|-------|--------|-------|
 | A11 | P1 | @architect | merged | Spec persona.sections schema — structured prompt sections for IR v0.2 |
-| D20 | P1 | @dev | ready | Add persona.sections to IR model + update parsers to populate from headings |
-| D21 | P1 | @dev | ready | Update emitters (Bedrock, Vertex, diff) to use persona.sections |
+| D20 | P1 | @dev | pr-created | Add persona.sections to IR model + update parsers to populate from headings |
+| D21 | P1 | @dev | pr-created | Update emitters (Bedrock, Vertex, diff) to use persona.sections |
 | T13 | P1 | @tester | ready | Write tests for persona.sections — parser detection, emitter mapping, diff |
 
 ## Week 5: Ecosystem + LangGraph + GitHub Action

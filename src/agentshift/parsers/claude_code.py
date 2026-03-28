@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 
 from agentshift.ir import AgentIR, Metadata, Persona, Tool
+from agentshift.sections import extract_sections
 
 
 def parse_agent_dir(path: Path) -> AgentIR:
@@ -27,7 +28,12 @@ def parse_agent_dir(path: Path) -> AgentIR:
         source_file=str(claude_md),
     )
 
-    persona = Persona(system_prompt=instructions.strip() if instructions.strip() else body.strip())
+    prompt_text = instructions.strip() if instructions.strip() else body.strip()
+    sections = extract_sections(prompt_text) if prompt_text else None
+    persona = Persona(
+        system_prompt=prompt_text,
+        sections=sections if sections else None,
+    )
 
     return AgentIR(
         name=name,
