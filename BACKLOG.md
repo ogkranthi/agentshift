@@ -92,7 +92,7 @@
 
 | ID | Priority | Owner | Status | Title |
 |----|----------|-------|--------|-------|
-| A12 | P1 | @architect | in-progress | Spec Governance IR schema — L1/L2/L3 layers, GPR/CFS scoring definitions, elevation rules |
+| A12 | P1 | @architect | pr-created | Spec Governance IR schema — L1/L2/L3 layers, GPR/CFS scoring definitions, elevation rules |
 | A13 | P1 | @architect | ready | Research and document Bedrock parser format (reverse: Bedrock → IR) |
 | A14 | P1 | @architect | ready | Research and document Vertex AI parser format (reverse: Vertex → IR) |
 | D22 | P1 | @dev | ready | Implement Bedrock parser (bedrock-agent.json + OpenAPI + instruction.txt → IR) |
