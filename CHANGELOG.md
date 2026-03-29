@@ -7,6 +7,37 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.3.0] — 2026-03-28
+
+Week 7 release — Governance framework + cloud parsers (Bedrock and Vertex AI).
+
+### Added
+- **Governance IR layer** — three-layer governance model (L1 guardrails, L2 tool permissions,
+  L3 platform annotations) integrated into `AgentIR.governance`
+- **AWS Bedrock parser** (`--from bedrock`) — reads `bedrock-agent.json`,
+  `cloudformation.yaml`, `instruction.txt`, `openapi.json`, `guardrail-config.json` (any
+  combination) and reconstructs an AgentIR with tools, knowledge sources, and L1 guardrails
+  - Detects and strips AgentShift instruction truncation notices
+  - Heuristic L1 guardrail classification from `guardrail-config.json` topic policies
+  - Tool reconstruction from OpenAPI action-group schemas
+- **Vertex AI parser** (`--from vertex`) — reads `agent.json` and optional `tools.json`
+  and reconstructs an AgentIR
+  - Reconstructs `system_prompt` from `goal` + `instructions` fields
+  - Recovers structured `persona.sections` from linearized `"SectionName:\ncontent"` patterns
+  - Detects tool kind (function / OpenAPI / data store) and routes data store tools to
+    `ir.knowledge`
+  - Reconstructs auth from Vertex `authentication` blocks (API key, OAuth2, service account)
+  - Heuristic L1 guardrail extraction from instruction strings
+- **Shared parser utilities** (`parsers/utils.py`) — `slugify`, `infer_guardrail_category`,
+  `infer_guardrail_severity`, `extract_guardrails_from_text`, `is_todo_placeholder`
+- **CLI support** for `--from bedrock` and `--from vertex` on `convert`, `diff`, and `audit`
+  commands
+
+### Changed
+- Version bumped to `0.3.0`
+
+---
+
 ## [1.0.0] — 2026-03-26
 
 First stable release. Full Week 3 + Week 4 feature set.
