@@ -25,6 +25,8 @@ err_console = Console(stderr=True)
 _PARSERS = {
     "openclaw": "agentshift.parsers.openclaw:parse_skill_dir",
     "claude-code": "agentshift.parsers.claude_code:parse_agent_dir",
+    "bedrock": "agentshift.parsers.bedrock:parse",
+    "vertex": "agentshift.parsers.vertex:parse",
 }
 
 _EMITTERS = {
@@ -114,6 +116,15 @@ def _parse_with_errors(parse_fn, source: Path):
                 f"  Tip: [cyan]{source}[/cyan] must contain a SKILL.md file with valid YAML frontmatter."
             )
             err_console.print("  See: https://github.com/ogkranthi/agentshift#skill-format")
+        elif "agent.json" in msg:
+            err_console.print(
+                f"  Tip: [cyan]{source}[/cyan] must contain an agent.json file (Vertex AI agent definition)."
+            )
+        elif "Bedrock artifact" in msg or "bedrock" in msg.lower():
+            err_console.print(
+                f"  Tip: [cyan]{source}[/cyan] must contain at least one of: "
+                "bedrock-agent.json, cloudformation.yaml, instruction.txt"
+            )
         if state.verbose:
             err_console.print(traceback.format_exc())
         raise typer.Exit(1) from e

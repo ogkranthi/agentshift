@@ -62,6 +62,22 @@ weather-claude/               weather-copilot/
   Emitter →  Claude Code ✅  |  Copilot ✅  |  Bedrock ✅  |  M365 ✅  |  Vertex AI ✅
 ```
 
+## Parse cloud agent artifacts
+
+```bash
+# Parse Bedrock artifacts → convert to OpenClaw skill
+agentshift convert ./bedrock-output/ --from bedrock --to openclaw --output ./my-skill
+
+# Parse Vertex AI artifacts → convert to Claude Code
+agentshift convert ./vertex-output/ --from vertex --to claude-code --output ./claude-output
+
+# Diff portability from Bedrock source
+agentshift diff ./bedrock-output/ --from bedrock --targets claude-code,copilot
+
+# Governance audit: Vertex → Bedrock round-trip
+agentshift audit ./vertex-output/ --from vertex --targets bedrock
+```
+
 ## See portability before converting
 
 ```bash
@@ -77,6 +93,27 @@ Tools (shell: 2)     ✅    ✅ Bash(bin:*)   ✅ terminal   ⚠️  Lambda*
 Portability                    100%             92%           38%
 ```
 
+## Governance layer
+
+AgentShift v0.3 introduces a three-layer governance model that travels with your agent through
+every conversion:
+
+| Layer | Model | Source |
+|---|---|---|
+| **L1 — Guardrails** | `Guardrail` — prompt-level safety rules | SOUL.md, instruction.txt, Bedrock topics, Vertex instructions |
+| **L2 — Tool permissions** | `ToolPermission` — per-tool access control | OpenClaw `tools/*.json` |
+| **L3 — Platform annotations** | `PlatformAnnotation` — native filters | `governance/annotations.json`, Bedrock guardrail config |
+
+Governance is preserved and audited during conversion:
+
+```bash
+# Audit governance preservation: bedrock → claude-code
+agentshift audit ./my-bedrock-agent/ --from bedrock --targets claude-code
+
+# Audit from Vertex AI artifacts
+agentshift audit ./vertex-output/ --from vertex --targets bedrock,claude-code
+```
+
 ## Supported platforms
 
 | Platform | Read (parser) | Write (emitter) | Status |
@@ -84,9 +121,9 @@ Portability                    100%             92%           38%
 | OpenClaw | ✅ | ✅ | **Works today** |
 | Claude Code | ✅ | ✅ | **Works today** |
 | GitHub Copilot | — | ✅ | **Works today** |
-| AWS Bedrock | — | ✅ | **Works today** |
+| AWS Bedrock | ✅ `--from bedrock` | ✅ | **Works today** |
 | Microsoft 365 Copilot | — | ✅ | **Works today** |
-| GCP Vertex AI | — | ✅ | **Works today** |
+| GCP Vertex AI | ✅ `--from vertex` | ✅ | **Works today** |
 | LangGraph | — | — | Planned |
 | CrewAI | — | — | Planned |
 
