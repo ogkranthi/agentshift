@@ -12,11 +12,15 @@ import yaml
 from agentshift.ir import (
     AgentIR,
     Constraints,
+    Governance,
+    Guardrail,
     InstallStep,
     KnowledgeSource,
     Metadata,
     Persona,
+    PlatformAnnotation,
     Tool,
+    ToolPermission,
     Trigger,
     TriggerDelivery,
 )
@@ -109,6 +113,9 @@ def parse_skill_dir(path: Path) -> AgentIR:
         platform_extensions={"openclaw": oc_meta} if oc_meta else {},
     )
 
+    # Governance: parse SOUL.md, tool permissions, and L3 annotations
+    governance = _extract_governance(path)
+
     return AgentIR(
         name=name,
         description=description,
@@ -118,6 +125,7 @@ def parse_skill_dir(path: Path) -> AgentIR:
         knowledge=knowledge,
         triggers=triggers,
         constraints=constraints,
+        governance=governance,
         install=install_steps,
         metadata=metadata,
     )
@@ -501,3 +509,159 @@ def _infer_format(filename: str) -> str:
         ".pdf": "pdf",
         ".html": "html",
     }.get(ext, "unknown")
+
+
+# ---------------------------------------------------------------------------
+# Governance extraction
+# ---------------------------------------------------------------------------
+
+_GUARDRAIL_CATEGORY_KEYWORDS: dict[str, list[str]] = {
+    "safety": ["harm", "dangerous", "emergency", "self-harm", "violence"],
+    "privacy": ["pii", "personal", "confidential", "data", "privacy", "hipaa", "phi"],
+    "compliance": ["legal", "regulatory", "disclaimer", "licensed", "compliance"],
+    "ethical": ["bias", "discriminat", "fair", "race", "gender", "religion"],
+    "operational": ["escalat", "timeout", "halt", "stop", "limit", "approval"],
+    "scope": ["do not", "never", "refuse", "only", "restrict"],
+}
+
+
+def _classify_guardrail(text: str) -> str:
+    """Classify a guardrail rule into a category based on keywords."""
+    lower = text.lower()
+    for category, keywords in _GUARDRAIL_CATEGORY_KEYWORDS.items():
+        if any(kw in lower for kw in keywords):
+            return category
+    return "general"
+
+
+def _infer_severity(text: str) -> str:
+    """Infer severity from guardrail language."""
+    lower = text.lower()
+    if any(w in lower for w in ["never", "immediately", "hard stop", "halt", "emergency"]):
+        return "critical"
+    if any(w in lower for w in ["always", "must", "require", "do not"]):
+        return "high"
+    if any(w in lower for w in ["should", "recommend", "prefer"]):
+        return "low"
+    return "medium"
+
+
+def _parse_soul_md(path: Path) -> list[Guardrail]:
+    """Parse SOUL.md to extract L1 guardrails."""
+    soul_md = path / "SOUL.md"
+    if not soul_md.exists():
+        return []
+
+    raw = soul_md.read_text(encoding="utf-8")
+    guardrails: list[Guardrail] = []
+    idx = 0
+
+    for line in raw.splitlines():
+        stripped = line.strip()
+        # Extract quoted rules: lines starting with quotes or bullet-quoted
+        rule_text = None
+        if stripped.startswith('"') and stripped.endswith('"'):
+            rule_text = stripped.strip('"')
+        elif stripped.startswith("- ") and '"' in stripped:
+            # bullet with quoted text: - "Do not..."
+            m = re.search(r'"([^"]+)"', stripped)
+            if m:
+                rule_text = m.group(1)
+        elif stripped.startswith("- ") and len(stripped) > 3 and not stripped.startswith("- #"):
+            # Plain bullet items that look like rules
+            candidate = stripped[2:].strip()
+            if any(
+                candidate.lower().startswith(w)
+                for w in [
+                    "do not", "never", "always", "refuse", "ensure", "include",
+                    "flag", "escalate", "maintain", "clarify", "halt", "log",
+                    "hard stop", "delegate", "aggregate", "enforce", "evaluate",
+                    "apply", "document",
+                ]
+            ):
+                rule_text = candidate
+
+        if rule_text:
+            idx += 1
+            guardrails.append(
+                Guardrail(
+                    id=f"L1-{idx:03d}",
+                    text=rule_text,
+                    category=_classify_guardrail(rule_text),
+                    severity=_infer_severity(rule_text),
+                )
+            )
+
+    return guardrails
+
+
+def _parse_tool_permissions(path: Path) -> list[ToolPermission]:
+    """Parse tools/*.json files to extract L2 tool permissions."""
+    tools_dir = path / "tools"
+    if not tools_dir.is_dir():
+        return []
+
+    permissions: list[ToolPermission] = []
+    for f in sorted(tools_dir.iterdir()):
+        if not f.is_file() or f.suffix != ".json":
+            continue
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+
+        tool_name = data.get("name", f.stem)
+        enabled = data.get("enabled", True)
+        access = data.get("access", "full")
+        deny_patterns = data.get("deny_patterns", [])
+        allow_patterns = data.get("allow_patterns", [])
+        rate_limit = data.get("rate_limit")
+        max_value = data.get("max_value")
+        notes = data.get("notes")
+
+        permissions.append(
+            ToolPermission(
+                tool_name=tool_name,
+                enabled=enabled,
+                access=access,
+                deny_patterns=deny_patterns,
+                allow_patterns=allow_patterns,
+                rate_limit=str(rate_limit) if rate_limit else None,
+                max_value=str(max_value) if max_value else None,
+                notes=notes,
+            )
+        )
+
+    return permissions
+
+
+def _parse_l3_annotations(path: Path) -> list[PlatformAnnotation]:
+    """Parse governance/annotations.json for L3 platform-native annotations."""
+    annotations_file = path / "governance" / "annotations.json"
+    if not annotations_file.exists():
+        return []
+
+    try:
+        data = json.loads(annotations_file.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return []
+
+    annotations: list[PlatformAnnotation] = []
+    for item in data if isinstance(data, list) else data.get("annotations", []):
+        with contextlib.suppress(Exception):
+            annotations.append(PlatformAnnotation(**item))
+
+    return annotations
+
+
+def _extract_governance(path: Path) -> Governance:
+    """Extract full governance model from agent directory."""
+    guardrails = _parse_soul_md(path)
+    tool_permissions = _parse_tool_permissions(path)
+    platform_annotations = _parse_l3_annotations(path)
+
+    return Governance(
+        guardrails=guardrails,
+        tool_permissions=tool_permissions,
+        platform_annotations=platform_annotations,
+    )

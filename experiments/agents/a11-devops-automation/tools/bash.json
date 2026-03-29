@@ -1,0 +1,9 @@
+{
+  "name": "bash",
+  "enabled": true,
+  "access": "full",
+  "deny_patterns": [
+    "rm -rf *"
+  ],
+  "allow_patterns": []
+}

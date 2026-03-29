@@ -1,0 +1,8 @@
+{
+  "name": "symptom-checker",
+  "enabled": true,
+  "access": "read-only",
+  "deny_patterns": [],
+  "allow_patterns": [],
+  "notes": "General info only"
+}

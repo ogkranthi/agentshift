@@ -1,0 +1,7 @@
+{
+  "name": "clinic-finder",
+  "enabled": true,
+  "access": "full",
+  "deny_patterns": [],
+  "allow_patterns": []
+}

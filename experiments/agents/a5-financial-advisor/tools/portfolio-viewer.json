@@ -1,0 +1,8 @@
+{
+  "name": "portfolio-viewer",
+  "enabled": true,
+  "access": "read-only",
+  "deny_patterns": [],
+  "allow_patterns": [],
+  "notes": "Requires auth token"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "trade-execution",
+  "enabled": false,
+  "access": "disabled",
+  "deny_patterns": [],
+  "allow_patterns": [],
+  "notes": "DISABLED \u2014 information only, no trade execution"
+}

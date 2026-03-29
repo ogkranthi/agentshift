@@ -1,0 +1,7 @@
+{
+  "name": "user-history",
+  "enabled": true,
+  "access": "read-only",
+  "deny_patterns": [],
+  "allow_patterns": []
+}

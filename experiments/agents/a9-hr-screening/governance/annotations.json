@@ -1,0 +1,45 @@
+{
+  "annotations": [
+    {
+      "id": "L3-A9-001",
+      "kind": "content_filter",
+      "description": "Block discriminatory language in assessments",
+      "platform_target": "any",
+      "config": {
+        "categories": [
+          "DISCRIMINATION",
+          "BIAS"
+        ]
+      }
+    },
+    {
+      "id": "L3-A9-002",
+      "kind": "pii_detection",
+      "description": "Mask candidate personal identifiers in logs",
+      "platform_target": "any",
+      "config": {
+        "types": [
+          "NAME",
+          "EMAIL",
+          "PHONE",
+          "ADDRESS"
+        ]
+      }
+    },
+    {
+      "id": "L3-A9-003",
+      "kind": "denied_topics",
+      "description": "Protected class characteristics in evaluation",
+      "platform_target": "bedrock",
+      "config": {
+        "topics": [
+          "age",
+          "gender",
+          "race",
+          "religion",
+          "disability"
+        ]
+      }
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import json
 import re
 from pathlib import Path
 
+from agentshift.elevation import ElevationResult, elevate_governance
 from agentshift.ir import AgentIR
 
 
@@ -13,13 +14,14 @@ def emit(ir: AgentIR, output_dir: Path) -> None:
     """Write a Claude Code agent directory from an AgentIR."""
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    _write_claude_md(ir, output_dir)
-    _write_settings_json(ir, output_dir)
+    elevation = elevate_governance(ir, "claude-code")
+    _write_claude_md(ir, output_dir, elevation)
+    _write_settings_json(ir, output_dir, elevation)
     if ir.triggers:
         _write_schedules_md(ir, output_dir)
 
 
-def _write_claude_md(ir: AgentIR, output_dir: Path) -> None:
+def _write_claude_md(ir: AgentIR, output_dir: Path, elevation: ElevationResult) -> None:
     lines: list[str] = []
 
     lines.append(f"# {ir.name}")
@@ -48,17 +50,38 @@ def _write_claude_md(ir: AgentIR, output_dir: Path) -> None:
             lines.append(f"- **{ks.name}**{path_info}: {ks.description or ''}")
         lines.append("")
 
-    if ir.constraints.guardrails:
+    # L1 guardrails (always preserved)
+    if elevation.l1_preserved:
+        lines.append("## Guardrails")
+        lines.append("")
+        for g in elevation.l1_preserved:
+            lines.append(f"- {g.text}")
+        lines.append("")
+
+    # Legacy guardrails from constraints (backward compat)
+    elif ir.constraints.guardrails:
         lines.append("## Guardrails")
         lines.append("")
         for g in ir.constraints.guardrails:
             lines.append(f"- {g}")
         lines.append("")
 
+    # Elevated L2/L3 → L1 instructions
+    if elevation.extra_instructions:
+        lines.append("## Governance Constraints (Elevated)")
+        lines.append("")
+        lines.append("<!-- These constraints were elevated from enforcement-level (L2/L3)")
+        lines.append("     to prompt-level (L1) because Claude Code does not natively support")
+        lines.append("     the original enforcement mechanism. -->")
+        lines.append("")
+        for instr in elevation.extra_instructions:
+            lines.append(f"- {instr}")
+        lines.append("")
+
     (output_dir / "CLAUDE.md").write_text("\n".join(lines), encoding="utf-8")
 
 
-def _write_settings_json(ir: AgentIR, output_dir: Path) -> None:
+def _write_settings_json(ir: AgentIR, output_dir: Path, elevation: ElevationResult) -> None:
     allow: list[str] = []
     deny: list[str] = []
 
@@ -106,7 +129,16 @@ def _write_settings_json(ir: AgentIR, output_dir: Path) -> None:
             if perm not in allow:
                 allow.append(perm)
 
-    # Guardrail-based denies
+    # L2 governance: apply preserved permissions as deny/allow rules
+    for perm_obj in elevation.l2_preserved:
+        if not perm_obj.enabled:
+            # Disabled tools → deny
+            tool_id = perm_obj.tool_name
+            deny.append(f"Bash({tool_id}:*)")
+        for pattern in perm_obj.deny_patterns:
+            deny.append(f"Bash({perm_obj.tool_name} {pattern})")
+
+    # Legacy guardrail-based denies
     if "no-web-search" in ir.constraints.guardrails:
         deny.append("WebSearch")
 

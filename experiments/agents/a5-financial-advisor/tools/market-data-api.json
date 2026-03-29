@@ -1,0 +1,7 @@
+{
+  "name": "market-data-api",
+  "enabled": true,
+  "access": "read-only",
+  "deny_patterns": [],
+  "allow_patterns": []
+}

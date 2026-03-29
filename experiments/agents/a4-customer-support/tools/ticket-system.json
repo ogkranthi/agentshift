@@ -1,0 +1,7 @@
+{
+  "name": "ticket-system",
+  "enabled": true,
+  "access": "full",
+  "deny_patterns": [],
+  "allow_patterns": []
+}

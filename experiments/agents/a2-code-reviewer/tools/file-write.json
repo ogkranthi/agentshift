@@ -1,0 +1,8 @@
+{
+  "name": "file-write",
+  "enabled": false,
+  "access": "disabled",
+  "deny_patterns": [],
+  "allow_patterns": [],
+  "notes": "Read-only reviewer \u2014 no write access"
+}

@@ -1,0 +1,36 @@
+{
+  "annotations": [
+    {
+      "id": "L3-A5-001",
+      "kind": "content_filter",
+      "description": "Block investment scam language (Bedrock MISCONDUCT filter)",
+      "platform_target": "bedrock",
+      "config": {
+        "filter": "MISCONDUCT",
+        "strength": "HIGH"
+      }
+    },
+    {
+      "id": "L3-A5-002",
+      "kind": "pii_detection",
+      "description": "Mask SSN/account numbers in responses (Bedrock sensitiveInfoPolicy)",
+      "platform_target": "bedrock",
+      "config": {
+        "policy": "sensitiveInfoPolicy",
+        "types": [
+          "SSN",
+          "ACCOUNT_NUMBER"
+        ]
+      }
+    },
+    {
+      "id": "L3-A5-003",
+      "kind": "grounding_check",
+      "description": "Ensure market data claims reference actual data (Bedrock contextualGroundingPolicy)",
+      "platform_target": "bedrock",
+      "config": {
+        "policy": "contextualGroundingPolicy"
+      }
+    }
+  ]
+}
