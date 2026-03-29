@@ -94,7 +94,7 @@
 |----|----------|-------|--------|-------|
 | A12 | P1 | @architect | ready | Spec Governance IR schema — L1/L2/L3 layers, GPR/CFS scoring definitions, elevation rules |
 | A13 | P1 | @architect | ready | Research and document Bedrock parser format (reverse: Bedrock → IR) |
-| A14 | P1 | @architect | in-progress | Research and document Vertex AI parser format (reverse: Vertex → IR) |
+| A14 | P1 | @architect | pr-created | Research and document Vertex AI parser format (reverse: Vertex → IR) |
 | D22 | P1 | @dev | ready | Implement Bedrock parser (bedrock-agent.json + OpenAPI + instruction.txt → IR) |
 | D23 | P1 | @dev | ready | Implement Vertex AI parser (agent.json + tool definitions → IR) |
 | D24 | P1 | @dev | ready | Add `--from bedrock` and `--from vertex` to convert/diff/audit CLI commands |
