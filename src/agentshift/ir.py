@@ -7,6 +7,63 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 
+# ---------------------------------------------------------------------------
+# Governance models (L1 / L2 / L3)
+# ---------------------------------------------------------------------------
+
+
+class Guardrail(BaseModel):
+    """Layer 1 — prompt-level governance rule (lives in SOUL.md / instructions)."""
+
+    model_config = {"extra": "forbid"}
+
+    id: str
+    text: str
+    category: Literal[
+        "safety", "privacy", "compliance", "ethical", "operational", "scope", "general"
+    ] = "general"
+    severity: Literal["critical", "high", "medium", "low"] = "medium"
+
+
+class ToolPermission(BaseModel):
+    """Layer 2 — tool-level permission/restriction."""
+
+    model_config = {"extra": "forbid"}
+
+    tool_name: str
+    enabled: bool = True
+    access: Literal["full", "read-only", "disabled"] = "full"
+    deny_patterns: list[str] = Field(default_factory=list)
+    allow_patterns: list[str] = Field(default_factory=list)
+    rate_limit: str | None = None
+    max_value: str | None = None
+    notes: str | None = None
+
+
+class PlatformAnnotation(BaseModel):
+    """Layer 3 — platform-native governance (Bedrock guardrails, Vertex safety, etc.)."""
+
+    model_config = {"extra": "forbid"}
+
+    id: str
+    kind: Literal["content_filter", "pii_detection", "denied_topics", "grounding_check"] = (
+        "content_filter"
+    )
+    description: str
+    platform_target: Literal["bedrock", "vertex-ai", "m365", "any"] = "any"
+    config: dict[str, Any] = Field(default_factory=dict)
+
+
+class Governance(BaseModel):
+    """Unified governance container for all three layers."""
+
+    model_config = {"extra": "forbid"}
+
+    guardrails: list[Guardrail] = Field(default_factory=list)
+    tool_permissions: list[ToolPermission] = Field(default_factory=list)
+    platform_annotations: list[PlatformAnnotation] = Field(default_factory=list)
+
+
 class ToolAuth(BaseModel):
     model_config = {"extra": "forbid"}
 
@@ -131,5 +188,6 @@ class AgentIR(BaseModel):
     knowledge: list[KnowledgeSource] = Field(default_factory=list)
     triggers: list[Trigger] = Field(default_factory=list)
     constraints: Constraints = Field(default_factory=Constraints)
+    governance: Governance = Field(default_factory=Governance)
     install: list[InstallStep] = Field(default_factory=list)
     metadata: Metadata = Field(default_factory=Metadata)

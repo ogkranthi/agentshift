@@ -1,0 +1,8 @@
+{
+  "name": "external-api",
+  "enabled": false,
+  "access": "disabled",
+  "deny_patterns": [],
+  "allow_patterns": [],
+  "notes": "DISABLED \u2014 no data leaves system"
+}

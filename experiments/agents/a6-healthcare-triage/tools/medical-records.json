@@ -1,0 +1,7 @@
+{
+  "name": "medical-records",
+  "enabled": false,
+  "access": "disabled",
+  "deny_patterns": [],
+  "allow_patterns": []
+}

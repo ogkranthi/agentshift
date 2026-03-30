@@ -1,0 +1,53 @@
+{
+  "annotations": [
+    {
+      "id": "L3-A10-001",
+      "kind": "content_filter",
+      "description": "Detect hate speech (Bedrock HATE, Vertex HARASSMENT)",
+      "platform_target": "any",
+      "config": {
+        "categories": [
+          "HATE",
+          "HARASSMENT"
+        ]
+      }
+    },
+    {
+      "id": "L3-A10-002",
+      "kind": "content_filter",
+      "description": "Detect explicit content (Bedrock SEXUAL, Vertex SEXUALLY_EXPLICIT)",
+      "platform_target": "any",
+      "config": {
+        "categories": [
+          "SEXUAL",
+          "SEXUALLY_EXPLICIT"
+        ]
+      }
+    },
+    {
+      "id": "L3-A10-003",
+      "kind": "content_filter",
+      "description": "Detect violence (Bedrock VIOLENCE, Vertex DANGEROUS_CONTENT)",
+      "platform_target": "any",
+      "config": {
+        "categories": [
+          "VIOLENCE",
+          "DANGEROUS_CONTENT"
+        ]
+      }
+    },
+    {
+      "id": "L3-A10-004",
+      "kind": "pii_detection",
+      "description": "Mask user PII in moderation logs",
+      "platform_target": "any",
+      "config": {
+        "types": [
+          "NAME",
+          "EMAIL",
+          "PHONE"
+        ]
+      }
+    }
+  ]
+}

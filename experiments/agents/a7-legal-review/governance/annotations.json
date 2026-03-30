@@ -1,0 +1,27 @@
+{
+  "annotations": [
+    {
+      "id": "L3-A7-001",
+      "kind": "pii_detection",
+      "description": "Redact names/addresses/SSNs in analysis output",
+      "platform_target": "any",
+      "config": {
+        "types": [
+          "NAME",
+          "ADDRESS",
+          "SSN"
+        ]
+      }
+    },
+    {
+      "id": "L3-A7-002",
+      "kind": "content_filter",
+      "description": "Block generation of fraudulent legal documents",
+      "platform_target": "bedrock",
+      "config": {
+        "filter": "MISCONDUCT",
+        "strength": "HIGH"
+      }
+    }
+  ]
+}

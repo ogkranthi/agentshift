@@ -301,5 +301,128 @@ def validate(
         raise typer.Exit(1)
 
 
+@app.command()
+def audit(
+    source: Path = typer.Argument(help="Path to source agent directory"),
+    from_platform: str = typer.Option("openclaw", "--from", help="Source platform"),
+    targets: str = typer.Option(
+        "claude-code,copilot", "--targets", help="Comma-separated target platforms"
+    ),
+    agent_id: str = typer.Option("", "--agent-id", help="Agent ID for the audit report"),
+    domain: str = typer.Option("", "--domain", help="Agent domain (e.g., General, Finance)"),
+    complexity: str = typer.Option("", "--complexity", help="Agent complexity (Low/Medium/High)"),
+    output_csv: Path | None = typer.Option(None, "--csv", help="Export results to CSV"),
+    output_json: Path | None = typer.Option(None, "--json", help="Export results to JSON"),
+) -> None:
+    """Run governance preservation audit on an agent conversion."""
+    from agentshift.governance_audit import (
+        audit_conversion,
+        export_csv,
+        export_json,
+        render_audit_table,
+        render_elevation_analysis,
+    )
+
+    parse_fn = _get_parser(from_platform)
+    ir = _parse_with_errors(parse_fn, source)
+
+    target_list = [t.strip() for t in targets.split(",")]
+    audits = []
+    for target in target_list:
+        if target not in _EMITTERS and target not in {"bedrock", "vertex", "m365"}:
+            err_console.print(f"[yellow]Skipping unknown target: {target}[/yellow]")
+            continue
+        a = audit_conversion(ir, target, agent_id or ir.name, domain, complexity)
+        audits.append(a)
+
+    render_audit_table(audits)
+    render_elevation_analysis(audits)
+
+    if output_csv:
+        export_csv(audits, output_csv)
+        console.print(f"[green]✓[/green] CSV exported → [cyan]{output_csv}[/cyan]")
+
+    if output_json:
+        export_json(audits, output_json)
+        console.print(f"[green]✓[/green] JSON exported → [cyan]{output_json}[/cyan]")
+
+
+@app.command(name="audit-batch")
+def audit_batch_cmd(
+    agents_dir: Path = typer.Argument(help="Directory containing agent subdirectories"),
+    from_platform: str = typer.Option("openclaw", "--from", help="Source platform"),
+    targets: str = typer.Option(
+        "claude-code,copilot", "--targets", help="Comma-separated target platforms"
+    ),
+    output_csv: Path | None = typer.Option(None, "--csv", help="Export results to CSV"),
+    output_json: Path | None = typer.Option(None, "--json", help="Export results to JSON"),
+) -> None:
+    """Run governance audit across all agents in a directory (batch mode for paper)."""
+    from agentshift.governance_audit import (
+        audit_batch,
+        export_csv,
+        export_json,
+        render_audit_table,
+        render_elevation_analysis,
+        render_per_agent_breakdown,
+        render_summary_by_target,
+    )
+
+    if not agents_dir.is_dir():
+        err_console.print(f"[red]Error:[/red] Not a directory: {agents_dir}")
+        raise typer.Exit(1)
+
+    parse_fn = _get_parser(from_platform)
+    target_list = [t.strip() for t in targets.split(",")]
+
+    # Discover agents — each subdirectory with a SKILL.md
+    agent_data = []
+    for subdir in sorted(agents_dir.iterdir()):
+        if not subdir.is_dir():
+            continue
+        skill_md = subdir / "SKILL.md"
+        if not skill_md.exists():
+            continue
+
+        ir = _parse_with_errors(parse_fn, subdir)
+
+        # Read metadata from agent_meta.json if present
+        meta_file = subdir / "agent_meta.json"
+        meta = {}
+        if meta_file.exists():
+            import json as _json
+
+            try:
+                meta = _json.loads(meta_file.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+
+        agent_id = meta.get("id", subdir.name)
+        domain_val = meta.get("domain", "")
+        complexity_val = meta.get("complexity", "")
+        agent_data.append((ir, agent_id, domain_val, complexity_val))
+
+    if not agent_data:
+        err_console.print(f"[red]No agents found in {agents_dir}[/red]")
+        raise typer.Exit(1)
+
+    console.print(f"[bold]Found {len(agent_data)} agents[/bold]")
+
+    audits = audit_batch(agent_data, target_list)
+
+    render_audit_table(audits)
+    render_summary_by_target(audits)
+    render_per_agent_breakdown(audits)
+    render_elevation_analysis(audits)
+
+    if output_csv:
+        export_csv(audits, output_csv)
+        console.print(f"[green]✓[/green] CSV exported → [cyan]{output_csv}[/cyan]")
+
+    if output_json:
+        export_json(audits, output_json)
+        console.print(f"[green]✓[/green] JSON exported → [cyan]{output_json}[/cyan]")
+
+
 if __name__ == "__main__":
     app()

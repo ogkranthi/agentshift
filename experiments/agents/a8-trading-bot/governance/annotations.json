@@ -1,0 +1,34 @@
+{
+  "annotations": [
+    {
+      "id": "L3-A8-001",
+      "kind": "content_filter",
+      "description": "Block market manipulation language",
+      "platform_target": "bedrock",
+      "config": {
+        "filter": "MISCONDUCT",
+        "strength": "HIGH"
+      }
+    },
+    {
+      "id": "L3-A8-002",
+      "kind": "pii_detection",
+      "description": "Mask account numbers in logs",
+      "platform_target": "any",
+      "config": {
+        "types": [
+          "ACCOUNT_NUMBER"
+        ]
+      }
+    },
+    {
+      "id": "L3-A8-003",
+      "kind": "grounding_check",
+      "description": "Trade rationale must reference market data",
+      "platform_target": "bedrock",
+      "config": {
+        "policy": "contextualGroundingPolicy"
+      }
+    }
+  ]
+}

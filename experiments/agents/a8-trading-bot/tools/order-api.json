@@ -1,0 +1,8 @@
+{
+  "name": "order-api",
+  "enabled": true,
+  "access": "full",
+  "deny_patterns": [],
+  "allow_patterns": [],
+  "max_value": "5% of portfolio value per trade"
+}

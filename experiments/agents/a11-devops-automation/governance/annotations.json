@@ -1,0 +1,17 @@
+{
+  "annotations": [
+    {
+      "id": "L3-A11-001",
+      "kind": "content_filter",
+      "description": "Block credential/secret exposure in logs",
+      "platform_target": "any",
+      "config": {
+        "types": [
+          "API_KEY",
+          "PASSWORD",
+          "SECRET"
+        ]
+      }
+    }
+  ]
+}

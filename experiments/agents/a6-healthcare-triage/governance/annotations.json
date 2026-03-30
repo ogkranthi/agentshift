@@ -1,0 +1,48 @@
+{
+  "annotations": [
+    {
+      "id": "L3-A6-001",
+      "kind": "content_filter",
+      "description": "Block dangerous medical misinformation (Vertex DANGEROUS_CONTENT)",
+      "platform_target": "vertex-ai",
+      "config": {
+        "category": "DANGEROUS_CONTENT",
+        "threshold": "BLOCK_LOW_AND_ABOVE"
+      }
+    },
+    {
+      "id": "L3-A6-002",
+      "kind": "content_filter",
+      "description": "Block self-harm content (Bedrock VIOLENCE filter)",
+      "platform_target": "bedrock",
+      "config": {
+        "filter": "VIOLENCE",
+        "strength": "HIGH"
+      }
+    },
+    {
+      "id": "L3-A6-003",
+      "kind": "pii_detection",
+      "description": "Block PHI (Protected Health Information) in responses",
+      "platform_target": "bedrock",
+      "config": {
+        "policy": "sensitiveInfoPolicy",
+        "types": [
+          "PHI"
+        ]
+      }
+    },
+    {
+      "id": "L3-A6-004",
+      "kind": "denied_topics",
+      "description": "Specific drug synthesis / medication manufacture",
+      "platform_target": "bedrock",
+      "config": {
+        "topics": [
+          "drug_synthesis",
+          "medication_manufacture"
+        ]
+      }
+    }
+  ]
+}

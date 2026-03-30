@@ -1,0 +1,8 @@
+{
+  "name": "web-search",
+  "enabled": true,
+  "access": "full",
+  "deny_patterns": [],
+  "allow_patterns": [],
+  "rate_limit": "50/hour"
+}

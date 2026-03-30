@@ -1,0 +1,28 @@
+{
+  "annotations": [
+    {
+      "id": "L3-A12-001",
+      "kind": "pii_detection",
+      "description": "Ensure PII doesn't leak between sub-agents",
+      "platform_target": "any",
+      "config": {
+        "scope": "inter-agent",
+        "types": [
+          "ALL"
+        ]
+      }
+    },
+    {
+      "id": "L3-A12-002",
+      "kind": "content_filter",
+      "description": "Block sub-agent outputs that violate content policies",
+      "platform_target": "any",
+      "config": {
+        "scope": "sub-agent-output",
+        "categories": [
+          "ALL"
+        ]
+      }
+    }
+  ]
+}

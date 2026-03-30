@@ -1,0 +1,9 @@
+{
+  "name": "file-write",
+  "enabled": true,
+  "access": "full",
+  "deny_patterns": [],
+  "allow_patterns": [
+    "/annotations/*"
+  ]
+}

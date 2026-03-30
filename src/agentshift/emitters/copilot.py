@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from agentshift.elevation import ElevationResult, elevate_governance
 from agentshift.ir import AgentIR
 
 _DEFAULT_MODELS = [
@@ -18,7 +19,8 @@ def emit(ir: AgentIR, output_dir: Path) -> None:
     """Write a GitHub Copilot agent directory from an AgentIR."""
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    _write_agent_md(ir, output_dir)
+    elevation = elevate_governance(ir, "copilot")
+    _write_agent_md(ir, output_dir, elevation)
     _write_readme(ir, output_dir)
 
 
@@ -88,7 +90,7 @@ def _slug(name: str) -> str:
     return s.strip("-")
 
 
-def _write_agent_md(ir: AgentIR, output_dir: Path) -> None:
+def _write_agent_md(ir: AgentIR, output_dir: Path, elevation: ElevationResult) -> None:
     tools = _build_tools(ir)
     mcp_names = _mcp_tools(ir)
 
@@ -123,6 +125,26 @@ def _write_agent_md(ir: AgentIR, output_dir: Path) -> None:
         lines.append(ir.description)
 
     lines.append("")
+
+    # L1 guardrails (always preserved in body)
+    if elevation.l1_preserved:
+        lines.append("## Guardrails")
+        lines.append("")
+        for g in elevation.l1_preserved:
+            lines.append(f"- {g.text}")
+        lines.append("")
+
+    # Elevated L2/L3 → L1 instructions
+    if elevation.extra_instructions:
+        lines.append("## Governance Constraints (Elevated)")
+        lines.append("")
+        lines.append("<!-- These constraints were elevated from enforcement-level (L2/L3)")
+        lines.append("     to prompt-level (L1) because GitHub Copilot does not natively support")
+        lines.append("     the original enforcement mechanism. -->")
+        lines.append("")
+        for instr in elevation.extra_instructions:
+            lines.append(f"- {instr}")
+        lines.append("")
 
     filename = f"{_slug(ir.name)}.agent.md"
     (output_dir / filename).write_text("\n".join(lines), encoding="utf-8")

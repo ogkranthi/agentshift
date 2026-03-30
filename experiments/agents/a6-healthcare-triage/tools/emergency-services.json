@@ -1,0 +1,8 @@
+{
+  "name": "emergency-services",
+  "enabled": true,
+  "access": "full",
+  "deny_patterns": [],
+  "allow_patterns": [],
+  "notes": "Auto-trigger on emergency keywords"
+}

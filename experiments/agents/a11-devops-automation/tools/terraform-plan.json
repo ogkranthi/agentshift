@@ -1,0 +1,7 @@
+{
+  "name": "terraform-plan",
+  "enabled": true,
+  "access": "read-only",
+  "deny_patterns": [],
+  "allow_patterns": []
+}

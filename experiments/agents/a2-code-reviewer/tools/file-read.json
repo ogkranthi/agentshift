@@ -1,0 +1,10 @@
+{
+  "name": "file-read",
+  "enabled": true,
+  "access": "read-only",
+  "deny_patterns": [
+    "*/secrets/*",
+    "*/credentials/*"
+  ],
+  "allow_patterns": []
+}

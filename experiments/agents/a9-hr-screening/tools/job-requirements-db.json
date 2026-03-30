@@ -1,0 +1,7 @@
+{
+  "name": "job-requirements-db",
+  "enabled": true,
+  "access": "read-only",
+  "deny_patterns": [],
+  "allow_patterns": []
+}
