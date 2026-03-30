@@ -101,4 +101,4 @@
 | D25 | P1 | @dev | merged | Bump version to 0.3.0 — update CHANGELOG.md, pyproject.toml, add governance to README |
 | T14 | P1 | @tester | merged | Write tests for governance extraction (Guardrail classification, ToolPermission, L3 annotations) |
 | T15 | P1 | @tester | merged | Write tests for audit engine (GPR-L1/L2/L3 scoring, elevation tracking, CSV/JSON export) |
-| T16 | P1 | @tester | in-progress | Write tests for Bedrock + Vertex parsers (fixtures + round-trip with emitters) |
+| T16 | P1 | @tester | pr-created | Write tests for Bedrock + Vertex parsers (fixtures + round-trip with emitters) |

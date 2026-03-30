@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AgentShift - Bedrock Agent CloudFormation Template
+
+Resources:
+  CustomerSupportBotAgent:
+    Type: AWS::Bedrock::Agent
+    Properties:
+      AgentName: CustomerSupportBot
+      Description: An AI-powered customer support agent for e-commerce.
+      FoundationModel: anthropic.claude-3-5-sonnet-20241022-v2:0
+      Instruction: |
+        You are a helpful customer support agent for an e-commerce platform.
+        Help customers with orders, returns, and product questions.
+        Always be polite and professional.
+      ActionGroups:
+        - ActionGroupName: order-management
+          Description: Manage customer orders
+          ApiSchema:
+            Payload: '{"openapi":"3.0.0","info":{"title":"Order Management","version":"1.0.0"},"paths":{"/get-order":{"get":{"operationId":"getOrder","description":"Get order details","responses":{"200":{"description":"OK"}}}}}}'
+      KnowledgeBases:
+        - KnowledgeBaseId: kb-12345
+          Description: Product catalog knowledge base
+
+  ProductCatalogKB:
+    Type: AWS::Bedrock::KnowledgeBase
+    Properties:
+      Name: product-catalog-kb
+      Description: Product catalog for e-commerce
+      StorageConfiguration:
+        Type: OPENSEARCH_SERVERLESS
+
+Outputs:
+  AgentId:
+    Value: PLACEHOLDER_AGENT_ID
+  AliasId:
+    Value: PLACEHOLDER_ALIAS_ID

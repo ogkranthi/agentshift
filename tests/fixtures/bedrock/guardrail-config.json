@@ -1,0 +1,27 @@
+{
+  "guardrailId": "GUARD001",
+  "name": "e-commerce-guardrail",
+  "topicPolicyConfig": {
+    "topicsConfig": [
+      {
+        "name": "competitor-comparison",
+        "definition": "Do not make comparisons with or recommendations about competitor products.",
+        "type": "DENY"
+      },
+      {
+        "name": "political-content",
+        "definition": "Avoid discussing political topics unrelated to product or service.",
+        "type": "DENY"
+      }
+    ]
+  },
+  "contentPolicyConfig": {
+    "filtersConfig": [
+      {
+        "type": "HATE",
+        "inputStrength": "HIGH",
+        "outputStrength": "HIGH"
+      }
+    ]
+  }
+}
