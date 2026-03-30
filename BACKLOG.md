@@ -95,10 +95,10 @@
 | A12 | P1 | @architect | ready | Spec Governance IR schema — L1/L2/L3 layers, GPR/CFS scoring definitions, elevation rules |
 | A13 | P1 | @architect | ready | Research and document Bedrock parser format (reverse: Bedrock → IR) |
 | A14 | P1 | @architect | ready | Research and document Vertex AI parser format (reverse: Vertex → IR) |
-| D22 | P1 | @dev | ready | Implement Bedrock parser (bedrock-agent.json + OpenAPI + instruction.txt → IR) |
-| D23 | P1 | @dev | ready | Implement Vertex AI parser (agent.json + tool definitions → IR) |
-| D24 | P1 | @dev | ready | Add `--from bedrock` and `--from vertex` to convert/diff/audit CLI commands |
-| D25 | P1 | @dev | ready | Bump version to 0.3.0 — update CHANGELOG.md, pyproject.toml, add governance to README |
-| T14 | P1 | @tester | ready | Write tests for governance extraction (Guardrail classification, ToolPermission, L3 annotations) |
-| T15 | P1 | @tester | ready | Write tests for audit engine (GPR-L1/L2/L3 scoring, elevation tracking, CSV/JSON export) |
+| D22 | P1 | @dev | pr-created | Implement Bedrock parser (bedrock-agent.json + OpenAPI + instruction.txt → IR) |
+| D23 | P1 | @dev | pr-created | Implement Vertex AI parser (agent.json + tool definitions → IR) |
+| D24 | P1 | @dev | pr-created | Add `--from bedrock` and `--from vertex` to convert/diff/audit CLI commands |
+| D25 | P1 | @dev | pr-created | Bump version to 0.3.0 — update CHANGELOG.md, pyproject.toml, add governance to README |
+| T14 | P1 | @tester | pr-created | Write tests for governance extraction (Guardrail classification, ToolPermission, L3 annotations) |
+| T15 | P1 | @tester | pr-created | Write tests for audit engine (GPR-L1/L2/L3 scoring, elevation tracking, CSV/JSON export) |
 | T16 | P1 | @tester | ready | Write tests for Bedrock + Vertex parsers (fixtures + round-trip with emitters) |
