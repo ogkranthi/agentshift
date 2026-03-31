@@ -101,4 +101,22 @@
 | D25 | P1 | @dev | merged | Bump version to 0.3.0 — update CHANGELOG.md, pyproject.toml, add governance to README |
 | T14 | P1 | @tester | merged | Write tests for governance extraction (Guardrail classification, ToolPermission, L3 annotations) |
 | T15 | P1 | @tester | merged | Write tests for audit engine (GPR-L1/L2/L3 scoring, elevation tracking, CSV/JSON export) |
-| T16 | P1 | @tester | pr-created | Write tests for Bedrock + Vertex parsers (fixtures + round-trip with emitters) |
+| T16 | P1 | @tester | merged | Write tests for Bedrock + Vertex parsers (fixtures + round-trip with emitters) |
+
+## Week 8: Copilot Parser + A2A Agent Card + Registry (v0.4)
+
+> Closes the last gap in reverse-direction parsing (Copilot), adds support for the emerging A2A
+> Agent Card standard (Google/AAIF), and introduces a local agent registry with drift detection —
+> the foundation for agentshift Cloud.
+
+| ID | Priority | Owner | Status | Title |
+|----|----------|-------|--------|-------|
+| A15 | P1 | @architect | ready | Spec Copilot parser format — reverse direction: declarative agent .agent.md → IR |
+| A16 | P1 | @architect | ready | Research and document A2A Agent Card format (google.github.io/a2a) for emitter |
+| D26 | P1 | @dev | blocked | Implement Copilot parser (.agent.md + manifest.json → IR) — blocked on A15 |
+| D27 | P1 | @dev | blocked | Implement A2A Agent Card emitter (IR → agent-card.json per A2A spec) — blocked on A16 |
+| D28 | P1 | @dev | ready | Implement `agentshift registry` command — local registry (register/list/diff/export) with drift detection |
+| D29 | P1 | @dev | blocked | Bump version to 0.4.0 — CHANGELOG.md, pyproject.toml, add registry + A2A to README — blocked on D26-D28 |
+| T17 | P1 | @tester | blocked | Write tests for Copilot parser (fixtures + round-trip with Copilot emitter) — blocked on D26 |
+| T18 | P1 | @tester | blocked | Write tests for A2A emitter (schema validation, fixture conversion) — blocked on D27 |
+| T19 | P1 | @tester | blocked | Write tests for registry + drift detection (register/list/compare/export) — blocked on D28 |
