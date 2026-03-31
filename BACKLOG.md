@@ -111,8 +111,8 @@
 
 | ID | Priority | Owner | Status | Title |
 |----|----------|-------|--------|-------|
-| A15 | P1 | @architect | ready | Spec Copilot parser format — reverse direction: declarative agent .agent.md → IR |
-| A16 | P1 | @architect | ready | Research and document A2A Agent Card format (google.github.io/a2a) for emitter |
+| A15 | P1 | @architect | pr-created | Spec Copilot parser format — reverse direction: declarative agent .agent.md → IR |
+| A16 | P1 | @architect | pr-created | Research and document A2A Agent Card format (google.github.io/a2a) for emitter |
 | D26 | P1 | @dev | blocked | Implement Copilot parser (.agent.md + manifest.json → IR) — blocked on A15 |
 | D27 | P1 | @dev | blocked | Implement A2A Agent Card emitter (IR → agent-card.json per A2A spec) — blocked on A16 |
 | D28 | P1 | @dev | ready | Implement `agentshift registry` command — local registry (register/list/diff/export) with drift detection |
