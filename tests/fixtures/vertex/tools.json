@@ -1,0 +1,53 @@
+[
+  {
+    "displayName": "Weather API",
+    "description": "Fetch current weather conditions and forecasts from external weather service.",
+    "functionDeclarations": [
+      {
+        "name": "get_current_weather",
+        "description": "Get current weather conditions for a location.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "City name or coordinates"
+            },
+            "units": {
+              "type": "string",
+              "enum": ["metric", "imperial"],
+              "description": "Temperature units"
+            }
+          },
+          "required": ["location"]
+        }
+      },
+      {
+        "name": "get_forecast",
+        "description": "Get weather forecast for the next N days.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string"
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for forecast (1-10)"
+            }
+          },
+          "required": ["location", "days"]
+        }
+      }
+    ]
+  },
+  {
+    "displayName": "Weather Data Store",
+    "description": "Historical weather data store for trend analysis.",
+    "datastoreSpec": {
+      "dataStores": [
+        "projects/my-project/locations/us-central1/collections/default/dataStores/weather-history-ds-001"
+      ]
+    }
+  }
+]
