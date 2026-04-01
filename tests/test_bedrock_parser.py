@@ -69,7 +69,9 @@ class TestParseFromBedrockAgentJson:
     def test_foundation_model_in_extensions(self):
         ir = bedrock_parser.parse(FIXTURES_DIR)
         ext = ir.metadata.platform_extensions.get("bedrock", {})
-        assert ext.get("foundation_model") == "anthropic.claude-3-5-sonnet-20241022-v2:0"
+        assert (
+            ext.get("foundation_model") == "anthropic.claude-3-5-sonnet-20241022-v2:0"
+        )
 
     def test_agent_id_in_extensions(self):
         ir = bedrock_parser.parse(FIXTURES_DIR)
@@ -97,14 +99,20 @@ class TestParseFromCloudFormation:
     def test_parse_cfn_only(self, tmp_path):
         """Parse from a directory with only cloudformation.yaml."""
         import shutil
-        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
+
+        shutil.copy(
+            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
+        )
 
         ir = bedrock_parser.parse(tmp_path)
         assert isinstance(ir, AgentIR)
 
     def test_name_from_cfn(self, tmp_path):
         import shutil
-        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
+
+        shutil.copy(
+            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
+        )
 
         ir = bedrock_parser.parse(tmp_path)
         # "CustomerSupportBot" → slugified (lowercased)
@@ -112,7 +120,10 @@ class TestParseFromCloudFormation:
 
     def test_instruction_from_cfn(self, tmp_path):
         import shutil
-        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
+
+        shutil.copy(
+            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
+        )
 
         ir = bedrock_parser.parse(tmp_path)
         assert ir.persona.system_prompt is not None
@@ -120,7 +131,10 @@ class TestParseFromCloudFormation:
 
     def test_knowledge_from_cfn(self, tmp_path):
         import shutil
-        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
+
+        shutil.copy(
+            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
+        )
 
         ir = bedrock_parser.parse(tmp_path)
         # Should extract KnowledgeBase resource
@@ -128,7 +142,10 @@ class TestParseFromCloudFormation:
 
     def test_knowledge_kind_is_vector_store(self, tmp_path):
         import shutil
-        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
+
+        shutil.copy(
+            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
+        )
 
         ir = bedrock_parser.parse(tmp_path)
         kb = ir.knowledge[0]
@@ -137,7 +154,10 @@ class TestParseFromCloudFormation:
     def test_tools_from_cfn_action_groups(self, tmp_path):
         """CFN ActionGroups with inline Payload → tools extracted."""
         import shutil
-        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
+
+        shutil.copy(
+            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
+        )
 
         ir = bedrock_parser.parse(tmp_path)
         # The CFN fixture has an ActionGroup with an inline OpenAPI payload
@@ -156,7 +176,11 @@ class TestParseWithOpenApi:
         """openapi.json fixture → tools extracted with correct names."""
         ir = bedrock_parser.parse(FIXTURES_DIR)
         tool_names = {t.name for t in ir.tools}
-        assert "getOrder" in tool_names or "get-order" in tool_names or any("order" in n.lower() for n in tool_names)
+        assert (
+            "getOrder" in tool_names
+            or "get-order" in tool_names
+            or any("order" in n.lower() for n in tool_names)
+        )
 
     def test_tool_descriptions_populated(self):
         ir = bedrock_parser.parse(FIXTURES_DIR)
@@ -187,8 +211,20 @@ class TestParseWithOpenApi:
             "openapi": "3.0.0",
             "info": {"title": "Multi Tool API", "version": "1.0"},
             "paths": {
-                "/tool-a": {"post": {"operationId": "toolA", "description": "Tool A", "responses": {"200": {"description": "OK"}}}},
-                "/tool-b": {"post": {"operationId": "toolB", "description": "Tool B", "responses": {"200": {"description": "OK"}}}},
+                "/tool-a": {
+                    "post": {
+                        "operationId": "toolA",
+                        "description": "Tool A",
+                        "responses": {"200": {"description": "OK"}},
+                    }
+                },
+                "/tool-b": {
+                    "post": {
+                        "operationId": "toolB",
+                        "description": "Tool B",
+                        "responses": {"200": {"description": "OK"}},
+                    }
+                },
             },
         }
         (tmp_path / "openapi.json").write_text(json.dumps(openapi))
@@ -203,7 +239,10 @@ class TestParseWithOpenApi:
     def test_openapi_wins_over_cfn_action_groups(self, tmp_path):
         """When openapi.json present, CFN ActionGroups are NOT used for tools."""
         import shutil
-        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
+
+        shutil.copy(
+            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
+        )
         shutil.copy(FIXTURES_DIR / "openapi.json", tmp_path / "openapi.json")
 
         ir = bedrock_parser.parse(tmp_path)
@@ -398,6 +437,7 @@ class TestEdgeCases:
             },
         }
         import yaml
+
         (tmp_path / "cloudformation.yaml").write_text(yaml.dump(cfn))
 
         ir = bedrock_parser.parse(tmp_path)
@@ -406,7 +446,10 @@ class TestEdgeCases:
     def test_missing_openapi_falls_back_to_cfn_tools(self, tmp_path):
         """No openapi.json → tools extracted from CFN ActionGroups."""
         import shutil
-        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
+
+        shutil.copy(
+            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
+        )
         # No openapi.json copied
 
         ir = bedrock_parser.parse(tmp_path)
@@ -449,8 +492,13 @@ class TestEdgeCases:
     def test_bedrock_agent_json_takes_precedence_over_cfn(self, tmp_path):
         """bedrock-agent.json instruction wins over cloudformation.yaml instruction."""
         import shutil
-        shutil.copy(FIXTURES_DIR / "bedrock-agent.json", tmp_path / "bedrock-agent.json")
-        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
+
+        shutil.copy(
+            FIXTURES_DIR / "bedrock-agent.json", tmp_path / "bedrock-agent.json"
+        )
+        shutil.copy(
+            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
+        )
 
         ir = bedrock_parser.parse(tmp_path)
         # bedrock-agent.json has a specific instruction
@@ -544,9 +592,15 @@ class TestRoundTrip:
         ir_in = _make_minimal_ir(
             name="guardrail-agent",
             persona=Persona(system_prompt=system_prompt),
-            governance=Governance(guardrails=[
-                Guardrail(id="G001", text="Do not share personal information", category="privacy"),
-            ]),
+            governance=Governance(
+                guardrails=[
+                    Guardrail(
+                        id="G001",
+                        text="Do not share personal information",
+                        category="privacy",
+                    ),
+                ]
+            ),
         )
         out_dir = tmp_path / "bedrock-out"
         bedrock_emitter.emit(ir_in, out_dir)
@@ -588,7 +642,9 @@ class TestRoundTrip:
         }
         ir_in = _make_minimal_ir(
             name="sections-agent",
-            persona=Persona(sections=sections, system_prompt="You are a helpful agent."),
+            persona=Persona(
+                sections=sections, system_prompt="You are a helpful agent."
+            ),
         )
         out_dir = tmp_path / "bedrock-out"
         bedrock_emitter.emit(ir_in, out_dir)
@@ -601,6 +657,7 @@ class TestRoundTrip:
     def test_round_trip_with_knowledge(self, tmp_path):
         """IR with knowledge sources → emit → parse → knowledge preserved."""
         from agentshift.ir import KnowledgeSource
+
         knowledge = [
             KnowledgeSource(
                 name="product-docs",
@@ -634,9 +691,7 @@ class TestOpenApiAuthVariants:
             "openapi": "3.0.0",
             "info": {"title": "API", "version": "1.0"},
             "components": {
-                "securitySchemes": {
-                    "BearerAuth": {"type": "http", "scheme": "bearer"}
-                }
+                "securitySchemes": {"BearerAuth": {"type": "http", "scheme": "bearer"}}
             },
             "paths": {
                 "/action": {

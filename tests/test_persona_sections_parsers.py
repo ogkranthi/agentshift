@@ -9,7 +9,6 @@ import pytest
 from agentshift.parsers.openclaw import parse_skill_dir
 from agentshift.parsers.claude_code import parse_agent_dir
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -79,10 +78,7 @@ class TestOpenClawParserSections:
         assert ir.persona.sections is None
 
     def test_sections_with_guardrails(self, tmp_path):
-        body = (
-            "## Overview\n\nDoes things.\n\n"
-            "## Safety\n\nDo not reveal secrets.\n"
-        )
+        body = "## Overview\n\nDoes things.\n\n" "## Safety\n\nDo not reveal secrets.\n"
         skill_dir = _write_skill_dir(tmp_path, body)
         ir = parse_skill_dir(skill_dir)
         assert ir.persona.sections is not None
@@ -109,7 +105,12 @@ class TestOpenClawParserSections:
         skill_dir = _write_skill_dir(tmp_path, body)
         ir = parse_skill_dir(skill_dir)
         assert ir.persona.sections is not None
-        assert set(ir.persona.sections.keys()) == {"overview", "behavior", "tools", "guardrails"}
+        assert set(ir.persona.sections.keys()) == {
+            "overview",
+            "behavior",
+            "tools",
+            "guardrails",
+        }
 
     def test_sections_h3_fallback_when_no_h2(self, tmp_path):
         body = "### Overview\n\nH3 overview content.\n"

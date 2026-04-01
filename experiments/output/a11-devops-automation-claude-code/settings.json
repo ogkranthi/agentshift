@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kubectl:*)",
+      "Bash(terraform:*)"
+    ],
+    "deny": [
+      "Bash(bash rm -rf *)",
+      "Bash(terraform-apply:*)"
+    ]
+  }
+}

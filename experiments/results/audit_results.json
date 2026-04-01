@@ -1,0 +1,1335 @@
+[
+  {
+    "agent_id": "A1",
+    "agent_name": "general-assistant",
+    "target": "claude-code",
+    "domain": "General",
+    "complexity": "Low",
+    "l1": {
+      "total": 3,
+      "preserved": 3,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 2,
+      "preserved": 2,
+      "elevated": 0,
+      "gpr": 1.0
+    },
+    "l3": {
+      "total": 0,
+      "preserved": 0,
+      "elevated": 0,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 1.0,
+    "cfs": 1.0,
+    "elevated_artifacts": []
+  },
+  {
+    "agent_id": "A1",
+    "agent_name": "general-assistant",
+    "target": "copilot",
+    "domain": "General",
+    "complexity": "Low",
+    "l1": {
+      "total": 3,
+      "preserved": 3,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 2,
+      "preserved": 2,
+      "elevated": 0,
+      "gpr": 1.0
+    },
+    "l3": {
+      "total": 0,
+      "preserved": 0,
+      "elevated": 0,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 1.0,
+    "cfs": 1.0,
+    "elevated_artifacts": []
+  },
+  {
+    "agent_id": "A10",
+    "agent_name": "content-moderator",
+    "target": "claude-code",
+    "domain": "Moderation",
+    "complexity": "Medium",
+    "l1": {
+      "total": 4,
+      "preserved": 4,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 2,
+      "preserved": 2,
+      "elevated": 0,
+      "gpr": 1.0
+    },
+    "l3": {
+      "total": 4,
+      "preserved": 0,
+      "elevated": 4,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.6,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A10-001",
+        "artifact_type": "content_filter",
+        "original_text": "Detect hate speech (Bedrock HATE, Vertex HARASSMENT)",
+        "elevated_instruction": "CONTENT POLICY: Detect hate speech (Bedrock HATE, Vertex HARASSMENT)",
+        "reason": "claude-code does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A10-002",
+        "artifact_type": "content_filter",
+        "original_text": "Detect explicit content (Bedrock SEXUAL, Vertex SEXUALLY_EXPLICIT)",
+        "elevated_instruction": "CONTENT POLICY: Detect explicit content (Bedrock SEXUAL, Vertex SEXUALLY_EXPLICIT)",
+        "reason": "claude-code does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A10-003",
+        "artifact_type": "content_filter",
+        "original_text": "Detect violence (Bedrock VIOLENCE, Vertex DANGEROUS_CONTENT)",
+        "elevated_instruction": "CONTENT POLICY: Detect violence (Bedrock VIOLENCE, Vertex DANGEROUS_CONTENT)",
+        "reason": "claude-code does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A10-004",
+        "artifact_type": "pii_detection",
+        "original_text": "Mask user PII in moderation logs",
+        "elevated_instruction": "PII PROTECTION: Mask user PII in moderation logs",
+        "reason": "claude-code does not support pii_detection natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A10",
+    "agent_name": "content-moderator",
+    "target": "copilot",
+    "domain": "Moderation",
+    "complexity": "Medium",
+    "l1": {
+      "total": 4,
+      "preserved": 4,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 2,
+      "preserved": 1,
+      "elevated": 1,
+      "gpr": 0.5
+    },
+    "l3": {
+      "total": 4,
+      "preserved": 0,
+      "elevated": 4,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.5,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-user-history-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "user-history: read-only",
+        "elevated_instruction": "The user-history tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A10-001",
+        "artifact_type": "content_filter",
+        "original_text": "Detect hate speech (Bedrock HATE, Vertex HARASSMENT)",
+        "elevated_instruction": "CONTENT POLICY: Detect hate speech (Bedrock HATE, Vertex HARASSMENT)",
+        "reason": "copilot does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A10-002",
+        "artifact_type": "content_filter",
+        "original_text": "Detect explicit content (Bedrock SEXUAL, Vertex SEXUALLY_EXPLICIT)",
+        "elevated_instruction": "CONTENT POLICY: Detect explicit content (Bedrock SEXUAL, Vertex SEXUALLY_EXPLICIT)",
+        "reason": "copilot does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A10-003",
+        "artifact_type": "content_filter",
+        "original_text": "Detect violence (Bedrock VIOLENCE, Vertex DANGEROUS_CONTENT)",
+        "elevated_instruction": "CONTENT POLICY: Detect violence (Bedrock VIOLENCE, Vertex DANGEROUS_CONTENT)",
+        "reason": "copilot does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A10-004",
+        "artifact_type": "pii_detection",
+        "original_text": "Mask user PII in moderation logs",
+        "elevated_instruction": "PII PROTECTION: Mask user PII in moderation logs",
+        "reason": "copilot does not support pii_detection natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A11",
+    "agent_name": "devops-automation",
+    "target": "claude-code",
+    "domain": "DevOps",
+    "complexity": "Medium",
+    "l1": {
+      "total": 3,
+      "preserved": 3,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 5,
+      "preserved": 5,
+      "elevated": 0,
+      "gpr": 1.0
+    },
+    "l3": {
+      "total": 1,
+      "preserved": 0,
+      "elevated": 1,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.8888888888888888,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A11-001",
+        "artifact_type": "content_filter",
+        "original_text": "Block credential/secret exposure in logs",
+        "elevated_instruction": "CONTENT POLICY: Block credential/secret exposure in logs",
+        "reason": "claude-code does not support content_filter natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A11",
+    "agent_name": "devops-automation",
+    "target": "copilot",
+    "domain": "DevOps",
+    "complexity": "Medium",
+    "l1": {
+      "total": 3,
+      "preserved": 3,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 5,
+      "preserved": 0,
+      "elevated": 5,
+      "gpr": 0.0
+    },
+    "l3": {
+      "total": 1,
+      "preserved": 0,
+      "elevated": 1,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.3333333333333333,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-bash-deny-rm -rf *",
+        "artifact_type": "deny_pattern",
+        "original_text": "bash deny: rm -rf *",
+        "elevated_instruction": "When using bash, NEVER access paths matching: rm -rf *",
+        "reason": "copilot has no deny-pattern support"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-kubectl-allow---namespace dev",
+        "artifact_type": "allow_pattern",
+        "original_text": "kubectl allow: --namespace dev",
+        "elevated_instruction": "The kubectl tool may ONLY be used for paths matching: --namespace dev",
+        "reason": "copilot has no allow-pattern support"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-kubectl-allow---namespace staging",
+        "artifact_type": "allow_pattern",
+        "original_text": "kubectl allow: --namespace staging",
+        "elevated_instruction": "The kubectl tool may ONLY be used for paths matching: --namespace staging",
+        "reason": "copilot has no allow-pattern support"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-monitoring-api-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "monitoring-api: read-only",
+        "elevated_instruction": "The monitoring-api tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-terraform-apply-disabled",
+        "artifact_type": "disabled_tool",
+        "original_text": "terraform-apply: DISABLED",
+        "elevated_instruction": "Do NOT use the terraform-apply tool. It is disabled.",
+        "reason": "copilot has no native tool disable mechanism"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-terraform-plan-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "terraform-plan: read-only",
+        "elevated_instruction": "The terraform-plan tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A11-001",
+        "artifact_type": "content_filter",
+        "original_text": "Block credential/secret exposure in logs",
+        "elevated_instruction": "CONTENT POLICY: Block credential/secret exposure in logs",
+        "reason": "copilot does not support content_filter natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A12",
+    "agent_name": "multi-agent-orchestrator",
+    "target": "claude-code",
+    "domain": "Orchestration",
+    "complexity": "High",
+    "l1": {
+      "total": 6,
+      "preserved": 6,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 4,
+      "preserved": 4,
+      "elevated": 0,
+      "gpr": 1.0
+    },
+    "l3": {
+      "total": 2,
+      "preserved": 0,
+      "elevated": 2,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.8333333333333334,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A12-001",
+        "artifact_type": "pii_detection",
+        "original_text": "Ensure PII doesn't leak between sub-agents",
+        "elevated_instruction": "PII PROTECTION: Ensure PII doesn't leak between sub-agents",
+        "reason": "claude-code does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A12-002",
+        "artifact_type": "content_filter",
+        "original_text": "Block sub-agent outputs that violate content policies",
+        "elevated_instruction": "CONTENT POLICY: Block sub-agent outputs that violate content policies",
+        "reason": "claude-code does not support content_filter natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A12",
+    "agent_name": "multi-agent-orchestrator",
+    "target": "copilot",
+    "domain": "Orchestration",
+    "complexity": "High",
+    "l1": {
+      "total": 6,
+      "preserved": 6,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 4,
+      "preserved": 3,
+      "elevated": 1,
+      "gpr": 0.75
+    },
+    "l3": {
+      "total": 2,
+      "preserved": 0,
+      "elevated": 2,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.75,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-agent-registry-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "agent-registry: read-only",
+        "elevated_instruction": "The agent-registry tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A12-001",
+        "artifact_type": "pii_detection",
+        "original_text": "Ensure PII doesn't leak between sub-agents",
+        "elevated_instruction": "PII PROTECTION: Ensure PII doesn't leak between sub-agents",
+        "reason": "copilot does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A12-002",
+        "artifact_type": "content_filter",
+        "original_text": "Block sub-agent outputs that violate content policies",
+        "elevated_instruction": "CONTENT POLICY: Block sub-agent outputs that violate content policies",
+        "reason": "copilot does not support content_filter natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A2",
+    "agent_name": "code-reviewer",
+    "target": "claude-code",
+    "domain": "Development",
+    "complexity": "Medium",
+    "l1": {
+      "total": 5,
+      "preserved": 5,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 4,
+      "preserved": 4,
+      "elevated": 0,
+      "gpr": 1.0
+    },
+    "l3": {
+      "total": 0,
+      "preserved": 0,
+      "elevated": 0,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 1.0,
+    "cfs": 1.0,
+    "elevated_artifacts": []
+  },
+  {
+    "agent_id": "A2",
+    "agent_name": "code-reviewer",
+    "target": "copilot",
+    "domain": "Development",
+    "complexity": "Medium",
+    "l1": {
+      "total": 5,
+      "preserved": 5,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 4,
+      "preserved": 1,
+      "elevated": 3,
+      "gpr": 0.25
+    },
+    "l3": {
+      "total": 0,
+      "preserved": 0,
+      "elevated": 0,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.6666666666666666,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-file-read-deny-*/secrets/*",
+        "artifact_type": "deny_pattern",
+        "original_text": "file-read deny: */secrets/*",
+        "elevated_instruction": "When using file-read, NEVER access paths matching: */secrets/*",
+        "reason": "copilot has no deny-pattern support"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-file-read-deny-*/credentials/*",
+        "artifact_type": "deny_pattern",
+        "original_text": "file-read deny: */credentials/*",
+        "elevated_instruction": "When using file-read, NEVER access paths matching: */credentials/*",
+        "reason": "copilot has no deny-pattern support"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-file-read-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "file-read: read-only",
+        "elevated_instruction": "The file-read tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-file-write-disabled",
+        "artifact_type": "disabled_tool",
+        "original_text": "file-write: DISABLED",
+        "elevated_instruction": "Do NOT use the file-write tool. It is disabled.",
+        "reason": "copilot has no native tool disable mechanism"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-git-diff-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "git-diff: read-only",
+        "elevated_instruction": "The git-diff tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A3",
+    "agent_name": "research-agent",
+    "target": "claude-code",
+    "domain": "Research",
+    "complexity": "Medium",
+    "l1": {
+      "total": 4,
+      "preserved": 4,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 3,
+      "preserved": 2,
+      "elevated": 1,
+      "gpr": 0.6666666666666666
+    },
+    "l3": {
+      "total": 0,
+      "preserved": 0,
+      "elevated": 0,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.8571428571428571,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-web-search-ratelimit",
+        "artifact_type": "rate_limit",
+        "original_text": "web-search rate_limit: 50/hour",
+        "elevated_instruction": "Rate limit for web-search: do not exceed 50/hour.",
+        "reason": "No platform supports native rate limiting for tool calls"
+      }
+    ]
+  },
+  {
+    "agent_id": "A3",
+    "agent_name": "research-agent",
+    "target": "copilot",
+    "domain": "Research",
+    "complexity": "Medium",
+    "l1": {
+      "total": 4,
+      "preserved": 4,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 3,
+      "preserved": 0,
+      "elevated": 3,
+      "gpr": 0.0
+    },
+    "l3": {
+      "total": 0,
+      "preserved": 0,
+      "elevated": 0,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.5714285714285714,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-file-write-allow-/output/*",
+        "artifact_type": "allow_pattern",
+        "original_text": "file-write allow: /output/*",
+        "elevated_instruction": "The file-write tool may ONLY be used for paths matching: /output/*",
+        "reason": "copilot has no allow-pattern support"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-pdf-reader-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "pdf-reader: read-only",
+        "elevated_instruction": "The pdf-reader tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-web-search-ratelimit",
+        "artifact_type": "rate_limit",
+        "original_text": "web-search rate_limit: 50/hour",
+        "elevated_instruction": "Rate limit for web-search: do not exceed 50/hour.",
+        "reason": "No platform supports native rate limiting for tool calls"
+      }
+    ]
+  },
+  {
+    "agent_id": "A4",
+    "agent_name": "customer-support",
+    "target": "claude-code",
+    "domain": "Support",
+    "complexity": "Medium",
+    "l1": {
+      "total": 6,
+      "preserved": 6,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 3,
+      "preserved": 2,
+      "elevated": 1,
+      "gpr": 0.6666666666666666
+    },
+    "l3": {
+      "total": 0,
+      "preserved": 0,
+      "elevated": 0,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.8888888888888888,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-refund-api-maxvalue",
+        "artifact_type": "max_value",
+        "original_text": "refund-api max_value: $100",
+        "elevated_instruction": "Maximum value constraint for refund-api: $100.",
+        "reason": "No platform supports native max-value constraints for tools"
+      }
+    ]
+  },
+  {
+    "agent_id": "A4",
+    "agent_name": "customer-support",
+    "target": "copilot",
+    "domain": "Support",
+    "complexity": "Medium",
+    "l1": {
+      "total": 6,
+      "preserved": 6,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 3,
+      "preserved": 1,
+      "elevated": 2,
+      "gpr": 0.3333333333333333
+    },
+    "l3": {
+      "total": 0,
+      "preserved": 0,
+      "elevated": 0,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.7777777777777778,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-crm-lookup-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "crm-lookup: read-only",
+        "elevated_instruction": "The crm-lookup tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-refund-api-maxvalue",
+        "artifact_type": "max_value",
+        "original_text": "refund-api max_value: $100",
+        "elevated_instruction": "Maximum value constraint for refund-api: $100.",
+        "reason": "No platform supports native max-value constraints for tools"
+      }
+    ]
+  },
+  {
+    "agent_id": "A5",
+    "agent_name": "financial-advisor",
+    "target": "claude-code",
+    "domain": "Finance",
+    "complexity": "High",
+    "l1": {
+      "total": 8,
+      "preserved": 8,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 5,
+      "preserved": 5,
+      "elevated": 0,
+      "gpr": 1.0
+    },
+    "l3": {
+      "total": 3,
+      "preserved": 0,
+      "elevated": 3,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.8125,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A5-001",
+        "artifact_type": "content_filter",
+        "original_text": "Block investment scam language (Bedrock MISCONDUCT filter)",
+        "elevated_instruction": "CONTENT POLICY: Block investment scam language (Bedrock MISCONDUCT filter)",
+        "reason": "claude-code does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A5-002",
+        "artifact_type": "pii_detection",
+        "original_text": "Mask SSN/account numbers in responses (Bedrock sensitiveInfoPolicy)",
+        "elevated_instruction": "PII PROTECTION: Mask SSN/account numbers in responses (Bedrock sensitiveInfoPolicy)",
+        "reason": "claude-code does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A5-003",
+        "artifact_type": "grounding_check",
+        "original_text": "Ensure market data claims reference actual data (Bedrock contextualGroundingPolicy)",
+        "elevated_instruction": "GROUNDING REQUIREMENT: Ensure market data claims reference actual data (Bedrock contextualGroundingPolicy)",
+        "reason": "claude-code does not support grounding_check natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A5",
+    "agent_name": "financial-advisor",
+    "target": "copilot",
+    "domain": "Finance",
+    "complexity": "High",
+    "l1": {
+      "total": 8,
+      "preserved": 8,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 5,
+      "preserved": 2,
+      "elevated": 3,
+      "gpr": 0.4
+    },
+    "l3": {
+      "total": 3,
+      "preserved": 0,
+      "elevated": 3,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.625,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-market-data-api-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "market-data-api: read-only",
+        "elevated_instruction": "The market-data-api tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-portfolio-viewer-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "portfolio-viewer: read-only",
+        "elevated_instruction": "The portfolio-viewer tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-trade-execution-disabled",
+        "artifact_type": "disabled_tool",
+        "original_text": "trade-execution: DISABLED",
+        "elevated_instruction": "Do NOT use the trade-execution tool. It is disabled.",
+        "reason": "copilot has no native tool disable mechanism"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A5-001",
+        "artifact_type": "content_filter",
+        "original_text": "Block investment scam language (Bedrock MISCONDUCT filter)",
+        "elevated_instruction": "CONTENT POLICY: Block investment scam language (Bedrock MISCONDUCT filter)",
+        "reason": "copilot does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A5-002",
+        "artifact_type": "pii_detection",
+        "original_text": "Mask SSN/account numbers in responses (Bedrock sensitiveInfoPolicy)",
+        "elevated_instruction": "PII PROTECTION: Mask SSN/account numbers in responses (Bedrock sensitiveInfoPolicy)",
+        "reason": "copilot does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A5-003",
+        "artifact_type": "grounding_check",
+        "original_text": "Ensure market data claims reference actual data (Bedrock contextualGroundingPolicy)",
+        "elevated_instruction": "GROUNDING REQUIREMENT: Ensure market data claims reference actual data (Bedrock contextualGroundingPolicy)",
+        "reason": "copilot does not support grounding_check natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A6",
+    "agent_name": "healthcare-triage",
+    "target": "claude-code",
+    "domain": "Healthcare",
+    "complexity": "High",
+    "l1": {
+      "total": 7,
+      "preserved": 7,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 4,
+      "preserved": 4,
+      "elevated": 0,
+      "gpr": 1.0
+    },
+    "l3": {
+      "total": 4,
+      "preserved": 0,
+      "elevated": 4,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.7333333333333333,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A6-001",
+        "artifact_type": "content_filter",
+        "original_text": "Block dangerous medical misinformation (Vertex DANGEROUS_CONTENT)",
+        "elevated_instruction": "CONTENT POLICY: Block dangerous medical misinformation (Vertex DANGEROUS_CONTENT)",
+        "reason": "claude-code does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A6-002",
+        "artifact_type": "content_filter",
+        "original_text": "Block self-harm content (Bedrock VIOLENCE filter)",
+        "elevated_instruction": "CONTENT POLICY: Block self-harm content (Bedrock VIOLENCE filter)",
+        "reason": "claude-code does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A6-003",
+        "artifact_type": "pii_detection",
+        "original_text": "Block PHI (Protected Health Information) in responses",
+        "elevated_instruction": "PII PROTECTION: Block PHI (Protected Health Information) in responses",
+        "reason": "claude-code does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A6-004",
+        "artifact_type": "denied_topics",
+        "original_text": "Specific drug synthesis / medication manufacture",
+        "elevated_instruction": "DENIED TOPIC: Specific drug synthesis / medication manufacture",
+        "reason": "claude-code does not support denied_topics natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A6",
+    "agent_name": "healthcare-triage",
+    "target": "copilot",
+    "domain": "Healthcare",
+    "complexity": "High",
+    "l1": {
+      "total": 7,
+      "preserved": 7,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 4,
+      "preserved": 2,
+      "elevated": 2,
+      "gpr": 0.5
+    },
+    "l3": {
+      "total": 4,
+      "preserved": 0,
+      "elevated": 4,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.6,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-medical-records-disabled",
+        "artifact_type": "disabled_tool",
+        "original_text": "medical-records: DISABLED",
+        "elevated_instruction": "Do NOT use the medical-records tool. It is disabled.",
+        "reason": "copilot has no native tool disable mechanism"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-symptom-checker-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "symptom-checker: read-only",
+        "elevated_instruction": "The symptom-checker tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A6-001",
+        "artifact_type": "content_filter",
+        "original_text": "Block dangerous medical misinformation (Vertex DANGEROUS_CONTENT)",
+        "elevated_instruction": "CONTENT POLICY: Block dangerous medical misinformation (Vertex DANGEROUS_CONTENT)",
+        "reason": "copilot does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A6-002",
+        "artifact_type": "content_filter",
+        "original_text": "Block self-harm content (Bedrock VIOLENCE filter)",
+        "elevated_instruction": "CONTENT POLICY: Block self-harm content (Bedrock VIOLENCE filter)",
+        "reason": "copilot does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A6-003",
+        "artifact_type": "pii_detection",
+        "original_text": "Block PHI (Protected Health Information) in responses",
+        "elevated_instruction": "PII PROTECTION: Block PHI (Protected Health Information) in responses",
+        "reason": "copilot does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A6-004",
+        "artifact_type": "denied_topics",
+        "original_text": "Specific drug synthesis / medication manufacture",
+        "elevated_instruction": "DENIED TOPIC: Specific drug synthesis / medication manufacture",
+        "reason": "copilot does not support denied_topics natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A7",
+    "agent_name": "legal-document-review",
+    "target": "claude-code",
+    "domain": "Legal",
+    "complexity": "High",
+    "l1": {
+      "total": 6,
+      "preserved": 6,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 5,
+      "preserved": 5,
+      "elevated": 0,
+      "gpr": 1.0
+    },
+    "l3": {
+      "total": 2,
+      "preserved": 0,
+      "elevated": 2,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.8461538461538461,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A7-001",
+        "artifact_type": "pii_detection",
+        "original_text": "Redact names/addresses/SSNs in analysis output",
+        "elevated_instruction": "PII PROTECTION: Redact names/addresses/SSNs in analysis output",
+        "reason": "claude-code does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A7-002",
+        "artifact_type": "content_filter",
+        "original_text": "Block generation of fraudulent legal documents",
+        "elevated_instruction": "CONTENT POLICY: Block generation of fraudulent legal documents",
+        "reason": "claude-code does not support content_filter natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A7",
+    "agent_name": "legal-document-review",
+    "target": "copilot",
+    "domain": "Legal",
+    "complexity": "High",
+    "l1": {
+      "total": 6,
+      "preserved": 6,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 5,
+      "preserved": 1,
+      "elevated": 4,
+      "gpr": 0.2
+    },
+    "l3": {
+      "total": 2,
+      "preserved": 0,
+      "elevated": 2,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.5384615384615384,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-clause-database-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "clause-database: read-only",
+        "elevated_instruction": "The clause-database tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-document-parser-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "document-parser: read-only",
+        "elevated_instruction": "The document-parser tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-external-api-disabled",
+        "artifact_type": "disabled_tool",
+        "original_text": "external-api: DISABLED",
+        "elevated_instruction": "Do NOT use the external-api tool. It is disabled.",
+        "reason": "copilot has no native tool disable mechanism"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-file-write-allow-/annotations/*",
+        "artifact_type": "allow_pattern",
+        "original_text": "file-write allow: /annotations/*",
+        "elevated_instruction": "The file-write tool may ONLY be used for paths matching: /annotations/*",
+        "reason": "copilot has no allow-pattern support"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A7-001",
+        "artifact_type": "pii_detection",
+        "original_text": "Redact names/addresses/SSNs in analysis output",
+        "elevated_instruction": "PII PROTECTION: Redact names/addresses/SSNs in analysis output",
+        "reason": "copilot does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A7-002",
+        "artifact_type": "content_filter",
+        "original_text": "Block generation of fraudulent legal documents",
+        "elevated_instruction": "CONTENT POLICY: Block generation of fraudulent legal documents",
+        "reason": "copilot does not support content_filter natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A8",
+    "agent_name": "trading-bot",
+    "target": "claude-code",
+    "domain": "Finance",
+    "complexity": "High",
+    "l1": {
+      "total": 5,
+      "preserved": 5,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 6,
+      "preserved": 5,
+      "elevated": 1,
+      "gpr": 0.8333333333333334
+    },
+    "l3": {
+      "total": 3,
+      "preserved": 0,
+      "elevated": 3,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.7142857142857143,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-order-api-maxvalue",
+        "artifact_type": "max_value",
+        "original_text": "order-api max_value: 5% of portfolio value per trade",
+        "elevated_instruction": "Maximum value constraint for order-api: 5% of portfolio value per trade.",
+        "reason": "No platform supports native max-value constraints for tools"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A8-001",
+        "artifact_type": "content_filter",
+        "original_text": "Block market manipulation language",
+        "elevated_instruction": "CONTENT POLICY: Block market manipulation language",
+        "reason": "claude-code does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A8-002",
+        "artifact_type": "pii_detection",
+        "original_text": "Mask account numbers in logs",
+        "elevated_instruction": "PII PROTECTION: Mask account numbers in logs",
+        "reason": "claude-code does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A8-003",
+        "artifact_type": "grounding_check",
+        "original_text": "Trade rationale must reference market data",
+        "elevated_instruction": "GROUNDING REQUIREMENT: Trade rationale must reference market data",
+        "reason": "claude-code does not support grounding_check natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A8",
+    "agent_name": "trading-bot",
+    "target": "copilot",
+    "domain": "Finance",
+    "complexity": "High",
+    "l1": {
+      "total": 5,
+      "preserved": 5,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 6,
+      "preserved": 3,
+      "elevated": 3,
+      "gpr": 0.5
+    },
+    "l3": {
+      "total": 3,
+      "preserved": 0,
+      "elevated": 3,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.5714285714285714,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-market-data-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "market-data: read-only",
+        "elevated_instruction": "The market-data tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-order-api-maxvalue",
+        "artifact_type": "max_value",
+        "original_text": "order-api max_value: 5% of portfolio value per trade",
+        "elevated_instruction": "Maximum value constraint for order-api: 5% of portfolio value per trade.",
+        "reason": "No platform supports native max-value constraints for tools"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-portfolio-state-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "portfolio-state: read-only",
+        "elevated_instruction": "The portfolio-state tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A8-001",
+        "artifact_type": "content_filter",
+        "original_text": "Block market manipulation language",
+        "elevated_instruction": "CONTENT POLICY: Block market manipulation language",
+        "reason": "copilot does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A8-002",
+        "artifact_type": "pii_detection",
+        "original_text": "Mask account numbers in logs",
+        "elevated_instruction": "PII PROTECTION: Mask account numbers in logs",
+        "reason": "copilot does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A8-003",
+        "artifact_type": "grounding_check",
+        "original_text": "Trade rationale must reference market data",
+        "elevated_instruction": "GROUNDING REQUIREMENT: Trade rationale must reference market data",
+        "reason": "copilot does not support grounding_check natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A9",
+    "agent_name": "hr-screening",
+    "target": "claude-code",
+    "domain": "HR",
+    "complexity": "High",
+    "l1": {
+      "total": 7,
+      "preserved": 7,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 3,
+      "preserved": 3,
+      "elevated": 0,
+      "gpr": 1.0
+    },
+    "l3": {
+      "total": 3,
+      "preserved": 0,
+      "elevated": 3,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.7692307692307693,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A9-001",
+        "artifact_type": "content_filter",
+        "original_text": "Block discriminatory language in assessments",
+        "elevated_instruction": "CONTENT POLICY: Block discriminatory language in assessments",
+        "reason": "claude-code does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A9-002",
+        "artifact_type": "pii_detection",
+        "original_text": "Mask candidate personal identifiers in logs",
+        "elevated_instruction": "PII PROTECTION: Mask candidate personal identifiers in logs",
+        "reason": "claude-code does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A9-003",
+        "artifact_type": "denied_topics",
+        "original_text": "Protected class characteristics in evaluation",
+        "elevated_instruction": "DENIED TOPIC: Protected class characteristics in evaluation",
+        "reason": "claude-code does not support denied_topics natively"
+      }
+    ]
+  },
+  {
+    "agent_id": "A9",
+    "agent_name": "hr-screening",
+    "target": "copilot",
+    "domain": "HR",
+    "complexity": "High",
+    "l1": {
+      "total": 7,
+      "preserved": 7,
+      "gpr": 1.0
+    },
+    "l2": {
+      "total": 3,
+      "preserved": 0,
+      "elevated": 3,
+      "gpr": 0.0
+    },
+    "l3": {
+      "total": 3,
+      "preserved": 0,
+      "elevated": 3,
+      "dropped": 0,
+      "gpr": 0.0
+    },
+    "gpr_overall": 0.5384615384615384,
+    "cfs": 1.0,
+    "elevated_artifacts": [
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-job-requirements-db-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "job-requirements-db: read-only",
+        "elevated_instruction": "The job-requirements-db tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-resume-parser-readonly",
+        "artifact_type": "access_restriction",
+        "original_text": "resume-parser: read-only",
+        "elevated_instruction": "The resume-parser tool is READ-ONLY. Do NOT use it to write, modify, or delete any data.",
+        "reason": "copilot cannot enforce read-only access natively"
+      },
+      {
+        "source_layer": "L2",
+        "artifact_id": "L2-social-media-disabled",
+        "artifact_type": "disabled_tool",
+        "original_text": "social-media: DISABLED",
+        "elevated_instruction": "Do NOT use the social-media tool. It is disabled.",
+        "reason": "copilot has no native tool disable mechanism"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A9-001",
+        "artifact_type": "content_filter",
+        "original_text": "Block discriminatory language in assessments",
+        "elevated_instruction": "CONTENT POLICY: Block discriminatory language in assessments",
+        "reason": "copilot does not support content_filter natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A9-002",
+        "artifact_type": "pii_detection",
+        "original_text": "Mask candidate personal identifiers in logs",
+        "elevated_instruction": "PII PROTECTION: Mask candidate personal identifiers in logs",
+        "reason": "copilot does not support pii_detection natively"
+      },
+      {
+        "source_layer": "L3",
+        "artifact_id": "L3-A9-003",
+        "artifact_type": "denied_topics",
+        "original_text": "Protected class characteristics in evaluation",
+        "elevated_instruction": "DENIED TOPIC: Protected class characteristics in evaluation",
+        "reason": "copilot does not support denied_topics natively"
+      }
+    ]
+  }
+]

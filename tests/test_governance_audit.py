@@ -42,7 +42,6 @@ from agentshift.ir import (
     ToolPermission,
 )
 
-
 # ---------------------------------------------------------------------------
 # Fixtures / helpers
 # ---------------------------------------------------------------------------
@@ -200,8 +199,12 @@ class TestGPRL2:
         """gpr_l2 = l2_preserved / l2_total when l2_total > 0."""
         ir = _make_ir(
             tool_permissions=[
-                ToolPermission(tool_name="exec", enabled=False),   # bedrock preserves this
-                ToolPermission(tool_name="shell", rate_limit="5/min"),  # always elevated
+                ToolPermission(
+                    tool_name="exec", enabled=False
+                ),  # bedrock preserves this
+                ToolPermission(
+                    tool_name="shell", rate_limit="5/min"
+                ),  # always elevated
             ]
         )
         audit = audit_conversion(ir, "bedrock")
@@ -279,7 +282,9 @@ class TestGPRL3:
             platform_annotations=[
                 PlatformAnnotation(id="a1", kind="content_filter", description="cf"),
                 PlatformAnnotation(id="a2", kind="pii_detection", description="pii"),
-                PlatformAnnotation(id="a3", kind="denied_topics", description="dt"),  # Not supported
+                PlatformAnnotation(
+                    id="a3", kind="denied_topics", description="dt"
+                ),  # Not supported
             ]
         )
         audit = audit_conversion(ir, "vertex")
@@ -341,9 +346,11 @@ class TestGPROverall:
     def test_gpr_overall_weighted_formula(self):
         """Check the weighted average formula explicitly."""
         ir = _make_ir(
-            guardrails=_safety_guardrail(2),              # L1: 2 total, 2 preserved
+            guardrails=_safety_guardrail(2),  # L1: 2 total, 2 preserved
             tool_permissions=[
-                ToolPermission(tool_name="t1", enabled=False),  # L2: depends on platform
+                ToolPermission(
+                    tool_name="t1", enabled=False
+                ),  # L2: depends on platform
             ],
             platform_annotations=[
                 PlatformAnnotation(id="a1", kind="content_filter", description="cf"),
@@ -479,7 +486,9 @@ class TestElevationTracking:
     def test_l3_annotation_elevated_on_claude_code(self):
         ir = _make_ir(
             platform_annotations=[
-                PlatformAnnotation(id="cf1", kind="content_filter", description="Block harmful")
+                PlatformAnnotation(
+                    id="cf1", kind="content_filter", description="Block harmful"
+                )
             ]
         )
         audit = audit_conversion(ir, "claude-code")
@@ -491,7 +500,9 @@ class TestElevationTracking:
     def test_l3_annotation_preserved_on_bedrock(self):
         ir = _make_ir(
             platform_annotations=[
-                PlatformAnnotation(id="cf1", kind="content_filter", description="Block harmful")
+                PlatformAnnotation(
+                    id="cf1", kind="content_filter", description="Block harmful"
+                )
             ]
         )
         audit = audit_conversion(ir, "bedrock")
@@ -506,8 +517,14 @@ class TestElevationTracking:
         audit = audit_conversion(ir, "copilot")
         assert len(audit.elevated_artifacts) > 0
         ea = audit.elevated_artifacts[0]
-        required_keys = {"source_layer", "artifact_id", "artifact_type", "original_text",
-                         "elevated_instruction", "reason"}
+        required_keys = {
+            "source_layer",
+            "artifact_id",
+            "artifact_type",
+            "original_text",
+            "elevated_instruction",
+            "reason",
+        }
         assert required_keys.issubset(ea.keys())
 
     def test_elevated_instruction_is_nonempty(self):
@@ -516,7 +533,9 @@ class TestElevationTracking:
         )
         audit = audit_conversion(ir, "copilot")
         for ea in audit.elevated_artifacts:
-            assert ea["elevated_instruction"], "elevated_instruction should not be empty"
+            assert ea[
+                "elevated_instruction"
+            ], "elevated_instruction should not be empty"
 
     def test_allow_pattern_elevated_on_unsupported_platform(self):
         """Allow patterns are elevated on platforms without allow_list support (e.g., bedrock)."""
@@ -550,11 +569,22 @@ class TestCSVExport:
     """Tests for export_csv: format, column headers, row data."""
 
     EXPECTED_HEADERS = [
-        "Agent", "Target", "Domain", "Complexity",
-        "L1 Total", "L1 Preserved", "GPR-L1",
-        "L2 Total", "L2 Preserved", "L2 Elevated", "GPR-L2",
-        "L3 Total", "L3 Preserved", "GPR-L3",
-        "GPR-Overall", "CFS",
+        "Agent",
+        "Target",
+        "Domain",
+        "Complexity",
+        "L1 Total",
+        "L1 Preserved",
+        "GPR-L1",
+        "L2 Total",
+        "L2 Preserved",
+        "L2 Elevated",
+        "GPR-L2",
+        "L3 Total",
+        "L3 Preserved",
+        "GPR-L3",
+        "GPR-Overall",
+        "CFS",
     ]
 
     def test_csv_headers_match_spec(self):
@@ -588,7 +618,9 @@ class TestCSVExport:
             name="my-agent",
             guardrails=_safety_guardrail(2),
         )
-        audit = audit_conversion(ir, "copilot", agent_id="my-agent", domain="test", complexity="low")
+        audit = audit_conversion(
+            ir, "copilot", agent_id="my-agent", domain="test", complexity="low"
+        )
         with tempfile.TemporaryDirectory() as tmpdir:
             csv_path = Path(tmpdir) / "r.csv"
             export_csv([audit], csv_path)
@@ -688,8 +720,17 @@ class TestJSONExport:
             data = json.loads(json_path.read_text())
             entry = data[0]
         required_keys = {
-            "agent_id", "agent_name", "target", "domain", "complexity",
-            "l1", "l2", "l3", "gpr_overall", "cfs", "elevated_artifacts",
+            "agent_id",
+            "agent_name",
+            "target",
+            "domain",
+            "complexity",
+            "l1",
+            "l2",
+            "l3",
+            "gpr_overall",
+            "cfs",
+            "elevated_artifacts",
         }
         assert required_keys.issubset(entry.keys())
 
@@ -757,8 +798,14 @@ class TestJSONExport:
             export_json([audit], json_path)
             data = json.loads(json_path.read_text())
             artifact = data[0]["elevated_artifacts"][0]
-        required = {"source_layer", "artifact_id", "artifact_type",
-                    "original_text", "elevated_instruction", "reason"}
+        required = {
+            "source_layer",
+            "artifact_id",
+            "artifact_type",
+            "original_text",
+            "elevated_instruction",
+            "reason",
+        }
         assert required.issubset(artifact.keys())
 
     def test_json_multiple_entries(self):
@@ -853,7 +900,9 @@ class TestEdgeCases:
         ir = _make_ir(
             guardrails=_safety_guardrail(3),
             platform_annotations=[
-                PlatformAnnotation(id="cf1", kind="content_filter", description="safety"),
+                PlatformAnnotation(
+                    id="cf1", kind="content_filter", description="safety"
+                ),
                 PlatformAnnotation(id="pii1", kind="pii_detection", description="pii"),
             ],
         )

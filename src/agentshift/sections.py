@@ -158,7 +158,9 @@ def extract_sections(
         if slug in result:
             # Duplicate canonical mapping — merge with warning
             logger.debug(
-                "Duplicate section slug '%s' (from heading '%s') — merging bodies.", slug, raw_heading
+                "Duplicate section slug '%s' (from heading '%s') — merging bodies.",
+                slug,
+                raw_heading,
             )
             result[slug] = result[slug] + "\n\n" + body_text
         else:

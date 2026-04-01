@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlanner xmlns="http://soap.sforce.com/2006/04/metadata">
+    <plannerType>ReAct</plannerType>
+    <masterLabel>Sales Agent Planner</masterLabel>
+    <description>Plans actions for the sales agent</description>
+    <plannerTopics>
+        <plannerTopic>
+            <masterLabel>Lead Qualification</masterLabel>
+            <description>Qualify and score inbound leads</description>
+            <scope>Handle lead qualification tasks when a user asks about lead quality or scoring</scope>
+            <instructions>Always check the lead score. If score > 80, immediately draft outreach. Never promise discounts without manager approval.</instructions>
+            <plannerActions>
+                <plannerAction>
+                    <action>GetLeadScore</action>
+                    <actionType>FlowAction</actionType>
+                </plannerAction>
+                <plannerAction>
+                    <action>DraftEmail</action>
+                    <actionType>FlowAction</actionType>
+                </plannerAction>
+            </plannerActions>
+        </plannerTopic>
+        <plannerTopic>
+            <masterLabel>Account Research</masterLabel>
+            <description>Research account history and interactions</description>
+            <scope>Research account information when asked about a company or contact</scope>
+            <instructions>Pull account history. Summarize last 3 interactions. Flag any open support cases.</instructions>
+        </plannerTopic>
+    </plannerTopics>
+</GenAiPlanner>

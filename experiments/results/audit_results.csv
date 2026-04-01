@@ -1,0 +1,25 @@
+Agent,Target,Domain,Complexity,L1 Total,L1 Preserved,GPR-L1,L2 Total,L2 Preserved,L2 Elevated,GPR-L2,L3 Total,L3 Preserved,GPR-L3,GPR-Overall,CFS
+A1,claude-code,General,Low,3,3,1.0000,2,2,0,1.0000,0,0,0.0000,1.0000,1.0000
+A1,copilot,General,Low,3,3,1.0000,2,2,0,1.0000,0,0,0.0000,1.0000,1.0000
+A10,claude-code,Moderation,Medium,4,4,1.0000,2,2,0,1.0000,4,0,0.0000,0.6000,1.0000
+A10,copilot,Moderation,Medium,4,4,1.0000,2,1,1,0.5000,4,0,0.0000,0.5000,1.0000
+A11,claude-code,DevOps,Medium,3,3,1.0000,5,5,0,1.0000,1,0,0.0000,0.8889,1.0000
+A11,copilot,DevOps,Medium,3,3,1.0000,5,0,5,0.0000,1,0,0.0000,0.3333,1.0000
+A12,claude-code,Orchestration,High,6,6,1.0000,4,4,0,1.0000,2,0,0.0000,0.8333,1.0000
+A12,copilot,Orchestration,High,6,6,1.0000,4,3,1,0.7500,2,0,0.0000,0.7500,1.0000
+A2,claude-code,Development,Medium,5,5,1.0000,4,4,0,1.0000,0,0,0.0000,1.0000,1.0000
+A2,copilot,Development,Medium,5,5,1.0000,4,1,3,0.2500,0,0,0.0000,0.6667,1.0000
+A3,claude-code,Research,Medium,4,4,1.0000,3,2,1,0.6667,0,0,0.0000,0.8571,1.0000
+A3,copilot,Research,Medium,4,4,1.0000,3,0,3,0.0000,0,0,0.0000,0.5714,1.0000
+A4,claude-code,Support,Medium,6,6,1.0000,3,2,1,0.6667,0,0,0.0000,0.8889,1.0000
+A4,copilot,Support,Medium,6,6,1.0000,3,1,2,0.3333,0,0,0.0000,0.7778,1.0000
+A5,claude-code,Finance,High,8,8,1.0000,5,5,0,1.0000,3,0,0.0000,0.8125,1.0000
+A5,copilot,Finance,High,8,8,1.0000,5,2,3,0.4000,3,0,0.0000,0.6250,1.0000
+A6,claude-code,Healthcare,High,7,7,1.0000,4,4,0,1.0000,4,0,0.0000,0.7333,1.0000
+A6,copilot,Healthcare,High,7,7,1.0000,4,2,2,0.5000,4,0,0.0000,0.6000,1.0000
+A7,claude-code,Legal,High,6,6,1.0000,5,5,0,1.0000,2,0,0.0000,0.8462,1.0000
+A7,copilot,Legal,High,6,6,1.0000,5,1,4,0.2000,2,0,0.0000,0.5385,1.0000
+A8,claude-code,Finance,High,5,5,1.0000,6,5,1,0.8333,3,0,0.0000,0.7143,1.0000
+A8,copilot,Finance,High,5,5,1.0000,6,3,3,0.5000,3,0,0.0000,0.5714,1.0000
+A9,claude-code,HR,High,7,7,1.0000,3,3,0,1.0000,3,0,0.0000,0.7692,1.0000
+A9,copilot,HR,High,7,7,1.0000,3,0,3,0.0000,3,0,0.0000,0.5385,1.0000

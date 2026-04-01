@@ -10,13 +10,16 @@ import pytest
 from agentshift.emitters import bedrock, vertex
 from agentshift.ir import AgentIR, Metadata, Persona
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
 
-def _make_ir(sections: dict[str, str] | None = None, system_prompt: str = "Fallback prompt.", **kwargs) -> AgentIR:
+def _make_ir(
+    sections: dict[str, str] | None = None,
+    system_prompt: str = "Fallback prompt.",
+    **kwargs,
+) -> AgentIR:
     defaults = dict(
         name="test-agent",
         description="A test agent.",

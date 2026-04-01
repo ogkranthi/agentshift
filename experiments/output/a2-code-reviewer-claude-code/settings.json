@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(file-read */secrets/*)",
+      "Bash(file-read */credentials/*)",
+      "Bash(file-write:*)"
+    ]
+  }
+}

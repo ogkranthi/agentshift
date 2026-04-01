@@ -1,0 +1,67 @@
+{
+  "agentDefinition": {
+    "agentDescription": "Sales assistant that helps qualify leads and research accounts",
+    "topics": [
+      {
+        "topic": "Lead Qualification",
+        "scope": "Handle lead qualification when user asks about leads",
+        "instructions": [
+          "Always check lead score before responding",
+          "If score > 80, draft outreach immediately",
+          "Never promise specific discounts without manager approval"
+        ],
+        "classificationDescription": "User wants to qualify or score a sales lead",
+        "actions": [
+          {
+            "actionName": "GetLeadScore",
+            "actionDescription": "Retrieves the AI-generated lead score from Salesforce",
+            "exampleOutput": "Lead score: 85 - High quality lead from enterprise segment",
+            "inputs": [
+              {"inputName": "leadId", "inputDataType": "String", "inputDescription": "The Salesforce Lead record ID"}
+            ],
+            "outputs": [
+              {"outputName": "score", "outputDataType": "Integer", "outputDescription": "Lead quality score 0-100"}
+            ]
+          },
+          {
+            "actionName": "DraftOutreach",
+            "actionDescription": "Drafts an outreach email for qualified leads",
+            "inputs": [
+              {"inputName": "leadId", "inputDataType": "String", "inputDescription": "The Salesforce Lead record ID"},
+              {"inputName": "templateName", "inputDataType": "String", "inputDescription": "Email template to use"}
+            ],
+            "outputs": [
+              {"outputName": "emailDraft", "outputDataType": "String", "outputDescription": "The drafted email content"}
+            ]
+          }
+        ]
+      },
+      {
+        "topic": "Account Research",
+        "scope": "Research account information when asked about a company or contact",
+        "instructions": [
+          "Pull account history before responding",
+          "Summarize last 3 interactions",
+          "Flag any open support cases"
+        ],
+        "actions": [
+          {
+            "actionName": "GetAccountHistory",
+            "actionDescription": "Retrieves account interaction history",
+            "inputs": [
+              {"inputName": "accountId", "inputDataType": "String", "inputDescription": "The Salesforce Account ID"}
+            ],
+            "outputs": [
+              {"outputName": "history", "outputDataType": "String", "outputDescription": "Account interaction history"}
+            ]
+          }
+        ]
+      }
+    ],
+    "sampleUtterances": [
+      "What is the lead score for this account?",
+      "Help me qualify this inbound lead",
+      "Show me the account history for Acme Corp"
+    ]
+  }
+}

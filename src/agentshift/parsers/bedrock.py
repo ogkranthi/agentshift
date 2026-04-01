@@ -331,9 +331,7 @@ def _infer_tool_kind_from_operation(name: str, operation: dict, is_stub: bool) -
 
 def _infer_auth_from_openapi(openapi: dict, operation: dict) -> ToolAuth:
     """Best-effort auth inference from OpenAPI security schemes."""
-    security_schemes = (
-        openapi.get("components", {}).get("securitySchemes", {})
-    )
+    security_schemes = openapi.get("components", {}).get("securitySchemes", {})
     security_refs = operation.get("security", openapi.get("security", []))
 
     for sec_req in security_refs:
@@ -386,7 +384,9 @@ def _extract_tools_from_cfn(cfn_yaml: dict) -> list[Tool]:
             payload = api_schema.get("Payload")
             if payload:
                 try:
-                    schema = json.loads(payload) if isinstance(payload, str) else payload
+                    schema = (
+                        json.loads(payload) if isinstance(payload, str) else payload
+                    )
                     sub_tools = _extract_tools_from_openapi(schema)
                     tools.extend(sub_tools)
                     continue
@@ -431,9 +431,7 @@ def _extract_knowledge_from_cfn(cfn_yaml: dict | None) -> list[KnowledgeSource]:
             description = str(description)
 
         # Infer storage kind
-        storage_type = (
-            props.get("StorageConfiguration", {}).get("Type", "").lower()
-        )
+        storage_type = props.get("StorageConfiguration", {}).get("Type", "").lower()
         kind: str
         if "opensearch" in storage_type or "vector" in storage_type:
             kind = "vector_store"
@@ -506,7 +504,11 @@ def _build_governance(
             if definition.lower() in existing_texts:
                 continue
             idx = len(guardrails) + 1
-            from agentshift.parsers.utils import infer_guardrail_category, infer_guardrail_severity
+            from agentshift.parsers.utils import (
+                infer_guardrail_category,
+                infer_guardrail_severity,
+            )
+
             guardrails.append(
                 Guardrail(
                     id=f"G{idx:03d}",
@@ -540,6 +542,7 @@ def _load_yaml(path: Path) -> dict | None:
         return None
     try:
         import yaml  # type: ignore[import-untyped]
+
         return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     except Exception:
         return None

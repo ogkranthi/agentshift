@@ -196,14 +196,9 @@ def parse_api_response(
         bedrock_ext["resource_name"] = resource_name
 
     # Model override
-    model_override = (
-        agent_data.get("platform_extensions", {})
-        .get("vertex_ai", {})
-        .get("model")
-        or agent_data.get("platform_extensions", {})
-        .get("vertex", {})
-        .get("model")
-    )
+    model_override = agent_data.get("platform_extensions", {}).get("vertex_ai", {}).get(
+        "model"
+    ) or agent_data.get("platform_extensions", {}).get("vertex", {}).get("model")
     if model_override:
         bedrock_ext["model"] = model_override
 
@@ -526,7 +521,9 @@ def _parse_vertex_auth(auth: dict | None) -> ToolAuth:
     if "oauthConfig" in auth:
         cfg = auth["oauthConfig"]
         scope_str = cfg.get("scope", "")
-        scopes = [s.strip() for s in scope_str.split() if s.strip()] if scope_str else []
+        scopes = (
+            [s.strip() for s in scope_str.split() if s.strip()] if scope_str else []
+        )
         return ToolAuth(type="oauth2", scopes=scopes)
 
     if "serviceAccountConfig" in auth:
