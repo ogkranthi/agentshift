@@ -27,6 +27,7 @@ _PARSERS = {
     "claude-code": "agentshift.parsers.claude_code:parse_agent_dir",
     "bedrock": "agentshift.parsers.bedrock:parse",
     "vertex": "agentshift.parsers.vertex:parse",
+    "copilot": "agentshift.parsers.copilot:parse",
 }
 
 _EMITTERS = {
