@@ -13,7 +13,9 @@ from agentshift.validators import run_validation
 
 FIXTURES = Path(__file__).parent / "fixtures"
 _VENV_BIN = Path(__file__).parent.parent / ".venv" / "bin" / "agentshift"
-AGENTSHIFT = [str(_VENV_BIN)] if _VENV_BIN.exists() else [sys.executable, "-m", "agentshift"]
+AGENTSHIFT = (
+    [str(_VENV_BIN)] if _VENV_BIN.exists() else [sys.executable, "-m", "agentshift"]
+)
 
 
 # ---------------------------------------------------------------------------
@@ -29,7 +31,10 @@ def run_validate(
 
 
 def make_claude_code_dir(
-    tmp_path: Path, *, claude_md: str = "# Agent\nDo stuff.", settings: dict | None = None
+    tmp_path: Path,
+    *,
+    claude_md: str = "# Agent\nDo stuff.",
+    settings: dict | None = None,
 ) -> Path:
     (tmp_path / "CLAUDE.md").write_text(claude_md, encoding="utf-8")
     if settings is None:
@@ -58,7 +63,11 @@ def make_bedrock_dir(
     tmp_path: Path, instruction: str = "Be helpful.", extra_cf: dict | None = None
 ) -> Path:
     (tmp_path / "instruction.txt").write_text(instruction, encoding="utf-8")
-    openapi = {"openapi": "3.0.0", "info": {"title": "Agent", "version": "1.0"}, "paths": {}}
+    openapi = {
+        "openapi": "3.0.0",
+        "info": {"title": "Agent", "version": "1.0"},
+        "paths": {},
+    }
     (tmp_path / "openapi.json").write_text(json.dumps(openapi), encoding="utf-8")
     cf = {
         "AWSTemplateFormatVersion": "2010-09-09",
@@ -87,7 +96,9 @@ def make_m365_dir(tmp_path: Path, *, instructions: str = "Be helpful.") -> Path:
     manifest = {
         "$schema": "https://developer.microsoft.com/json-schemas/teams/vDevPreview/MicrosoftTeams.schema.json",
         "manifestVersion": "devPreview",
-        "copilotAgents": {"declarativeAgents": [{"id": "da1", "file": "declarative-agent.json"}]},
+        "copilotAgents": {
+            "declarativeAgents": [{"id": "da1", "file": "declarative-agent.json"}]
+        },
     }
     (tmp_path / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
     return tmp_path
@@ -145,12 +156,16 @@ class TestClaudeCodeValidator:
         assert any("permissions" in e.name for e in report.errors)
 
     def test_allow_not_list_fails(self, tmp_path):
-        make_claude_code_dir(tmp_path, settings={"permissions": {"allow": "Bash(*)", "deny": []}})
+        make_claude_code_dir(
+            tmp_path, settings={"permissions": {"allow": "Bash(*)", "deny": []}}
+        )
         report = run_validation(tmp_path, "claude-code")
         assert not report.ok
 
     def test_bash_star_is_warning_not_error(self, tmp_path):
-        make_claude_code_dir(tmp_path, settings={"permissions": {"allow": ["Bash(*)"], "deny": []}})
+        make_claude_code_dir(
+            tmp_path, settings={"permissions": {"allow": ["Bash(*)"], "deny": []}}
+        )
         report = run_validation(tmp_path, "claude-code")
         # should still pass (no hard errors) but emit a warning
         assert report.ok
@@ -192,7 +207,12 @@ class TestCopilotValidator:
         assert not report.ok
 
     def test_model_not_list_fails(self, tmp_path):
-        fm = {"name": "Agent", "description": "Does stuff", "model": "gpt-4o", "tools": []}
+        fm = {
+            "name": "Agent",
+            "description": "Does stuff",
+            "model": "gpt-4o",
+            "tools": [],
+        }
         make_copilot_dir(tmp_path, frontmatter=fm)
         report = run_validation(tmp_path, "copilot")
         assert not report.ok
@@ -236,7 +256,9 @@ class TestBedrockValidator:
 
     def test_openapi_missing_keys_fails(self, tmp_path):
         make_bedrock_dir(tmp_path)
-        (tmp_path / "openapi.json").write_text(json.dumps({"openapi": "3.0.0"}), encoding="utf-8")
+        (tmp_path / "openapi.json").write_text(
+            json.dumps({"openapi": "3.0.0"}), encoding="utf-8"
+        )
         report = run_validation(tmp_path, "bedrock")
         assert not report.ok
 

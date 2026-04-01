@@ -99,7 +99,9 @@ def test_langgraph_agent_py_graph_exported(tmp_path):
 def test_langgraph_tools_py_structure(tmp_path):
     """tools.py contains get_tools() and @tool decorator."""
     ir = make_simple_ir(
-        tools=[Tool(name="my-tool", description="Does something useful.", kind="function")]
+        tools=[
+            Tool(name="my-tool", description="Does something useful.", kind="function")
+        ]
     )
     emit(ir, tmp_path)
     content = (tmp_path / "tools.py").read_text()
@@ -139,7 +141,9 @@ def test_langgraph_requirements_includes_anthropic_by_default(tmp_path):
 
 def test_langgraph_requirements_includes_requests_for_openapi_tools(tmp_path):
     """requirements.txt includes requests when any openapi tool is present."""
-    ir = make_simple_ir(tools=[Tool(name="weather", description="Weather API", kind="openapi")])
+    ir = make_simple_ir(
+        tools=[Tool(name="weather", description="Weather API", kind="openapi")]
+    )
     emit(ir, tmp_path)
     content = (tmp_path / "requirements.txt").read_text()
     assert "requests" in content
@@ -352,7 +356,9 @@ _VENV_BIN = Path(__file__).parent.parent / ".venv" / "bin" / "agentshift"
 import subprocess  # noqa: E402
 import sys  # noqa: E402
 
-_AGENTSHIFT = [str(_VENV_BIN)] if _VENV_BIN.exists() else [sys.executable, "-m", "agentshift"]
+_AGENTSHIFT = (
+    [str(_VENV_BIN)] if _VENV_BIN.exists() else [sys.executable, "-m", "agentshift"]
+)
 
 
 def test_langgraph_convert_command(tmp_path):
@@ -372,7 +378,9 @@ def test_langgraph_convert_command(tmp_path):
         capture_output=True,
         text=True,
     )
-    assert result.returncode == 0, f"CLI failed:\nstdout: {result.stdout}\nstderr: {result.stderr}"
+    assert (
+        result.returncode == 0
+    ), f"CLI failed:\nstdout: {result.stdout}\nstderr: {result.stderr}"
     for fname in OUTPUT_FILES:
         assert (tmp_path / fname).exists(), f"CLI did not create: {fname}"
 
@@ -439,7 +447,9 @@ class TestLangGraphAgentPyExtras:
         assert "cron" in content or "0 9 * * *" in content
 
     def test_no_python_repr_in_any_file(self, tmp_path):
-        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
+        ir = make_simple_ir(
+            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
+        )
         emit(ir, tmp_path)
         for fname in OUTPUT_FILES:
             content = (tmp_path / fname).read_text()

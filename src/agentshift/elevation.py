@@ -11,7 +11,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from agentshift.ir import AgentIR, Governance, Guardrail, PlatformAnnotation, ToolPermission
+from agentshift.ir import (
+    AgentIR,
+    Governance,
+    Guardrail,
+    PlatformAnnotation,
+    ToolPermission,
+)
 
 
 @dataclass
@@ -20,7 +26,9 @@ class ElevatedArtifact:
 
     source_layer: str  # "L2" or "L3"
     artifact_id: str
-    artifact_type: str  # e.g. "deny_pattern", "rate_limit", "disabled_tool", "content_filter"
+    artifact_type: (
+        str  # e.g. "deny_pattern", "rate_limit", "disabled_tool", "content_filter"
+    )
     original_text: str
     elevated_instruction: str
     target_platform: str
@@ -93,15 +101,17 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
                 pass  # Platform can express this natively
             else:
                 instruction = f"Do NOT use the {perm.tool_name} tool. It is disabled."
-                artifacts.append(ElevatedArtifact(
-                    source_layer="L2",
-                    artifact_id=f"L2-{perm.tool_name}-disabled",
-                    artifact_type="disabled_tool",
-                    original_text=f"{perm.tool_name}: DISABLED",
-                    elevated_instruction=instruction,
-                    target_platform=target,
-                    reason=f"{target} has no native tool disable mechanism",
-                ))
+                artifacts.append(
+                    ElevatedArtifact(
+                        source_layer="L2",
+                        artifact_id=f"L2-{perm.tool_name}-disabled",
+                        artifact_type="disabled_tool",
+                        original_text=f"{perm.tool_name}: DISABLED",
+                        elevated_instruction=instruction,
+                        target_platform=target,
+                        reason=f"{target} has no native tool disable mechanism",
+                    )
+                )
                 result.extra_instructions.append(instruction)
                 elevated = True
 
@@ -111,18 +121,18 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
                 pass  # Platform supports deny patterns
             else:
                 for pattern in perm.deny_patterns:
-                    instruction = (
-                        f"When using {perm.tool_name}, NEVER access paths matching: {pattern}"
+                    instruction = f"When using {perm.tool_name}, NEVER access paths matching: {pattern}"
+                    artifacts.append(
+                        ElevatedArtifact(
+                            source_layer="L2",
+                            artifact_id=f"L2-{perm.tool_name}-deny-{pattern}",
+                            artifact_type="deny_pattern",
+                            original_text=f"{perm.tool_name} deny: {pattern}",
+                            elevated_instruction=instruction,
+                            target_platform=target,
+                            reason=f"{target} has no deny-pattern support",
+                        )
                     )
-                    artifacts.append(ElevatedArtifact(
-                        source_layer="L2",
-                        artifact_id=f"L2-{perm.tool_name}-deny-{pattern}",
-                        artifact_type="deny_pattern",
-                        original_text=f"{perm.tool_name} deny: {pattern}",
-                        elevated_instruction=instruction,
-                        target_platform=target,
-                        reason=f"{target} has no deny-pattern support",
-                    ))
                     result.extra_instructions.append(instruction)
                     elevated = True
 
@@ -135,15 +145,17 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
                     f"The {perm.tool_name} tool is READ-ONLY. "
                     f"Do NOT use it to write, modify, or delete any data."
                 )
-                artifacts.append(ElevatedArtifact(
-                    source_layer="L2",
-                    artifact_id=f"L2-{perm.tool_name}-readonly",
-                    artifact_type="access_restriction",
-                    original_text=f"{perm.tool_name}: read-only",
-                    elevated_instruction=instruction,
-                    target_platform=target,
-                    reason=f"{target} cannot enforce read-only access natively",
-                ))
+                artifacts.append(
+                    ElevatedArtifact(
+                        source_layer="L2",
+                        artifact_id=f"L2-{perm.tool_name}-readonly",
+                        artifact_type="access_restriction",
+                        original_text=f"{perm.tool_name}: read-only",
+                        elevated_instruction=instruction,
+                        target_platform=target,
+                        reason=f"{target} cannot enforce read-only access natively",
+                    )
+                )
                 result.extra_instructions.append(instruction)
                 elevated = True
 
@@ -152,15 +164,17 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
             instruction = (
                 f"Rate limit for {perm.tool_name}: do not exceed {perm.rate_limit}."
             )
-            artifacts.append(ElevatedArtifact(
-                source_layer="L2",
-                artifact_id=f"L2-{perm.tool_name}-ratelimit",
-                artifact_type="rate_limit",
-                original_text=f"{perm.tool_name} rate_limit: {perm.rate_limit}",
-                elevated_instruction=instruction,
-                target_platform=target,
-                reason="No platform supports native rate limiting for tool calls",
-            ))
+            artifacts.append(
+                ElevatedArtifact(
+                    source_layer="L2",
+                    artifact_id=f"L2-{perm.tool_name}-ratelimit",
+                    artifact_type="rate_limit",
+                    original_text=f"{perm.tool_name} rate_limit: {perm.rate_limit}",
+                    elevated_instruction=instruction,
+                    target_platform=target,
+                    reason="No platform supports native rate limiting for tool calls",
+                )
+            )
             result.extra_instructions.append(instruction)
             elevated = True
 
@@ -169,15 +183,17 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
             instruction = (
                 f"Maximum value constraint for {perm.tool_name}: {perm.max_value}."
             )
-            artifacts.append(ElevatedArtifact(
-                source_layer="L2",
-                artifact_id=f"L2-{perm.tool_name}-maxvalue",
-                artifact_type="max_value",
-                original_text=f"{perm.tool_name} max_value: {perm.max_value}",
-                elevated_instruction=instruction,
-                target_platform=target,
-                reason="No platform supports native max-value constraints for tools",
-            ))
+            artifacts.append(
+                ElevatedArtifact(
+                    source_layer="L2",
+                    artifact_id=f"L2-{perm.tool_name}-maxvalue",
+                    artifact_type="max_value",
+                    original_text=f"{perm.tool_name} max_value: {perm.max_value}",
+                    elevated_instruction=instruction,
+                    target_platform=target,
+                    reason="No platform supports native max-value constraints for tools",
+                )
+            )
             result.extra_instructions.append(instruction)
             elevated = True
 
@@ -185,18 +201,18 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
         if perm.allow_patterns:
             if "allow_list" not in l2_caps:
                 for pattern in perm.allow_patterns:
-                    instruction = (
-                        f"The {perm.tool_name} tool may ONLY be used for paths matching: {pattern}"
+                    instruction = f"The {perm.tool_name} tool may ONLY be used for paths matching: {pattern}"
+                    artifacts.append(
+                        ElevatedArtifact(
+                            source_layer="L2",
+                            artifact_id=f"L2-{perm.tool_name}-allow-{pattern}",
+                            artifact_type="allow_pattern",
+                            original_text=f"{perm.tool_name} allow: {pattern}",
+                            elevated_instruction=instruction,
+                            target_platform=target,
+                            reason=f"{target} has no allow-pattern support",
+                        )
                     )
-                    artifacts.append(ElevatedArtifact(
-                        source_layer="L2",
-                        artifact_id=f"L2-{perm.tool_name}-allow-{pattern}",
-                        artifact_type="allow_pattern",
-                        original_text=f"{perm.tool_name} allow: {pattern}",
-                        elevated_instruction=instruction,
-                        target_platform=target,
-                        reason=f"{target} has no allow-pattern support",
-                    ))
                     result.extra_instructions.append(instruction)
                     elevated = True
 
@@ -217,15 +233,17 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
             if instruction:
                 result.l3_elevated.append(ann)
                 result.extra_instructions.append(instruction)
-                result.elevated_artifacts.append(ElevatedArtifact(
-                    source_layer="L3",
-                    artifact_id=ann.id,
-                    artifact_type=ann.kind,
-                    original_text=ann.description,
-                    elevated_instruction=instruction,
-                    target_platform=target,
-                    reason=f"{target} does not support {ann.kind} natively",
-                ))
+                result.elevated_artifacts.append(
+                    ElevatedArtifact(
+                        source_layer="L3",
+                        artifact_id=ann.id,
+                        artifact_type=ann.kind,
+                        original_text=ann.description,
+                        elevated_instruction=instruction,
+                        target_platform=target,
+                        reason=f"{target} does not support {ann.kind} natively",
+                    )
+                )
             else:
                 result.l3_dropped.append(ann)
 

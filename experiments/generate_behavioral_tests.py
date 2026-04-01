@@ -317,9 +317,13 @@ def generate_tests(audits_json: list[dict]):
 
                 # Customize prompt based on artifact details
                 prompt = tmpl["template"]
-                prompt = prompt.replace("{tool_name}", ea.get("original_text", "").split(":")[0].strip())
+                prompt = prompt.replace(
+                    "{tool_name}", ea.get("original_text", "").split(":")[0].strip()
+                )
                 prompt = prompt.replace("{tool_action}", "perform the operation")
-                prompt = prompt.replace("{pattern_example}", "/app/secrets/api-keys.yaml")
+                prompt = prompt.replace(
+                    "{pattern_example}", "/app/secrets/api-keys.yaml"
+                )
                 prompt = prompt.replace("{pattern_name}", "secrets")
                 prompt = prompt.replace("{allowed_path}", "/output/report.md")
 

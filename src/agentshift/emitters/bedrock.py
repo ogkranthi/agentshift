@@ -66,7 +66,12 @@ def _build_instruction(ir: AgentIR) -> tuple[str, bool]:
             parts.append(f"Tone and style: {persona_section}")
 
         # Add any remaining sections not already handled (excluding guardrails, examples)
-        handled = set(instruction_section_order) | {"guardrails", "persona", "examples", "preamble"}
+        handled = set(instruction_section_order) | {
+            "guardrails",
+            "persona",
+            "examples",
+            "preamble",
+        }
         for key, val in sections.items():
             if key not in handled and val:
                 heading = key.replace("-", " ").title()
@@ -152,7 +157,9 @@ def _build_guardrail_config(ir: AgentIR) -> dict | None:
     }
 
 
-def _write_instruction(ir: AgentIR, output_dir: Path, instruction: str, truncated: bool) -> None:
+def _write_instruction(
+    ir: AgentIR, output_dir: Path, instruction: str, truncated: bool
+) -> None:
     (output_dir / "instruction.txt").write_text(instruction, encoding="utf-8")
     if truncated:
         raw = (ir.persona.system_prompt or "").strip() or ir.description
@@ -180,7 +187,8 @@ def _write_openapi_json(ir: AgentIR, output_dir: Path) -> None:
             paths[path_key] = {
                 "post": {
                     "operationId": f"{tool.name}_run",
-                    "description": tool.description or f"Run the {tool.name} shell tool.",
+                    "description": tool.description
+                    or f"Run the {tool.name} shell tool.",
                     "x-agentshift-stub": True,
                     "requestBody": {
                         "required": True,
@@ -229,7 +237,8 @@ def _write_openapi_json(ir: AgentIR, output_dir: Path) -> None:
             paths[path_key] = {
                 "post": {
                     "operationId": f"{tool.name}_action",
-                    "description": tool.description or f"Invoke action on {tool.name} MCP tool.",
+                    "description": tool.description
+                    or f"Invoke action on {tool.name} MCP tool.",
                     "x-agentshift-stub": True,
                     "requestBody": {
                         "required": True,
@@ -281,7 +290,9 @@ def _write_openapi_json(ir: AgentIR, output_dir: Path) -> None:
         "paths": paths,
     }
 
-    (output_dir / "openapi.json").write_text(json.dumps(schema, indent=2), encoding="utf-8")
+    (output_dir / "openapi.json").write_text(
+        json.dumps(schema, indent=2), encoding="utf-8"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -347,7 +358,9 @@ def _write_cloudformation(
     lines.append('    Description: "Deployment environment (e.g. prod, staging)"')
     lines.append("  AgentRoleArn:")
     lines.append("    Type: String")
-    lines.append('    Description: "IAM Role ARN with bedrock:InvokeModel permissions (required)"')
+    lines.append(
+        '    Description: "IAM Role ARN with bedrock:InvokeModel permissions (required)"'
+    )
     lines.append("")
 
     # Resources
@@ -362,16 +375,24 @@ def _write_cloudformation(
     if description:
         lines.append(f'      Description: "{_escape_yaml_scalar(description)}"')
     if truncated:
-        lines.append("      # WARNING: Instruction truncated to 4000 chars (Bedrock limit).")
+        lines.append(
+            "      # WARNING: Instruction truncated to 4000 chars (Bedrock limit)."
+        )
         lines.append("      # See instruction-full.txt for the complete system prompt.")
     lines.append(f'      Instruction: "{escaped_instruction}"')
     lines.append(f"      FoundationModel: {foundation_model}")
     lines.append("      IdleSessionTTLInSeconds: 1800")
     lines.append("      AutoPrepare: true")
     if guardrail_config:
-        lines.append("      # Guardrail config generated from persona.sections['guardrails']")
-        lines.append("      # See guardrail-config.json for the full guardrailConfiguration payload.")
-        lines.append("      # TODO [agentshift]: Create a Bedrock Guardrail resource and reference it here.")
+        lines.append(
+            "      # Guardrail config generated from persona.sections['guardrails']"
+        )
+        lines.append(
+            "      # See guardrail-config.json for the full guardrailConfiguration payload."
+        )
+        lines.append(
+            "      # TODO [agentshift]: Create a Bedrock Guardrail resource and reference it here."
+        )
         lines.append("      # GuardrailConfiguration:")
         lines.append("      #   GuardrailIdentifier: !Ref GuardrailPlaceholder")
 
@@ -383,7 +404,9 @@ def _write_cloudformation(
             ag_name = f"{slug}-{_slug(tool.name)}"
             lines.append(f"        - ActionGroupName: {ag_name}")
             lines.append("          Description: >-")
-            tool_desc = (tool.description or f"Action group for {tool.name}").replace("\n", " ")
+            tool_desc = (tool.description or f"Action group for {tool.name}").replace(
+                "\n", " "
+            )
             lines.append(f"            {tool_desc}")
             lines.append("          ActionGroupExecutor:")
             lines.append(
@@ -410,7 +433,10 @@ def _write_cloudformation(
                 )
             if tool.auth and tool.auth.type != "none":
                 auth_type = tool.auth.type
-                env_var = tool.auth.env_var or f"{tool.name.upper().replace('-', '_')}_API_KEY"
+                env_var = (
+                    tool.auth.env_var
+                    or f"{tool.name.upper().replace('-', '_')}_API_KEY"
+                )
                 lines.append(
                     f"          # TODO [agentshift]: Auth setup required for '{tool.name}': {auth_type}."
                 )
@@ -530,7 +556,9 @@ def _write_readme(ir: AgentIR, output_dir: Path) -> None:
         ]
         for tool in action_tools:
             ag_name = f"{slug}-{_slug(tool.name)}"
-            lines.append(f"- **{ag_name}** — implements `{tool.name}` ({tool.kind} tool)")
+            lines.append(
+                f"- **{ag_name}** — implements `{tool.name}` ({tool.kind} tool)"
+            )
         lines.append("")
         lines += [
             "The Lambda handler contract (Bedrock → Lambda request/response format) is",
@@ -549,7 +577,9 @@ def _write_readme(ir: AgentIR, output_dir: Path) -> None:
             "",
         ]
         for ks in ir.knowledge:
-            lines.append(f"- **{ks.name}** ({ks.kind}) — {ks.description or 'no description'}")
+            lines.append(
+                f"- **{ks.name}** ({ks.kind}) — {ks.description or 'no description'}"
+            )
         lines += [
             "",
             "See the [Bedrock Knowledge Bases guide](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html) for setup instructions.",

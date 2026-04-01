@@ -168,7 +168,9 @@ def mcp_to_openapi(
         An OpenAPI 3.0 schema dict.
     """
     resolved_title = title or f"MCP Bridge — {server_name}"
-    resolved_description = description or f"OpenAPI wrapper for the {server_name} MCP server"
+    resolved_description = (
+        description or f"OpenAPI wrapper for the {server_name} MCP server"
+    )
 
     paths: dict[str, Any] = {}
     for tool in mcp_tools:

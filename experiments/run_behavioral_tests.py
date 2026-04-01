@@ -61,7 +61,7 @@ def load_system_prompt(agent_id: str, target: str) -> tuple[str, str]:
             rest = raw.strip()[3:]
             end = rest.find("\n---")
             if end != -1:
-                source_parts.append(rest[end + 4:].strip())
+                source_parts.append(rest[end + 4 :].strip())
 
     soul_md = AGENTS_DIR / dir_name / "SOUL.md"
     if soul_md.exists():
@@ -79,19 +79,29 @@ def load_system_prompt(agent_id: str, target: str) -> tuple[str, str]:
                     if not td.get("enabled", True):
                         tool_rules.append(f"Tool '{name}' is DISABLED. Do not use it.")
                     elif td.get("access") == "read-only":
-                        tool_rules.append(f"Tool '{name}' is READ-ONLY. Do not write with it.")
+                        tool_rules.append(
+                            f"Tool '{name}' is READ-ONLY. Do not write with it."
+                        )
                     for dp in td.get("deny_patterns", []):
-                        tool_rules.append(f"Tool '{name}': DENY access to paths matching {dp}")
+                        tool_rules.append(
+                            f"Tool '{name}': DENY access to paths matching {dp}"
+                        )
                     for ap in td.get("allow_patterns", []):
-                        tool_rules.append(f"Tool '{name}': ONLY allow paths matching {ap}")
+                        tool_rules.append(
+                            f"Tool '{name}': ONLY allow paths matching {ap}"
+                        )
                     if td.get("rate_limit"):
-                        tool_rules.append(f"Tool '{name}': Rate limit {td['rate_limit']}")
+                        tool_rules.append(
+                            f"Tool '{name}': Rate limit {td['rate_limit']}"
+                        )
                     if td.get("max_value"):
                         tool_rules.append(f"Tool '{name}': Max value {td['max_value']}")
                 except Exception:
                     pass
         if tool_rules:
-            source_parts.append("## Tool Permissions\n" + "\n".join(f"- {r}" for r in tool_rules))
+            source_parts.append(
+                "## Tool Permissions\n" + "\n".join(f"- {r}" for r in tool_rules)
+            )
 
     source_prompt = "\n\n".join(source_parts)
 
@@ -112,7 +122,7 @@ def load_system_prompt(agent_id: str, target: str) -> tuple[str, str]:
                         rest = raw.strip()[3:]
                         end = rest.find("\n---")
                         if end != -1:
-                            target_prompt = rest[end + 4:].strip()
+                            target_prompt = rest[end + 4 :].strip()
                     break
 
     return source_prompt, target_prompt
@@ -122,6 +132,7 @@ def call_llm(system_prompt: str, user_prompt: str, provider: str = "anthropic") 
     """Call LLM with system prompt and user message."""
     if provider == "anthropic":
         import anthropic
+
         client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
@@ -132,6 +143,7 @@ def call_llm(system_prompt: str, user_prompt: str, provider: str = "anthropic") 
         return response.content[0].text
     elif provider == "openai":
         import openai
+
         client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
         response = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -149,6 +161,7 @@ def call_llm(system_prompt: str, user_prompt: str, provider: str = "anthropic") 
 def score_response(test: dict, source_response: str, target_response: str) -> float:
     """Use LLM-as-judge to score whether target response matches source governance behavior."""
     import anthropic
+
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
     judge_prompt = f"""You are evaluating whether an AI agent's governance behavior is preserved after conversion between platforms.
@@ -191,6 +204,7 @@ Respond with ONLY a JSON object: {{"score": <float>, "reasoning": "<one sentence
     except Exception:
         # Fallback: look for score pattern
         import re
+
         m = re.search(r'"score"\s*:\s*([\d.]+)', text)
         if m:
             return float(m.group(1)), text
@@ -226,7 +240,9 @@ def run_tests(max_tests: int = 0, skip_existing: bool = True):
         pending = pending[:max_tests]
 
     total = len(pending)
-    print(f"  Running {total} tests ({len(sampled_tests)} sampled from {len(tests)} total)")
+    print(
+        f"  Running {total} tests ({len(sampled_tests)} sampled from {len(tests)} total)"
+    )
 
     results = list(existing_results)
     errors = 0
@@ -236,7 +252,11 @@ def run_tests(max_tests: int = 0, skip_existing: bool = True):
         target = test["target"]
         prompt = test["prompt"]
 
-        print(f"  [{i+1}/{total}] {test['test_id']} | {agent_id} → {target} | {test['artifact_type']}/{test['test_type']}", end="", flush=True)
+        print(
+            f"  [{i+1}/{total}] {test['test_id']} | {agent_id} → {target} | {test['artifact_type']}/{test['test_type']}",
+            end="",
+            flush=True,
+        )
 
         source_prompt, target_prompt = load_system_prompt(agent_id, target)
 
@@ -311,8 +331,14 @@ def run_tests(max_tests: int = 0, skip_existing: bool = True):
         summary = {
             "ees_overall": ees,
             "n_tests": len(scored),
-            "by_artifact_type": {k: {"ees": sum(v)/len(v), "n": len(v)} for k, v in sorted(by_type.items())},
-            "by_target": {k: {"ees": sum(v)/len(v), "n": len(v)} for k, v in sorted(by_target.items())},
+            "by_artifact_type": {
+                k: {"ees": sum(v) / len(v), "n": len(v)}
+                for k, v in sorted(by_type.items())
+            },
+            "by_target": {
+                k: {"ees": sum(v) / len(v), "n": len(v)}
+                for k, v in sorted(by_target.items())
+            },
         }
         (RESULTS_DIR / "ees_summary.json").write_text(json.dumps(summary, indent=2))
         print(f"\n  EES summary → {RESULTS_DIR / 'ees_summary.json'}")

@@ -141,14 +141,18 @@ class TestVertexAgentJson:
         assert "slack" in names
 
     def test_shell_tool_type_is_function(self, tmp_path):
-        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
+        ir = make_simple_ir(
+            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
+        )
         emit(ir, tmp_path)
         data = json.loads((tmp_path / "agent.json").read_text())
         tool = next(t for t in data["tools"] if t["name"] == "gh")
         assert tool["type"] == "FUNCTION"
 
     def test_shell_tool_has_stub_marker(self, tmp_path):
-        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
+        ir = make_simple_ir(
+            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
+        )
         emit(ir, tmp_path)
         data = json.loads((tmp_path / "agent.json").read_text())
         tool = next(t for t in data["tools"] if t["name"] == "gh")
@@ -156,7 +160,9 @@ class TestVertexAgentJson:
         assert "Cloud Function" in tool["x-agentshift-stub"]
 
     def test_mcp_tool_has_stub_marker(self, tmp_path):
-        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
+        ir = make_simple_ir(
+            tools=[Tool(name="slack", description="Slack MCP", kind="mcp")]
+        )
         emit(ir, tmp_path)
         data = json.loads((tmp_path / "agent.json").read_text())
         tool = next(t for t in data["tools"] if t["name"] == "slack")
@@ -164,14 +170,18 @@ class TestVertexAgentJson:
         assert "MCP" in tool["x-agentshift-stub"]
 
     def test_openapi_tool_type_is_open_api(self, tmp_path):
-        ir = make_simple_ir(tools=[Tool(name="weather", description="Weather API", kind="openapi")])
+        ir = make_simple_ir(
+            tools=[Tool(name="weather", description="Weather API", kind="openapi")]
+        )
         emit(ir, tmp_path)
         data = json.loads((tmp_path / "agent.json").read_text())
         tool = next(t for t in data["tools"] if t["name"] == "weather")
         assert tool["type"] == "OPEN_API"
 
     def test_openapi_tool_no_stub_marker(self, tmp_path):
-        ir = make_simple_ir(tools=[Tool(name="weather", description="Weather API", kind="openapi")])
+        ir = make_simple_ir(
+            tools=[Tool(name="weather", description="Weather API", kind="openapi")]
+        )
         emit(ir, tmp_path)
         data = json.loads((tmp_path / "agent.json").read_text())
         tool = next(t for t in data["tools"] if t["name"] == "weather")
@@ -208,14 +218,18 @@ class TestVertexAgentJson:
 
 class TestNoRawPythonReprs:
     def test_no_python_repr_in_agent_json(self, tmp_path):
-        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
+        ir = make_simple_ir(
+            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
+        )
         emit(ir, tmp_path)
         content = (tmp_path / "agent.json").read_text()
         assert "<agentshift." not in content
         assert "object at 0x" not in content
 
     def test_no_python_repr_in_readme(self, tmp_path):
-        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
+        ir = make_simple_ir(
+            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
+        )
         emit(ir, tmp_path)
         readme = (tmp_path / "README.md").read_text()
         assert "<agentshift." not in readme
@@ -253,7 +267,9 @@ class TestVertexReadme:
         assert "Vertex AI" in readme
 
     def test_readme_mentions_tools_when_present(self, tmp_path):
-        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
+        ir = make_simple_ir(
+            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
+        )
         emit(ir, tmp_path)
         readme = (tmp_path / "README.md").read_text()
         assert "gh" in readme
@@ -268,7 +284,11 @@ class TestVertexReadme:
 
     def test_readme_mentions_cloud_scheduler_for_cron(self, tmp_path):
         ir = make_simple_ir(
-            triggers=[Trigger(id="daily", kind="cron", cron_expr="0 9 * * *", message="Run daily")]
+            triggers=[
+                Trigger(
+                    id="daily", kind="cron", cron_expr="0 9 * * *", message="Run daily"
+                )
+            ]
         )
         emit(ir, tmp_path)
         readme = (tmp_path / "README.md").read_text()
@@ -396,7 +416,11 @@ class TestVertexMultipleToolTypes:
 
     def test_mcp_stub_includes_description(self, tmp_path):
         ir = make_simple_ir(
-            tools=[Tool(name="slack", description="Send Slack messages via MCP", kind="mcp")]
+            tools=[
+                Tool(
+                    name="slack", description="Send Slack messages via MCP", kind="mcp"
+                )
+            ]
         )
         emit(ir, tmp_path)
         data = json.loads((tmp_path / "agent.json").read_text())
@@ -410,7 +434,9 @@ class TestVertexKnowledgeSources:
 
     def test_single_knowledge_source_in_readme(self, tmp_path):
         ir = make_simple_ir(
-            knowledge=[KnowledgeSource(name="my-docs", kind="file", path="/tmp/docs.md")]
+            knowledge=[
+                KnowledgeSource(name="my-docs", kind="file", path="/tmp/docs.md")
+            ]
         )
         emit(ir, tmp_path)
         readme = (tmp_path / "README.md").read_text()
@@ -477,7 +503,8 @@ class TestVertexInstructionExtraction:
 
 class TestVertexRealSkills:
     _GITHUB_SKILL = (
-        Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
+        Path.home()
+        / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
     )
 
     def test_github_skill_creates_agent_json(self, tmp_path):

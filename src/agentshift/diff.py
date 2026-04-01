@@ -293,7 +293,9 @@ def _count_mapped_sections(sections: dict[str, str], target: str) -> tuple[int, 
     mapped = 0
     for slug in sections:
         supported_platforms = SECTION_PLATFORM_SUPPORT.get(slug, set())
-        if target in supported_platforms or (slug not in SECTION_PLATFORM_SUPPORT and target == "claude-code"):
+        if target in supported_platforms or (
+            slug not in SECTION_PLATFORM_SUPPORT and target == "claude-code"
+        ):
             mapped += 1
     return mapped, total
 
@@ -436,8 +438,12 @@ def diff_agents(ir_a: AgentIR, ir_b: AgentIR) -> list[dict]:
                 lines_a = norm_a.splitlines()
                 lines_b = norm_b.splitlines()
                 matcher = difflib.SequenceMatcher(None, lines_a, lines_b)
-                added = sum(b2 - b1 for _, _, _, b1, b2 in matcher.get_opcodes() if _ != "equal")
-                removed = sum(a2 - a1 for _, a1, a2, _, _ in matcher.get_opcodes() if _ != "equal")
+                added = sum(
+                    b2 - b1 for _, _, _, b1, b2 in matcher.get_opcodes() if _ != "equal"
+                )
+                removed = sum(
+                    a2 - a1 for _, a1, a2, _, _ in matcher.get_opcodes() if _ != "equal"
+                )
                 delta_parts = []
                 if added:
                     delta_parts.append(f"+{added} line{'s' if added != 1 else ''}")
@@ -447,9 +453,17 @@ def diff_agents(ir_a: AgentIR, ir_b: AgentIR) -> list[dict]:
                 rows.append({"section": key, "status": "changed", "summary": summary})
         elif in_b:
             char_count = len(secs_b[key])
-            rows.append({"section": key, "status": "added", "summary": f"New section ({char_count} chars)"})
+            rows.append(
+                {
+                    "section": key,
+                    "status": "added",
+                    "summary": f"New section ({char_count} chars)",
+                }
+            )
         else:
-            rows.append({"section": key, "status": "removed", "summary": "Was present in v1"})
+            rows.append(
+                {"section": key, "status": "removed", "summary": "Was present in v1"}
+            )
 
     return rows
 
@@ -482,7 +496,9 @@ def render_agent_diff_table(
         if not unified:
             console.print("[green]Agents are identical (system_prompt).[/green]")
         else:
-            console.print(f"[bold]{label_a}[/bold] ↔ [bold]{label_b}[/bold] — system_prompt diff\n")
+            console.print(
+                f"[bold]{label_a}[/bold] ↔ [bold]{label_b}[/bold] — system_prompt diff\n"
+            )
             for line in unified:
                 if line.startswith("+"):
                     console.print(f"[green]{line}[/green]", end="")
@@ -497,7 +513,9 @@ def render_agent_diff_table(
     if section_filter:
         matching = [r for r in rows if r["section"] == section_filter]
         if not matching:
-            console.print(f"[yellow]Section '{section_filter}' not found in either agent.[/yellow]")
+            console.print(
+                f"[yellow]Section '{section_filter}' not found in either agent.[/yellow]"
+            )
             return
         # Show full unified diff for the specific section
         body_a = secs_a.get(section_filter, "")
@@ -557,7 +575,9 @@ def render_diff_table(ir: AgentIR, targets: list[str]) -> None:
     # Filter to known targets only
     unknown = [t for t in targets if t not in PLATFORM_SUPPORT]
     if unknown:
-        console.print(f"[yellow]Warning:[/yellow] Unknown target(s) skipped: {', '.join(unknown)}")
+        console.print(
+            f"[yellow]Warning:[/yellow] Unknown target(s) skipped: {', '.join(unknown)}"
+        )
         targets = [t for t in targets if t in PLATFORM_SUPPORT]
 
     if not targets:

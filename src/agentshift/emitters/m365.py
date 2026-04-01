@@ -19,12 +19,8 @@ from agentshift.ir import AgentIR
 _MAX_INSTRUCTIONS = 8000
 _TRUNCATION_SAFE_LIMIT = 7800
 
-_DECLARATIVE_AGENT_SCHEMA = (
-    "https://developer.microsoft.com/json-schemas/copilot/declarative-agent/v1.4/schema.json"
-)
-_TEAMS_MANIFEST_SCHEMA = (
-    "https://developer.microsoft.com/json-schemas/teams/v1.17/MicrosoftTeams.schema.json"
-)
+_DECLARATIVE_AGENT_SCHEMA = "https://developer.microsoft.com/json-schemas/copilot/declarative-agent/v1.4/schema.json"
+_TEAMS_MANIFEST_SCHEMA = "https://developer.microsoft.com/json-schemas/teams/v1.17/MicrosoftTeams.schema.json"
 
 # MCP tool names that map to known M365 capabilities
 _MCP_CAPABILITY_MAP: dict[str, dict] = {
@@ -41,7 +37,9 @@ _MCP_CAPABILITY_MAP: dict[str, dict] = {
 }
 
 # Shell tool command patterns that imply web access
-_WEB_PATTERNS = re.compile(r"\bcurl\b|\bwget\b|\bhttp\b|\bweb\b|\bfetch\b", re.IGNORECASE)
+_WEB_PATTERNS = re.compile(
+    r"\bcurl\b|\bwget\b|\bhttp\b|\bweb\b|\bfetch\b", re.IGNORECASE
+)
 
 
 def emit(ir: AgentIR, output_dir: Path) -> None:
@@ -122,7 +120,9 @@ def _build_capabilities(ir: AgentIR) -> list[dict]:
                 dropped_shell.append(tool.name)
 
     # URL knowledge → WebSearch with sites
-    url_sites = [{"url": ks.path} for ks in ir.knowledge if ks.kind == "url" and ks.path]
+    url_sites = [
+        {"url": ks.path} for ks in ir.knowledge if ks.kind == "url" and ks.path
+    ]
     if url_sites:
         if "WebSearch" in seen:
             # Merge sites into existing WebSearch cap
@@ -250,13 +250,18 @@ def _write_readme(ir: AgentIR, output_dir: Path) -> None:
     dropped_shell = [
         t.name
         for t in ir.tools
-        if t.kind == "shell" and not _WEB_PATTERNS.search((t.description or "") + " " + t.name)
+        if t.kind == "shell"
+        and not _WEB_PATTERNS.search((t.description or "") + " " + t.name)
     ]
     dropped_mcp = [
-        t.name for t in ir.tools if t.kind == "mcp" and t.name.lower() not in _MCP_CAPABILITY_MAP
+        t.name
+        for t in ir.tools
+        if t.kind == "mcp" and t.name.lower() not in _MCP_CAPABILITY_MAP
     ]
     gc_tools = [
-        t.name for t in ir.tools if t.kind == "mcp" and t.name.lower() in ("graph", "notion")
+        t.name
+        for t in ir.tools
+        if t.kind == "mcp" and t.name.lower() in ("graph", "notion")
     ]
 
     lines: list[str] = [

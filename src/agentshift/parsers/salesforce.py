@@ -91,9 +91,7 @@ def parse_agent_dir(path: Path) -> AgentIR:
 
         return _parse_xml_directory(path, bot_files, planner_files)
 
-    raise FileNotFoundError(
-        f"Expected a directory or JSON file, got: {path}"
-    )
+    raise FileNotFoundError(f"Expected a directory or JSON file, got: {path}")
 
 
 # ---------------------------------------------------------------------------
@@ -234,7 +232,11 @@ def _parse_json_action(action: dict) -> Tool | None:
 
     full_desc = description
     if example_output:
-        full_desc = f"{description}\n\nExample output: {example_output}" if description else f"Example output: {example_output}"
+        full_desc = (
+            f"{description}\n\nExample output: {example_output}"
+            if description
+            else f"Example output: {example_output}"
+        )
 
     return Tool(
         name=_camel_to_kebab(action_name),
@@ -266,7 +268,11 @@ def _parse_xml_directory(
         planner_data = _parse_planner_xml(planner_files[0])
 
     # Identity
-    name = slugify(bot_data.get("label", "") or planner_data.get("masterLabel", "") or input_dir.name)
+    name = slugify(
+        bot_data.get("label", "")
+        or planner_data.get("masterLabel", "")
+        or input_dir.name
+    )
     description = bot_data.get("description", "") or planner_data.get("description", "")
 
     # System prompt
@@ -328,7 +334,11 @@ def _parse_xml_directory(
 
     metadata = Metadata(
         source_platform="salesforce",
-        source_file=str(bot_files[0]) if bot_files else str(planner_files[0]) if planner_files else None,
+        source_file=(
+            str(bot_files[0])
+            if bot_files
+            else str(planner_files[0]) if planner_files else None
+        ),
         platform_extensions={"salesforce": extensions} if extensions else {},
     )
 
@@ -413,10 +423,16 @@ def _extract_context_variables(root: ET.Element) -> list[dict[str, str]]:
         name_el = ctx_var.find(f"{{{_SF_NS}}}contextVariableName")
         type_el = ctx_var.find(f"{{{_SF_NS}}}dataType")
         if name_el is not None and name_el.text:
-            variables.append({
-                "name": name_el.text.strip(),
-                "dataType": type_el.text.strip() if type_el is not None and type_el.text else "Text",
-            })
+            variables.append(
+                {
+                    "name": name_el.text.strip(),
+                    "dataType": (
+                        type_el.text.strip()
+                        if type_el is not None and type_el.text
+                        else "Text"
+                    ),
+                }
+            )
     return variables
 
 
@@ -478,14 +494,22 @@ def _parse_planner_topic(topic_el: ET.Element) -> dict[str, Any]:
 
     # Actions
     actions: list[dict[str, str]] = []
-    for action_el in topic_el.findall(f"{{{_SF_NS}}}plannerActions/{{{_SF_NS}}}plannerAction"):
+    for action_el in topic_el.findall(
+        f"{{{_SF_NS}}}plannerActions/{{{_SF_NS}}}plannerAction"
+    ):
         action_name_el = action_el.find(f"{{{_SF_NS}}}action")
         action_type_el = action_el.find(f"{{{_SF_NS}}}actionType")
         if action_name_el is not None and action_name_el.text:
-            actions.append({
-                "action": action_name_el.text.strip(),
-                "actionType": action_type_el.text.strip() if action_type_el is not None and action_type_el.text else "",
-            })
+            actions.append(
+                {
+                    "action": action_name_el.text.strip(),
+                    "actionType": (
+                        action_type_el.text.strip()
+                        if action_type_el is not None and action_type_el.text
+                        else ""
+                    ),
+                }
+            )
     topic["actions"] = actions
 
     return topic

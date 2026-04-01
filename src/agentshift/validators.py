@@ -62,11 +62,17 @@ def _validate_claude_code(output_dir: Path) -> ValidationReport:
     if claude_md.exists():
         content = claude_md.read_text(encoding="utf-8").strip()
         if content:
-            report.checks.append(CheckResult("CLAUDE.md exists and non-empty", True, ""))
+            report.checks.append(
+                CheckResult("CLAUDE.md exists and non-empty", True, "")
+            )
         else:
-            report.checks.append(CheckResult("CLAUDE.md non-empty", False, "CLAUDE.md is empty"))
+            report.checks.append(
+                CheckResult("CLAUDE.md non-empty", False, "CLAUDE.md is empty")
+            )
     else:
-        report.checks.append(CheckResult("CLAUDE.md exists", False, "CLAUDE.md not found"))
+        report.checks.append(
+            CheckResult("CLAUDE.md exists", False, "CLAUDE.md not found")
+        )
 
     # settings.json exists and valid JSON
     settings_path = output_dir / "settings.json"
@@ -80,12 +86,16 @@ def _validate_claude_code(output_dir: Path) -> ValidationReport:
                 CheckResult("settings.json valid JSON", False, f"JSON parse error: {e}")
             )
     else:
-        report.checks.append(CheckResult("settings.json exists", False, "settings.json not found"))
+        report.checks.append(
+            CheckResult("settings.json exists", False, "settings.json not found")
+        )
 
     if settings is not None:
         # has "permissions" key
         if "permissions" in settings:
-            report.checks.append(CheckResult("settings.json has 'permissions'", True, ""))
+            report.checks.append(
+                CheckResult("settings.json has 'permissions'", True, "")
+            )
         else:
             report.checks.append(
                 CheckResult(
@@ -100,7 +110,9 @@ def _validate_claude_code(output_dir: Path) -> ValidationReport:
         if isinstance(perms, dict) and "allow" in perms:
             allow = perms["allow"]
             if isinstance(allow, list):
-                report.checks.append(CheckResult("permissions.allow is a list", True, ""))
+                report.checks.append(
+                    CheckResult("permissions.allow is a list", True, "")
+                )
                 # warn if Bash(*) is present — too broad
                 if "Bash(*)" in allow:
                     report.checks.append(
@@ -130,7 +142,11 @@ def _validate_copilot(output_dir: Path) -> ValidationReport:
     agent_md_files = list(output_dir.glob("*.agent.md"))
     if not agent_md_files:
         report.checks.append(
-            CheckResult("*.agent.md exists", False, "No *.agent.md file found in output directory")
+            CheckResult(
+                "*.agent.md exists",
+                False,
+                "No *.agent.md file found in output directory",
+            )
         )
         return report
 
@@ -149,15 +165,25 @@ def _validate_copilot(output_dir: Path) -> ValidationReport:
                 report.checks.append(CheckResult("YAML frontmatter valid", True, ""))
             except yaml.YAMLError as e:
                 report.checks.append(
-                    CheckResult("YAML frontmatter valid", False, f"YAML parse error: {e}")
+                    CheckResult(
+                        "YAML frontmatter valid", False, f"YAML parse error: {e}"
+                    )
                 )
         else:
             report.checks.append(
-                CheckResult("YAML frontmatter valid", False, "Frontmatter closing '---' not found")
+                CheckResult(
+                    "YAML frontmatter valid",
+                    False,
+                    "Frontmatter closing '---' not found",
+                )
             )
     else:
         report.checks.append(
-            CheckResult("YAML frontmatter present", False, "No YAML frontmatter found in .agent.md")
+            CheckResult(
+                "YAML frontmatter present",
+                False,
+                "No YAML frontmatter found in .agent.md",
+            )
         )
 
     if frontmatter is not None:
@@ -210,7 +236,9 @@ def _validate_copilot(output_dir: Path) -> ValidationReport:
                 report.checks.append(CheckResult("description non-empty", True, ""))
             else:
                 report.checks.append(
-                    CheckResult("description non-empty", False, "description is empty string")
+                    CheckResult(
+                        "description non-empty", False, "description is empty string"
+                    )
                 )
         elif desc is not None:
             report.checks.append(
@@ -233,7 +261,9 @@ def _validate_bedrock(output_dir: Path) -> ValidationReport:
         report.checks.append(CheckResult("instruction.txt exists", True, ""))
         content = instr_path.read_text(encoding="utf-8")
         if len(content) <= 4000:
-            report.checks.append(CheckResult("instruction.txt length <= 4000", True, ""))
+            report.checks.append(
+                CheckResult("instruction.txt length <= 4000", True, "")
+            )
         else:
             report.checks.append(
                 CheckResult(
@@ -259,7 +289,9 @@ def _validate_bedrock(output_dir: Path) -> ValidationReport:
                 CheckResult("openapi.json valid JSON", False, f"JSON parse error: {e}")
             )
     else:
-        report.checks.append(CheckResult("openapi.json exists", False, "openapi.json not found"))
+        report.checks.append(
+            CheckResult("openapi.json exists", False, "openapi.json not found")
+        )
 
     if openapi is not None:
         for key in ("openapi", "info", "paths"):
@@ -280,19 +312,27 @@ def _validate_bedrock(output_dir: Path) -> ValidationReport:
     if cf_path.exists():
         try:
             cf = _load_cf_yaml(cf_path.read_text(encoding="utf-8"))
-            report.checks.append(CheckResult("cloudformation.yaml valid YAML", True, ""))
+            report.checks.append(
+                CheckResult("cloudformation.yaml valid YAML", True, "")
+            )
         except Exception as e:
             report.checks.append(
-                CheckResult("cloudformation.yaml valid YAML", False, f"YAML parse error: {e}")
+                CheckResult(
+                    "cloudformation.yaml valid YAML", False, f"YAML parse error: {e}"
+                )
             )
     else:
         report.checks.append(
-            CheckResult("cloudformation.yaml exists", False, "cloudformation.yaml not found")
+            CheckResult(
+                "cloudformation.yaml exists", False, "cloudformation.yaml not found"
+            )
         )
 
     if cf is not None:
         if "Resources" in cf:
-            report.checks.append(CheckResult("cloudformation.yaml has Resources", True, ""))
+            report.checks.append(
+                CheckResult("cloudformation.yaml has Resources", True, "")
+            )
             resources = cf["Resources"]
             bedrock_agents = [
                 k
@@ -300,7 +340,9 @@ def _validate_bedrock(output_dir: Path) -> ValidationReport:
                 if isinstance(v, dict) and v.get("Type") == "AWS::Bedrock::Agent"
             ]
             if bedrock_agents:
-                report.checks.append(CheckResult("Resources has AWS::Bedrock::Agent", True, ""))
+                report.checks.append(
+                    CheckResult("Resources has AWS::Bedrock::Agent", True, "")
+                )
             else:
                 report.checks.append(
                     CheckResult(
@@ -330,20 +372,30 @@ def _validate_m365(output_dir: Path) -> ValidationReport:
     if da_path.exists():
         try:
             da = json.loads(da_path.read_text(encoding="utf-8"))
-            report.checks.append(CheckResult("declarative-agent.json valid JSON", True, ""))
+            report.checks.append(
+                CheckResult("declarative-agent.json valid JSON", True, "")
+            )
         except json.JSONDecodeError as e:
             report.checks.append(
-                CheckResult("declarative-agent.json valid JSON", False, f"JSON parse error: {e}")
+                CheckResult(
+                    "declarative-agent.json valid JSON", False, f"JSON parse error: {e}"
+                )
             )
     else:
         report.checks.append(
-            CheckResult("declarative-agent.json exists", False, "declarative-agent.json not found")
+            CheckResult(
+                "declarative-agent.json exists",
+                False,
+                "declarative-agent.json not found",
+            )
         )
 
     if da is not None:
         for key in ("$schema", "version", "name", "description", "instructions"):
             if key in da:
-                report.checks.append(CheckResult(f"declarative-agent.json has '{key}'", True, ""))
+                report.checks.append(
+                    CheckResult(f"declarative-agent.json has '{key}'", True, "")
+                )
             else:
                 report.checks.append(
                     CheckResult(
@@ -377,11 +429,15 @@ def _validate_m365(output_dir: Path) -> ValidationReport:
                 CheckResult("manifest.json valid JSON", False, f"JSON parse error: {e}")
             )
     else:
-        report.checks.append(CheckResult("manifest.json exists", False, "manifest.json not found"))
+        report.checks.append(
+            CheckResult("manifest.json exists", False, "manifest.json not found")
+        )
 
     if manifest is not None:
         if "copilotAgents" in manifest:
-            report.checks.append(CheckResult("manifest.json has 'copilotAgents'", True, ""))
+            report.checks.append(
+                CheckResult("manifest.json has 'copilotAgents'", True, "")
+            )
         else:
             report.checks.append(
                 CheckResult(
@@ -409,7 +465,9 @@ def _validate_vertex(output_dir: Path) -> ValidationReport:
                 CheckResult("agent.json valid JSON", False, f"JSON parse error: {e}")
             )
     else:
-        report.checks.append(CheckResult("agent.json exists", False, "agent.json not found"))
+        report.checks.append(
+            CheckResult("agent.json exists", False, "agent.json not found")
+        )
 
     if agent is not None:
         for key in ("displayName", "goal", "instructions"):
@@ -483,7 +541,9 @@ def run_validation(output_dir: Path, platform: str) -> ValidationReport:
     """Run platform-specific validation and return a ValidationReport."""
     platform = platform.lower()
     if platform not in _VALIDATORS:
-        raise ValueError(f"Unknown platform: {platform!r}. Supported: {', '.join(_VALIDATORS)}")
+        raise ValueError(
+            f"Unknown platform: {platform!r}. Supported: {', '.join(_VALIDATORS)}"
+        )
     return _VALIDATORS[platform](output_dir)
 
 

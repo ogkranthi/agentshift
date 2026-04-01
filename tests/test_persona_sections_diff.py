@@ -15,13 +15,14 @@ from agentshift.diff import (
 )
 from agentshift.ir import AgentIR, Persona
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
 
-def _make_ir(sections: dict[str, str] | None = None, system_prompt: str = "Do things.") -> AgentIR:
+def _make_ir(
+    sections: dict[str, str] | None = None, system_prompt: str = "Do things."
+) -> AgentIR:
     return AgentIR(
         name="test-agent",
         description="A test agent.",

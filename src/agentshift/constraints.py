@@ -158,7 +158,9 @@ def _check_vertex_constraints(ir_agent: AgentIR, result: ConstraintResult) -> No
         result.warnings.append(
             ConstraintWarning(
                 field="tools",
-                message=(f"Vertex AI allows max 128 tools; {len(ir_agent.tools)} tools found."),
+                message=(
+                    f"Vertex AI allows max 128 tools; {len(ir_agent.tools)} tools found."
+                ),
             )
         )
 

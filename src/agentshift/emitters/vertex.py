@@ -73,7 +73,16 @@ def _build_structured_instructions(ir: AgentIR) -> list[str]:
             parts.append(f"{heading}:\n{val}")
 
     # Custom sections (not overview, guardrails, examples, preamble)
-    skip = {"overview", "behavior", "persona", "tools", "knowledge", "guardrails", "examples", "preamble"}
+    skip = {
+        "overview",
+        "behavior",
+        "persona",
+        "tools",
+        "knowledge",
+        "guardrails",
+        "examples",
+        "preamble",
+    }
     for key, val in sections.items():
         if key not in skip and val:
             heading = key.replace("-", " ").title()
@@ -122,7 +131,8 @@ def _map_tools(ir: AgentIR) -> list[dict]:
                 {
                     "name": tool.name,
                     "type": "FUNCTION",
-                    "description": tool.description or f"Run the {tool.name} shell tool.",
+                    "description": tool.description
+                    or f"Run the {tool.name} shell tool.",
                     "x-agentshift-stub": "Implement as Cloud Function or Cloud Run service",
                 }
             )
@@ -165,7 +175,9 @@ def _write_agent_json(ir: AgentIR, output_dir: Path) -> None:
         "supportedLanguageCodes": ["en"],
     }
 
-    (output_dir / "agent.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
+    (output_dir / "agent.json").write_text(
+        json.dumps(config, indent=2), encoding="utf-8"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -249,7 +261,9 @@ def _write_readme(ir: AgentIR, output_dir: Path) -> None:
                     f"- **{tool.name}** (shell) — implement as Cloud Function or Cloud Run service"
                 )
             elif tool.kind == "mcp":
-                lines.append(f"- **{tool.name}** (mcp) — implement as MCP-compatible endpoint")
+                lines.append(
+                    f"- **{tool.name}** (mcp) — implement as MCP-compatible endpoint"
+                )
         lines += [
             "",
             "See the [Vertex AI Agent Builder docs](https://cloud.google.com/vertex-ai/docs/agent-builder/create-manage-agents) for integration details.",
@@ -264,7 +278,9 @@ def _write_readme(ir: AgentIR, output_dir: Path) -> None:
             "",
         ]
         for ks in ir.knowledge:
-            lines.append(f"- **{ks.name}** ({ks.kind}) — {ks.description or 'no description'}")
+            lines.append(
+                f"- **{ks.name}** ({ks.kind}) — {ks.description or 'no description'}"
+            )
         lines += [
             "",
             "See the [Vertex AI data stores guide](https://cloud.google.com/generative-ai-app-builder/docs/create-datastore-ingest) for setup instructions.",

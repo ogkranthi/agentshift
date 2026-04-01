@@ -6,7 +6,6 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-
 # ---------------------------------------------------------------------------
 # Governance models (L1 / L2 / L3)
 # ---------------------------------------------------------------------------
@@ -46,9 +45,9 @@ class PlatformAnnotation(BaseModel):
     model_config = {"extra": "forbid"}
 
     id: str
-    kind: Literal["content_filter", "pii_detection", "denied_topics", "grounding_check"] = (
-        "content_filter"
-    )
+    kind: Literal[
+        "content_filter", "pii_detection", "denied_topics", "grounding_check"
+    ] = "content_filter"
     description: str
     platform_target: Literal["bedrock", "vertex-ai", "m365", "any"] = "any"
     config: dict[str, Any] = Field(default_factory=dict)
@@ -79,7 +78,9 @@ class Tool(BaseModel):
 
     name: str
     description: str
-    kind: Literal["mcp", "openapi", "shell", "builtin", "function", "unknown"] = "unknown"
+    kind: Literal["mcp", "openapi", "shell", "builtin", "function", "unknown"] = (
+        "unknown"
+    )
     parameters: dict[str, Any] | None = None
     auth: ToolAuth | None = None
     endpoint: str | None = None
@@ -95,7 +96,9 @@ class KnowledgeSource(BaseModel):
     kind: Literal["file", "directory", "url", "vector_store", "database", "s3"]
     path: str | None = None
     description: str | None = None
-    format: Literal["markdown", "json", "yaml", "text", "pdf", "html", "unknown"] = "unknown"
+    format: Literal["markdown", "json", "yaml", "text", "pdf", "html", "unknown"] = (
+        "unknown"
+    )
     load_mode: Literal["always", "on_demand", "indexed"] = "on_demand"
 
 
@@ -103,7 +106,9 @@ class TriggerDelivery(BaseModel):
     model_config = {"extra": "forbid"}
 
     mode: Literal["announce", "silent", "reply"] = "announce"
-    channel: Literal["telegram", "slack", "discord", "email", "webhook", "stdout"] | None = None
+    channel: (
+        Literal["telegram", "slack", "discord", "email", "webhook", "stdout"] | None
+    ) = None
     to: str | None = None
     account_id: str | None = None
 
@@ -127,7 +132,9 @@ class Constraints(BaseModel):
     model_config = {"extra": "forbid"}
 
     max_instruction_chars: int | None = None
-    supported_os: list[Literal["darwin", "linux", "windows"]] = Field(default_factory=list)
+    supported_os: list[Literal["darwin", "linux", "windows"]] = Field(
+        default_factory=list
+    )
     required_bins: list[str] = Field(default_factory=list)
     any_required_bins: list[str] = Field(default_factory=list)
     required_config_keys: list[str] = Field(default_factory=list)
@@ -161,7 +168,8 @@ class Metadata(BaseModel):
     model_config = {"extra": "forbid"}
 
     source_platform: (
-        Literal["openclaw", "claude-code", "copilot", "bedrock", "vertex-ai", "unknown"] | None
+        Literal["openclaw", "claude-code", "copilot", "bedrock", "vertex-ai", "unknown"]
+        | None
     ) = None
     target_platforms: list[
         Literal["openclaw", "claude-code", "copilot", "bedrock", "vertex-ai"]

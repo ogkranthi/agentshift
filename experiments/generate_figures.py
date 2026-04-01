@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,6 +15,7 @@ from scipy import stats
 RESULTS_DIR = Path(__file__).parent / "results"
 FIGURES_DIR = Path(__file__).parent / "figures"
 FIGURES_DIR.mkdir(exist_ok=True)
+
 
 # ---------------------------------------------------------------------------
 # Load audit data
@@ -37,7 +39,20 @@ def figure_2_heatmap(audits: list[dict]):
     """Two-panel heatmap: agents (x) × layers (y), color = GPR."""
 
     # Agent order by ID number
-    agent_order = ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A11", "A12"]
+    agent_order = [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10",
+        "A11",
+        "A12",
+    ]
     layers = ["GPR-L1", "GPR-L2", "GPR-L3"]
     layer_labels = ["L1 (Prompt)", "L2 (Permission)", "L3 (Platform)"]
 
@@ -59,9 +74,7 @@ def figure_2_heatmap(audits: list[dict]):
             for row, layer_key in enumerate(layers):
                 matrix[row, col] = float(a[layer_key])
 
-        im = axes[idx].imshow(
-            matrix, cmap="RdYlGn", vmin=0, vmax=1, aspect="auto"
-        )
+        im = axes[idx].imshow(matrix, cmap="RdYlGn", vmin=0, vmax=1, aspect="auto")
         axes[idx].set_title(label, fontsize=13, fontweight="bold", pad=10)
         axes[idx].set_xticks(range(len(agent_order)))
         axes[idx].set_xticklabels(agent_order, fontsize=9, rotation=45, ha="right")
@@ -73,11 +86,24 @@ def figure_2_heatmap(audits: list[dict]):
             for j in range(len(agent_order)):
                 val = matrix[i, j]
                 color = "white" if val < 0.4 else "black"
-                axes[idx].text(j, i, f"{val:.2f}", ha="center", va="center",
-                               fontsize=8, color=color, fontweight="bold")
+                axes[idx].text(
+                    j,
+                    i,
+                    f"{val:.2f}",
+                    ha="center",
+                    va="center",
+                    fontsize=8,
+                    color=color,
+                    fontweight="bold",
+                )
 
     fig.colorbar(im, ax=axes, shrink=0.8, label="GPR Score", pad=0.02)
-    fig.suptitle("Figure 2: Governance Preservation Heatmap", fontsize=14, fontweight="bold", y=1.02)
+    fig.suptitle(
+        "Figure 2: Governance Preservation Heatmap",
+        fontsize=14,
+        fontweight="bold",
+        y=1.02,
+    )
     plt.tight_layout()
     fig.savefig(FIGURES_DIR / "fig2_heatmap.png", dpi=300, bbox_inches="tight")
     fig.savefig(FIGURES_DIR / "fig2_heatmap.pdf", bbox_inches="tight")
@@ -97,7 +123,9 @@ def figure_3_complexity(audits: list[dict]):
     colors = ["#2196F3", "#FF9800"]
 
     # Aggregate GPR-Overall by complexity and target
-    data: dict[str, dict[str, list[float]]] = {c: {t: [] for t in targets} for c in complexity_order}
+    data: dict[str, dict[str, list[float]]] = {
+        c: {t: [] for t in targets} for c in complexity_order
+    }
     for a in audits:
         comp = a["Complexity"]
         tgt = a["Target"]
@@ -110,14 +138,36 @@ def figure_3_complexity(audits: list[dict]):
     fig, ax = plt.subplots(figsize=(8, 5))
 
     for i, (target, label, color) in enumerate(zip(targets, target_labels, colors)):
-        means = [np.mean(data[c][target]) if data[c][target] else 0 for c in complexity_order]
-        stds = [np.std(data[c][target]) if len(data[c][target]) > 1 else 0 for c in complexity_order]
-        bars = ax.bar(x + i * width, means, width, label=label, color=color,
-                      yerr=stds, capsize=4, alpha=0.85, edgecolor="white", linewidth=0.5)
+        means = [
+            np.mean(data[c][target]) if data[c][target] else 0 for c in complexity_order
+        ]
+        stds = [
+            np.std(data[c][target]) if len(data[c][target]) > 1 else 0
+            for c in complexity_order
+        ]
+        bars = ax.bar(
+            x + i * width,
+            means,
+            width,
+            label=label,
+            color=color,
+            yerr=stds,
+            capsize=4,
+            alpha=0.85,
+            edgecolor="white",
+            linewidth=0.5,
+        )
         # Value labels
         for bar, mean in zip(bars, means):
-            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.02,
-                    f"{mean:.2f}", ha="center", va="bottom", fontsize=9, fontweight="bold")
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height() + 0.02,
+                f"{mean:.2f}",
+                ha="center",
+                va="bottom",
+                fontsize=9,
+                fontweight="bold",
+            )
 
     ax.set_xlabel("Agent Complexity", fontsize=12)
     ax.set_ylabel("GPR-Overall", fontsize=12)
@@ -167,12 +217,22 @@ def figure_4_elevation(audits_json: list[dict]):
 
     for i, art_type in enumerate(art_types):
         vals = [type_counts[art_type].get(t, 0) for t in targets]
-        ax.bar(x, vals, width, bottom=bottom, label=art_type, color=cmap[i], edgecolor="white")
+        ax.bar(
+            x,
+            vals,
+            width,
+            bottom=bottom,
+            label=art_type,
+            color=cmap[i],
+            edgecolor="white",
+        )
         bottom += vals
 
     ax.set_xlabel("Target Platform", fontsize=12)
     ax.set_ylabel("Elevated Artifacts (count)", fontsize=12)
-    ax.set_title("Figure 4: Governance Elevation by Type", fontsize=14, fontweight="bold")
+    ax.set_title(
+        "Figure 4: Governance Elevation by Type", fontsize=14, fontweight="bold"
+    )
     ax.set_xticks(x)
     ax.set_xticklabels(target_labels, fontsize=11)
     ax.legend(fontsize=8, loc="upper left", bbox_to_anchor=(1.02, 1))
@@ -221,7 +281,9 @@ def run_statistical_tests(audits: list[dict]):
     print(f"   p-value:   {p_value:.6f}")
     print(f"   Significant (p<0.05): {'YES' if p_value < 0.05 else 'NO'}")
     print(f"   Mean CC: {np.mean(cc_scores):.4f}, Mean CP: {np.mean(cp_scores):.4f}")
-    print(f"   Median CC: {np.median(cc_scores):.4f}, Median CP: {np.median(cp_scores):.4f}")
+    print(
+        f"   Median CC: {np.median(cc_scores):.4f}, Median CP: {np.median(cp_scores):.4f}"
+    )
 
     # 2. Spearman correlation: complexity vs GPR-Overall
     print("\n2. Spearman correlation: Complexity vs GPR-Overall")
@@ -265,18 +327,22 @@ def run_statistical_tests(audits: list[dict]):
         l1_total += l1_t
         l2_total += l2_t
         l3_total += l3_t
-        l1_lost += (l1_t - l1_p)
-        l2_lost += (l2_t - l2_p)
-        l3_lost += (l3_t - l3_p)
+        l1_lost += l1_t - l1_p
+        l2_lost += l2_t - l2_p
+        l3_lost += l3_t - l3_p
 
     # Contingency table: [preserved, lost] × [L1, L2, L3]
-    observed = np.array([
-        [l1_total - l1_lost, l2_total - l2_lost, l3_total - l3_lost],  # preserved
-        [l1_lost, l2_lost, l3_lost],  # lost
-    ])
+    observed = np.array(
+        [
+            [l1_total - l1_lost, l2_total - l2_lost, l3_total - l3_lost],  # preserved
+            [l1_lost, l2_lost, l3_lost],  # lost
+        ]
+    )
 
     print(f"   Layer totals: L1={l1_total}, L2={l2_total}, L3={l3_total}")
-    print(f"   Preserved:    L1={l1_total-l1_lost}, L2={l2_total-l2_lost}, L3={l3_total-l3_lost}")
+    print(
+        f"   Preserved:    L1={l1_total-l1_lost}, L2={l2_total-l2_lost}, L3={l3_total-l3_lost}"
+    )
     print(f"   Lost:         L1={l1_lost}, L2={l2_lost}, L3={l3_lost}")
 
     chi2, p_chi, dof, expected = stats.chi2_contingency(observed)

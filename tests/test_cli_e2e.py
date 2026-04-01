@@ -14,7 +14,10 @@ AGENTSHIFT = [str(_VENV_BIN)] if _VENV_BIN.exists() else [PYTHON, "-m", "agentsh
 
 
 def run_convert(
-    source: Path, tmp_path: Path, from_platform: str = "openclaw", to_platform: str = "claude-code"
+    source: Path,
+    tmp_path: Path,
+    from_platform: str = "openclaw",
+    to_platform: str = "claude-code",
 ) -> subprocess.CompletedProcess[str]:
     cmd = [
         *AGENTSHIFT,
@@ -27,13 +30,17 @@ def run_convert(
         "--output",
         str(tmp_path),
     ]
-    return subprocess.run(cmd, capture_output=True, text=True, cwd=str(FIXTURES.parent.parent))
+    return subprocess.run(
+        cmd, capture_output=True, text=True, cwd=str(FIXTURES.parent.parent)
+    )
 
 
 class TestCLIConvertSimple:
     def test_exit_code_zero(self, tmp_path):
         result = run_convert(FIXTURES / "simple-skill", tmp_path)
-        assert result.returncode == 0, f"stderr: {result.stderr}\nstdout: {result.stdout}"
+        assert (
+            result.returncode == 0
+        ), f"stderr: {result.stderr}\nstdout: {result.stdout}"
 
     def test_claude_md_created(self, tmp_path):
         run_convert(FIXTURES / "simple-skill", tmp_path)
@@ -119,7 +126,10 @@ class TestCLIErrors:
     def test_stdout_contains_skill_name(self, tmp_path):
         result = run_convert(FIXTURES / "simple-skill", tmp_path)
         # Output contains source path (which includes "simple-skill") and target platform
-        assert "simple-skill" in result.stdout.lower() or "claude-code" in result.stdout.lower()
+        assert (
+            "simple-skill" in result.stdout.lower()
+            or "claude-code" in result.stdout.lower()
+        )
 
 
 class TestCLIVersion:
@@ -133,7 +143,9 @@ class TestCLIVersion:
         assert "agentshift" in result.stdout
         import re
 
-        assert re.search(r"\d+\.\d+", result.stdout), "version string not found in output"
+        assert re.search(
+            r"\d+\.\d+", result.stdout
+        ), "version string not found in output"
 
     def test_version_short_flag(self):
         result = subprocess.run(

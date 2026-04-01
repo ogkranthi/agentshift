@@ -70,8 +70,12 @@ def _write_claude_md(ir: AgentIR, output_dir: Path, elevation: ElevationResult) 
     if elevation.extra_instructions:
         lines.append("## Governance Constraints (Elevated)")
         lines.append("")
-        lines.append("<!-- These constraints were elevated from enforcement-level (L2/L3)")
-        lines.append("     to prompt-level (L1) because Claude Code does not natively support")
+        lines.append(
+            "<!-- These constraints were elevated from enforcement-level (L2/L3)"
+        )
+        lines.append(
+            "     to prompt-level (L1) because Claude Code does not natively support"
+        )
         lines.append("     the original enforcement mechanism. -->")
         lines.append("")
         for instr in elevation.extra_instructions:
@@ -81,7 +85,9 @@ def _write_claude_md(ir: AgentIR, output_dir: Path, elevation: ElevationResult) 
     (output_dir / "CLAUDE.md").write_text("\n".join(lines), encoding="utf-8")
 
 
-def _write_settings_json(ir: AgentIR, output_dir: Path, elevation: ElevationResult) -> None:
+def _write_settings_json(
+    ir: AgentIR, output_dir: Path, elevation: ElevationResult
+) -> None:
     allow: list[str] = []
     deny: list[str] = []
 
@@ -151,7 +157,9 @@ def _write_settings_json(ir: AgentIR, output_dir: Path, elevation: ElevationResu
     if ir.constraints.supported_os:
         settings["supportedOs"] = ir.constraints.supported_os
 
-    (output_dir / "settings.json").write_text(json.dumps(settings, indent=2), encoding="utf-8")
+    (output_dir / "settings.json").write_text(
+        json.dumps(settings, indent=2), encoding="utf-8"
+    )
 
 
 def _write_schedules_md(ir: AgentIR, output_dir: Path) -> None:
@@ -193,14 +201,18 @@ def _write_schedules_md(ir: AgentIR, output_dir: Path) -> None:
 
         lines.append("**Set up in Claude Code:**")
         lines.append("")
-        lines.append("Option 1 — Cloud scheduled task (recommended, survives restarts):")
+        lines.append(
+            "Option 1 — Cloud scheduled task (recommended, survives restarts):"
+        )
         lines.append("```")
         lines.append("# In any Claude Code session:")
         if trigger.cron_expr:
             lines.append(
                 f"/schedule cron({trigger.cron_expr}) {(trigger.message or '').splitlines()[0][:80]}"
             )
-        lines.append("# Or visit: https://claude.ai/code/scheduled → New scheduled task")
+        lines.append(
+            "# Or visit: https://claude.ai/code/scheduled → New scheduled task"
+        )
         lines.append("```")
         lines.append("")
         lines.append("Option 2 — In-session loop (disappears when Claude Code exits):")
@@ -220,10 +232,22 @@ def _cron_to_human(expr: str) -> str:
         return "1h"
     minute, hour, dom, month, dow = parts
     # Daily at specific hour
-    if minute.isdigit() and hour.isdigit() and dom == "*" and month == "*" and dow == "*":
+    if (
+        minute.isdigit()
+        and hour.isdigit()
+        and dom == "*"
+        and month == "*"
+        and dow == "*"
+    ):
         return "1d"
     # Weekly
-    if minute.isdigit() and hour.isdigit() and dom == "*" and month == "*" and dow.isdigit():
+    if (
+        minute.isdigit()
+        and hour.isdigit()
+        and dom == "*"
+        and month == "*"
+        and dow.isdigit()
+    ):
         return "7d"
     # Every N hours
     if minute.isdigit() and hour.startswith("*/"):

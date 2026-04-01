@@ -318,9 +318,9 @@ class TestBedrockGuardrailsSectionMapped:
         )
         bedrock_emitter.emit(ir, tmp_path)
         guardrail_file = tmp_path / "guardrail-config.json"
-        assert guardrail_file.exists(), (
-            "guardrail-config.json should be created when sections['guardrails'] present"
-        )
+        assert (
+            guardrail_file.exists()
+        ), "guardrail-config.json should be created when sections['guardrails'] present"
         config = json.loads(guardrail_file.read_text(encoding="utf-8"))
         assert "topicPolicyConfig" in config
         topics = config["topicPolicyConfig"]["topicsConfig"]
@@ -340,7 +340,10 @@ class TestBedrockGuardrailsSectionMapped:
         config = json.loads((tmp_path / "guardrail-config.json").read_text())
         topics = config["topicPolicyConfig"]["topicsConfig"]
         all_definitions = " ".join(t["definition"] for t in topics)
-        assert "medical" in all_definitions.lower() or "competitor" in all_definitions.lower()
+        assert (
+            "medical" in all_definitions.lower()
+            or "competitor" in all_definitions.lower()
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -378,7 +381,9 @@ class TestBedrockNoSectionsFallsBack:
 class TestVertexOverviewAsGoal:
     def test_vertex_overview_as_goal(self, tmp_path):
         """IR with sections['overview'] → vertex agent.json goal field uses it."""
-        overview_text = "I provide current weather and forecasts using wttr.in or Open-Meteo."
+        overview_text = (
+            "I provide current weather and forecasts using wttr.in or Open-Meteo."
+        )
         ir = _make_ir(
             sections={
                 "overview": overview_text,
@@ -409,7 +414,10 @@ class TestVertexOverviewAsGoal:
         vertex_emitter.emit(ir, tmp_path)
         agent_json = json.loads((tmp_path / "agent.json").read_text(encoding="utf-8"))
         instructions_text = " ".join(agent_json.get("instructions", []))
-        assert "Restrictions" in instructions_text or "emergency" in instructions_text.lower()
+        assert (
+            "Restrictions" in instructions_text
+            or "emergency" in instructions_text.lower()
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -461,14 +469,18 @@ class TestDiffIncludesPersonaSectionsRow:
 
     def test_diff_persona_sections_label_contains_mapped(self):
         """The persona_sections row shows N/M mapped format."""
-        ir = _make_ir(sections={"overview": "I do stuff.", "guardrails": "Do not be bad."})
+        ir = _make_ir(
+            sections={"overview": "I do stuff.", "guardrails": "Do not be bad."}
+        )
         result = compute_diff(ir, ["bedrock"])
         label = result["components"]["persona_sections"]["bedrock"][1]
         assert "mapped" in label
 
     def test_diff_render_table_includes_persona_sections_text(self, capsys):
         """render_diff_table output contains 'Persona Sections' when sections present."""
-        ir = _make_ir(sections={"overview": "I help users.", "guardrails": "No harmful content."})
+        ir = _make_ir(
+            sections={"overview": "I help users.", "guardrails": "No harmful content."}
+        )
         render_diff_table(ir, ["bedrock", "vertex"])
         captured = capsys.readouterr()
         assert "Persona Sections" in captured.out
