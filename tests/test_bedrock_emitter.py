@@ -560,7 +560,10 @@ class TestBedrockKnowledgeSourcesDetailed:
         ir = make_simple_ir(
             knowledge=[
                 KnowledgeSource(
-                    name="kb1", kind="file", path="/tmp/kb1.md", description="My knowledge base"
+                    name="kb1",
+                    kind="file",
+                    path="/tmp/kb1.md",
+                    description="My knowledge base",
                 )
             ]
         )

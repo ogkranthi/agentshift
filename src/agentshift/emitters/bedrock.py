@@ -66,7 +66,12 @@ def _build_instruction(ir: AgentIR) -> tuple[str, bool]:
             parts.append(f"Tone and style: {persona_section}")
 
         # Add any remaining sections not already handled (excluding guardrails, examples)
-        handled = set(instruction_section_order) | {"guardrails", "persona", "examples", "preamble"}
+        handled = set(instruction_section_order) | {
+            "guardrails",
+            "persona",
+            "examples",
+            "preamble",
+        }
         for key, val in sections.items():
             if key not in handled and val:
                 heading = key.replace("-", " ").title()
@@ -370,8 +375,12 @@ def _write_cloudformation(
     lines.append("      AutoPrepare: true")
     if guardrail_config:
         lines.append("      # Guardrail config generated from persona.sections['guardrails']")
-        lines.append("      # See guardrail-config.json for the full guardrailConfiguration payload.")
-        lines.append("      # TODO [agentshift]: Create a Bedrock Guardrail resource and reference it here.")
+        lines.append(
+            "      # See guardrail-config.json for the full guardrailConfiguration payload."
+        )
+        lines.append(
+            "      # TODO [agentshift]: Create a Bedrock Guardrail resource and reference it here."
+        )
         lines.append("      # GuardrailConfiguration:")
         lines.append("      #   GuardrailIdentifier: !Ref GuardrailPlaceholder")
 

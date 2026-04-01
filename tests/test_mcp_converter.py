@@ -88,7 +88,10 @@ class TestMcpToOpenapi:
             {
                 "name": "tool",
                 "description": "Tool",
-                "inputSchema": {"type": "object", "properties": {"x": {"type": "string"}}},
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {"x": {"type": "string"}},
+                },
             }
         ]
         schema = mcp_to_openapi(tools)

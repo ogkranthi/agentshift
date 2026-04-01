@@ -196,14 +196,9 @@ def parse_api_response(
         bedrock_ext["resource_name"] = resource_name
 
     # Model override
-    model_override = (
-        agent_data.get("platform_extensions", {})
-        .get("vertex_ai", {})
-        .get("model")
-        or agent_data.get("platform_extensions", {})
-        .get("vertex", {})
-        .get("model")
-    )
+    model_override = agent_data.get("platform_extensions", {}).get("vertex_ai", {}).get(
+        "model"
+    ) or agent_data.get("platform_extensions", {}).get("vertex", {}).get("model")
     if model_override:
         bedrock_ext["model"] = model_override
 

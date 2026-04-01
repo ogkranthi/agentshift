@@ -22,10 +22,10 @@ from agentshift.ir import (
     ToolPermission,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_ir(**governance_kwargs) -> AgentIR:
     """Create a minimal AgentIR with given governance kwargs."""

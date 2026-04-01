@@ -146,7 +146,11 @@ class TestParseToolDefinitions:
             "goal": "You are a test agent.",
             "instructions": [],
             "tools": [
-                {"name": "get_current_weather", "description": "Old weather tool", "type": "FUNCTION"},
+                {
+                    "name": "get_current_weather",
+                    "description": "Old weather tool",
+                    "type": "FUNCTION",
+                },
             ],
         }
         tools_data = [
@@ -413,9 +417,7 @@ class TestVertexAuthParsing:
                 "displayName": "Secured API",
                 "description": "An API with key auth",
                 "openApiFunctionDeclarations": {},
-                "authentication": {
-                    "apiKeyConfig": {"name": "my-api-key"}
-                },
+                "authentication": {"apiKeyConfig": {"name": "my-api-key"}},
             }
         ]
         agent = {
@@ -564,7 +566,7 @@ class TestRoundTrip:
                 sections={
                     "overview": "You are a helpful assistant.",
                     "guardrails": "Do not share personal information.\nNever provide financial advice.",
-                }
+                },
             ),
         )
         out_dir = tmp_path / "vertex-out"
@@ -632,30 +634,30 @@ class TestRoundTrip:
 
     def test_parse_agent_json_string_helper(self):
         """parse_agent_json() convenience function parses JSON strings directly."""
-        agent_str = json.dumps({
-            "displayName": "StringAgent",
-            "goal": "You are a string-based agent.",
-            "instructions": [],
-            "tools": [],
-        })
+        agent_str = json.dumps(
+            {
+                "displayName": "StringAgent",
+                "goal": "You are a string-based agent.",
+                "instructions": [],
+                "tools": [],
+            }
+        )
         ir = vertex_parser.parse_agent_json(agent_str)
         # "StringAgent" → slugified (lowercased)
         assert ir.name == "stringagent"
 
     def test_parse_agent_json_with_tools_string(self):
         """parse_agent_json() with tools_json string."""
-        agent_str = json.dumps({
-            "displayName": "ToolAgent",
-            "goal": "Test.",
-            "instructions": [],
-            "tools": [],
-        })
-        tools_str = json.dumps([
+        agent_str = json.dumps(
             {
-                "functionDeclarations": [
-                    {"name": "my_tool", "description": "A test tool"}
-                ]
+                "displayName": "ToolAgent",
+                "goal": "Test.",
+                "instructions": [],
+                "tools": [],
             }
-        ])
+        )
+        tools_str = json.dumps(
+            [{"functionDeclarations": [{"name": "my_tool", "description": "A test tool"}]}]
+        )
         ir = vertex_parser.parse_agent_json(agent_str, tools_str)
         assert any(t.name == "my_tool" for t in ir.tools)

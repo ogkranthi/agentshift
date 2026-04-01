@@ -42,7 +42,6 @@ from agentshift.ir import (
     ToolPermission,
 )
 
-
 # ---------------------------------------------------------------------------
 # Fixtures / helpers
 # ---------------------------------------------------------------------------
@@ -66,10 +65,7 @@ def _make_ir(
 
 
 def _safety_guardrail(n: int = 1) -> list[Guardrail]:
-    return [
-        Guardrail(id=f"g{i}", text=f"Safety rule {i}", category="safety")
-        for i in range(n)
-    ]
+    return [Guardrail(id=f"g{i}", text=f"Safety rule {i}", category="safety") for i in range(n)]
 
 
 def _bedrock_annotation(n: int = 1) -> list[PlatformAnnotation]:
@@ -200,7 +196,7 @@ class TestGPRL2:
         """gpr_l2 = l2_preserved / l2_total when l2_total > 0."""
         ir = _make_ir(
             tool_permissions=[
-                ToolPermission(tool_name="exec", enabled=False),   # bedrock preserves this
+                ToolPermission(tool_name="exec", enabled=False),  # bedrock preserves this
                 ToolPermission(tool_name="shell", rate_limit="5/min"),  # always elevated
             ]
         )
@@ -279,7 +275,9 @@ class TestGPRL3:
             platform_annotations=[
                 PlatformAnnotation(id="a1", kind="content_filter", description="cf"),
                 PlatformAnnotation(id="a2", kind="pii_detection", description="pii"),
-                PlatformAnnotation(id="a3", kind="denied_topics", description="dt"),  # Not supported
+                PlatformAnnotation(
+                    id="a3", kind="denied_topics", description="dt"
+                ),  # Not supported
             ]
         )
         audit = audit_conversion(ir, "vertex")
@@ -341,7 +339,7 @@ class TestGPROverall:
     def test_gpr_overall_weighted_formula(self):
         """Check the weighted average formula explicitly."""
         ir = _make_ir(
-            guardrails=_safety_guardrail(2),              # L1: 2 total, 2 preserved
+            guardrails=_safety_guardrail(2),  # L1: 2 total, 2 preserved
             tool_permissions=[
                 ToolPermission(tool_name="t1", enabled=False),  # L2: depends on platform
             ],
@@ -443,9 +441,7 @@ class TestElevationTracking:
 
     def test_disabled_tool_elevated_on_copilot(self):
         """Copilot has no disable mechanism — disabled tool should be elevated."""
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="shell", enabled=False)]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="shell", enabled=False)])
         audit = audit_conversion(ir, "copilot")
         assert audit.l2_elevated == 1
         assert len(audit.elevated_artifacts) >= 1
@@ -455,9 +451,7 @@ class TestElevationTracking:
 
     def test_deny_patterns_elevated_on_copilot(self):
         ir = _make_ir(
-            tool_permissions=[
-                ToolPermission(tool_name="exec", deny_patterns=["rm -rf", "sudo"])
-            ]
+            tool_permissions=[ToolPermission(tool_name="exec", deny_patterns=["rm -rf", "sudo"])]
         )
         audit = audit_conversion(ir, "copilot")
         assert len(audit.elevated_artifacts) >= 2
@@ -467,9 +461,7 @@ class TestElevationTracking:
     def test_rate_limit_elevated_everywhere(self):
         """Rate limits should always be elevated."""
         ir = _make_ir(
-            tool_permissions=[
-                ToolPermission(tool_name="web_search", rate_limit="5/minute")
-            ]
+            tool_permissions=[ToolPermission(tool_name="web_search", rate_limit="5/minute")]
         )
         for target in ["claude-code", "copilot", "bedrock", "vertex"]:
             audit = audit_conversion(ir, target)
@@ -500,20 +492,22 @@ class TestElevationTracking:
         assert len(audit.elevated_artifacts) == 0
 
     def test_elevated_artifact_has_required_keys(self):
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="shell", enabled=False)]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="shell", enabled=False)])
         audit = audit_conversion(ir, "copilot")
         assert len(audit.elevated_artifacts) > 0
         ea = audit.elevated_artifacts[0]
-        required_keys = {"source_layer", "artifact_id", "artifact_type", "original_text",
-                         "elevated_instruction", "reason"}
+        required_keys = {
+            "source_layer",
+            "artifact_id",
+            "artifact_type",
+            "original_text",
+            "elevated_instruction",
+            "reason",
+        }
         assert required_keys.issubset(ea.keys())
 
     def test_elevated_instruction_is_nonempty(self):
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="exec", rate_limit="1/hour")]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="exec", rate_limit="1/hour")])
         audit = audit_conversion(ir, "copilot")
         for ea in audit.elevated_artifacts:
             assert ea["elevated_instruction"], "elevated_instruction should not be empty"
@@ -531,11 +525,7 @@ class TestElevationTracking:
 
     def test_no_elevation_on_claude_code_with_deny_patterns(self):
         """Claude-code supports deny_patterns → no elevation needed."""
-        ir = _make_ir(
-            tool_permissions=[
-                ToolPermission(tool_name="exec", deny_patterns=["rm -rf"])
-            ]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="exec", deny_patterns=["rm -rf"])])
         audit = audit_conversion(ir, "claude-code")
         types = [a["artifact_type"] for a in audit.elevated_artifacts]
         assert "deny_pattern" not in types
@@ -550,11 +540,22 @@ class TestCSVExport:
     """Tests for export_csv: format, column headers, row data."""
 
     EXPECTED_HEADERS = [
-        "Agent", "Target", "Domain", "Complexity",
-        "L1 Total", "L1 Preserved", "GPR-L1",
-        "L2 Total", "L2 Preserved", "L2 Elevated", "GPR-L2",
-        "L3 Total", "L3 Preserved", "GPR-L3",
-        "GPR-Overall", "CFS",
+        "Agent",
+        "Target",
+        "Domain",
+        "Complexity",
+        "L1 Total",
+        "L1 Preserved",
+        "GPR-L1",
+        "L2 Total",
+        "L2 Preserved",
+        "L2 Elevated",
+        "GPR-L2",
+        "L3 Total",
+        "L3 Preserved",
+        "GPR-L3",
+        "GPR-Overall",
+        "CFS",
     ]
 
     def test_csv_headers_match_spec(self):
@@ -588,7 +589,9 @@ class TestCSVExport:
             name="my-agent",
             guardrails=_safety_guardrail(2),
         )
-        audit = audit_conversion(ir, "copilot", agent_id="my-agent", domain="test", complexity="low")
+        audit = audit_conversion(
+            ir, "copilot", agent_id="my-agent", domain="test", complexity="low"
+        )
         with tempfile.TemporaryDirectory() as tmpdir:
             csv_path = Path(tmpdir) / "r.csv"
             export_csv([audit], csv_path)
@@ -688,8 +691,17 @@ class TestJSONExport:
             data = json.loads(json_path.read_text())
             entry = data[0]
         required_keys = {
-            "agent_id", "agent_name", "target", "domain", "complexity",
-            "l1", "l2", "l3", "gpr_overall", "cfs", "elevated_artifacts",
+            "agent_id",
+            "agent_name",
+            "target",
+            "domain",
+            "complexity",
+            "l1",
+            "l2",
+            "l3",
+            "gpr_overall",
+            "cfs",
+            "elevated_artifacts",
         }
         assert required_keys.issubset(entry.keys())
 
@@ -709,9 +721,7 @@ class TestJSONExport:
         assert l1["gpr"] == pytest.approx(1.0)
 
     def test_json_l2_subkeys(self):
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="exec", enabled=False)]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="exec", enabled=False)])
         audit = audit_conversion(ir, "copilot")
         with tempfile.TemporaryDirectory() as tmpdir:
             json_path = Path(tmpdir) / "r.json"
@@ -735,9 +745,7 @@ class TestJSONExport:
         assert set(l3.keys()) >= {"total", "preserved", "elevated", "dropped", "gpr"}
 
     def test_json_elevated_artifacts_is_list(self):
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="shell", enabled=False)]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="shell", enabled=False)])
         audit = audit_conversion(ir, "copilot")
         with tempfile.TemporaryDirectory() as tmpdir:
             json_path = Path(tmpdir) / "r.json"
@@ -748,17 +756,21 @@ class TestJSONExport:
         assert len(artifacts) >= 1
 
     def test_json_elevated_artifact_keys(self):
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="shell", enabled=False)]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="shell", enabled=False)])
         audit = audit_conversion(ir, "copilot")
         with tempfile.TemporaryDirectory() as tmpdir:
             json_path = Path(tmpdir) / "r.json"
             export_json([audit], json_path)
             data = json.loads(json_path.read_text())
             artifact = data[0]["elevated_artifacts"][0]
-        required = {"source_layer", "artifact_id", "artifact_type",
-                    "original_text", "elevated_instruction", "reason"}
+        required = {
+            "source_layer",
+            "artifact_id",
+            "artifact_type",
+            "original_text",
+            "elevated_instruction",
+            "reason",
+        }
         assert required.issubset(artifact.keys())
 
     def test_json_multiple_entries(self):
@@ -788,10 +800,7 @@ class TestAuditBatch:
     """Tests for audit_batch (multi-agent × multi-target)."""
 
     def test_batch_produces_agents_times_targets(self):
-        agents = [
-            (_make_ir(name=f"agent-{i}"), f"agent-{i}", "domain", "low")
-            for i in range(3)
-        ]
+        agents = [(_make_ir(name=f"agent-{i}"), f"agent-{i}", "domain", "low") for i in range(3)]
         targets = ["copilot", "bedrock"]
         audits = audit_batch(agents, targets)
         assert len(audits) == 6  # 3 × 2

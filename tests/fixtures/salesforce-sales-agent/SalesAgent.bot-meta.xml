@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bot xmlns="http://soap.sforce.com/2006/04/metadata">
+    <botMlDomain>
+        <label>Agentforce Sales Agent</label>
+    </botMlDomain>
+    <botVersions>
+        <fullName>v1</fullName>
+        <botDialogs>
+            <botSteps>
+                <stepType>SystemMessage</stepType>
+                <systemMessage>You are a helpful sales assistant. Always be professional and courteous. Never promise discounts without manager approval.</systemMessage>
+            </botSteps>
+        </botDialogs>
+    </botVersions>
+    <contextVariables>
+        <contextVariableName>AccountId</contextVariableName>
+        <dataType>Text</dataType>
+    </contextVariables>
+    <contextVariables>
+        <contextVariableName>OpportunityId</contextVariableName>
+        <dataType>Text</dataType>
+    </contextVariables>
+    <description>Sales assistant agent for lead qualification and account research</description>
+    <label>Agentforce Sales Agent</label>
+    <type>Bot</type>
+    <agentType>EinsteinGPT_Copilot</agentType>
+</Bot>

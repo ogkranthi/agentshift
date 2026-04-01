@@ -130,7 +130,11 @@ def _validate_copilot(output_dir: Path) -> ValidationReport:
     agent_md_files = list(output_dir.glob("*.agent.md"))
     if not agent_md_files:
         report.checks.append(
-            CheckResult("*.agent.md exists", False, "No *.agent.md file found in output directory")
+            CheckResult(
+                "*.agent.md exists",
+                False,
+                "No *.agent.md file found in output directory",
+            )
         )
         return report
 
@@ -153,11 +157,19 @@ def _validate_copilot(output_dir: Path) -> ValidationReport:
                 )
         else:
             report.checks.append(
-                CheckResult("YAML frontmatter valid", False, "Frontmatter closing '---' not found")
+                CheckResult(
+                    "YAML frontmatter valid",
+                    False,
+                    "Frontmatter closing '---' not found",
+                )
             )
     else:
         report.checks.append(
-            CheckResult("YAML frontmatter present", False, "No YAML frontmatter found in .agent.md")
+            CheckResult(
+                "YAML frontmatter present",
+                False,
+                "No YAML frontmatter found in .agent.md",
+            )
         )
 
     if frontmatter is not None:
@@ -337,7 +349,11 @@ def _validate_m365(output_dir: Path) -> ValidationReport:
             )
     else:
         report.checks.append(
-            CheckResult("declarative-agent.json exists", False, "declarative-agent.json not found")
+            CheckResult(
+                "declarative-agent.json exists",
+                False,
+                "declarative-agent.json not found",
+            )
         )
 
     if da is not None:

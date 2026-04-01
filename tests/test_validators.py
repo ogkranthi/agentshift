@@ -29,7 +29,10 @@ def run_validate(
 
 
 def make_claude_code_dir(
-    tmp_path: Path, *, claude_md: str = "# Agent\nDo stuff.", settings: dict | None = None
+    tmp_path: Path,
+    *,
+    claude_md: str = "# Agent\nDo stuff.",
+    settings: dict | None = None,
 ) -> Path:
     (tmp_path / "CLAUDE.md").write_text(claude_md, encoding="utf-8")
     if settings is None:
@@ -58,7 +61,11 @@ def make_bedrock_dir(
     tmp_path: Path, instruction: str = "Be helpful.", extra_cf: dict | None = None
 ) -> Path:
     (tmp_path / "instruction.txt").write_text(instruction, encoding="utf-8")
-    openapi = {"openapi": "3.0.0", "info": {"title": "Agent", "version": "1.0"}, "paths": {}}
+    openapi = {
+        "openapi": "3.0.0",
+        "info": {"title": "Agent", "version": "1.0"},
+        "paths": {},
+    }
     (tmp_path / "openapi.json").write_text(json.dumps(openapi), encoding="utf-8")
     cf = {
         "AWSTemplateFormatVersion": "2010-09-09",
@@ -192,7 +199,12 @@ class TestCopilotValidator:
         assert not report.ok
 
     def test_model_not_list_fails(self, tmp_path):
-        fm = {"name": "Agent", "description": "Does stuff", "model": "gpt-4o", "tools": []}
+        fm = {
+            "name": "Agent",
+            "description": "Does stuff",
+            "model": "gpt-4o",
+            "tools": [],
+        }
         make_copilot_dir(tmp_path, frontmatter=fm)
         report = run_validation(tmp_path, "copilot")
         assert not report.ok

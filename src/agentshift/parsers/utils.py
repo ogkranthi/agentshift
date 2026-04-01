@@ -6,7 +6,6 @@ import re
 
 from agentshift.ir import Guardrail
 
-
 # ---------------------------------------------------------------------------
 # String helpers
 # ---------------------------------------------------------------------------
@@ -56,40 +55,101 @@ _GUARDRAIL_TRIGGER_PATTERNS: list[str] = [
 
 _CATEGORY_KEYWORDS: dict[str, list[str]] = {
     "safety": [
-        "harm", "dangerous", "emergency", "self-harm", "violence", "injury",
-        "medical", "diagnosis", "prescri", "suicide", "weapon",
+        "harm",
+        "dangerous",
+        "emergency",
+        "self-harm",
+        "violence",
+        "injury",
+        "medical",
+        "diagnosis",
+        "prescri",
+        "suicide",
+        "weapon",
     ],
     "privacy": [
-        "pii", "personal", "confidential", "data", "privacy", "hipaa", "phi",
-        "private", "sensitive", "identity", "password", "secret",
+        "pii",
+        "personal",
+        "confidential",
+        "data",
+        "privacy",
+        "hipaa",
+        "phi",
+        "private",
+        "sensitive",
+        "identity",
+        "password",
+        "secret",
     ],
     "compliance": [
-        "legal", "regulatory", "disclaimer", "licensed", "compliance",
-        "warranty", "liability", "regulation",
+        "legal",
+        "regulatory",
+        "disclaimer",
+        "licensed",
+        "compliance",
+        "warranty",
+        "liability",
+        "regulation",
     ],
     "ethical": [
-        "bias", "discriminat", "fair", "race", "gender", "religion",
-        "political", "offensive", "hate", "harassment",
+        "bias",
+        "discriminat",
+        "fair",
+        "race",
+        "gender",
+        "religion",
+        "political",
+        "offensive",
+        "hate",
+        "harassment",
     ],
     "operational": [
-        "escalat", "timeout", "halt", "stop", "limit", "approval",
-        "rate", "quota", "throttle",
+        "escalat",
+        "timeout",
+        "halt",
+        "stop",
+        "limit",
+        "approval",
+        "rate",
+        "quota",
+        "throttle",
     ],
     "scope": [
-        "do not", "never", "refuse", "only", "restrict", "out of scope",
-        "not support", "cannot", "won't",
+        "do not",
+        "never",
+        "refuse",
+        "only",
+        "restrict",
+        "out of scope",
+        "not support",
+        "cannot",
+        "won't",
     ],
 }
 
 _SEVERITY_HIGH_WORDS: list[str] = [
-    "never", "immediately", "hard stop", "halt", "emergency", "critical",
-    "absolutely", "strictly", "must never",
+    "never",
+    "immediately",
+    "hard stop",
+    "halt",
+    "emergency",
+    "critical",
+    "absolutely",
+    "strictly",
+    "must never",
 ]
 _SEVERITY_MEDIUM_HIGH_WORDS: list[str] = [
-    "always", "must", "require", "do not", "prohibited",
+    "always",
+    "must",
+    "require",
+    "do not",
+    "prohibited",
 ]
 _SEVERITY_LOW_WORDS: list[str] = [
-    "should", "recommend", "prefer", "avoid when possible",
+    "should",
+    "recommend",
+    "prefer",
+    "avoid when possible",
 ]
 
 

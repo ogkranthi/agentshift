@@ -6,7 +6,6 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-
 # ---------------------------------------------------------------------------
 # Governance models (L1 / L2 / L3)
 # ---------------------------------------------------------------------------

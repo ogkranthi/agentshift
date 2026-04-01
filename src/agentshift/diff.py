@@ -293,7 +293,9 @@ def _count_mapped_sections(sections: dict[str, str], target: str) -> tuple[int, 
     mapped = 0
     for slug in sections:
         supported_platforms = SECTION_PLATFORM_SUPPORT.get(slug, set())
-        if target in supported_platforms or (slug not in SECTION_PLATFORM_SUPPORT and target == "claude-code"):
+        if target in supported_platforms or (
+            slug not in SECTION_PLATFORM_SUPPORT and target == "claude-code"
+        ):
             mapped += 1
     return mapped, total
 
@@ -447,7 +449,13 @@ def diff_agents(ir_a: AgentIR, ir_b: AgentIR) -> list[dict]:
                 rows.append({"section": key, "status": "changed", "summary": summary})
         elif in_b:
             char_count = len(secs_b[key])
-            rows.append({"section": key, "status": "added", "summary": f"New section ({char_count} chars)"})
+            rows.append(
+                {
+                    "section": key,
+                    "status": "added",
+                    "summary": f"New section ({char_count} chars)",
+                }
+            )
         else:
             rows.append({"section": key, "status": "removed", "summary": "Was present in v1"})
 

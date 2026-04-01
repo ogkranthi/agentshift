@@ -573,10 +573,25 @@ def _parse_soul_md(path: Path) -> list[Guardrail]:
             if any(
                 candidate.lower().startswith(w)
                 for w in [
-                    "do not", "never", "always", "refuse", "ensure", "include",
-                    "flag", "escalate", "maintain", "clarify", "halt", "log",
-                    "hard stop", "delegate", "aggregate", "enforce", "evaluate",
-                    "apply", "document",
+                    "do not",
+                    "never",
+                    "always",
+                    "refuse",
+                    "ensure",
+                    "include",
+                    "flag",
+                    "escalate",
+                    "maintain",
+                    "clarify",
+                    "halt",
+                    "log",
+                    "hard stop",
+                    "delegate",
+                    "aggregate",
+                    "enforce",
+                    "evaluate",
+                    "apply",
+                    "document",
                 ]
             ):
                 rule_text = candidate

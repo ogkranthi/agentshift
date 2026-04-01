@@ -14,7 +14,10 @@ AGENTSHIFT = [str(_VENV_BIN)] if _VENV_BIN.exists() else [PYTHON, "-m", "agentsh
 
 
 def run_convert(
-    source: Path, tmp_path: Path, from_platform: str = "openclaw", to_platform: str = "claude-code"
+    source: Path,
+    tmp_path: Path,
+    from_platform: str = "openclaw",
+    to_platform: str = "claude-code",
 ) -> subprocess.CompletedProcess[str]:
     cmd = [
         *AGENTSHIFT,

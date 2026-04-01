@@ -96,7 +96,9 @@ class TestCopilotEmitterTools:
         ir = make_simple_ir(
             knowledge=[
                 KnowledgeSource(
-                    name="guide", kind="file", path="~/.openclaw/skills/x/knowledge/guide.md"
+                    name="guide",
+                    kind="file",
+                    path="~/.openclaw/skills/x/knowledge/guide.md",
                 )
             ]
         )

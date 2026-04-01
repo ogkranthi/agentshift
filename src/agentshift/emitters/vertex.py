@@ -73,7 +73,16 @@ def _build_structured_instructions(ir: AgentIR) -> list[str]:
             parts.append(f"{heading}:\n{val}")
 
     # Custom sections (not overview, guardrails, examples, preamble)
-    skip = {"overview", "behavior", "persona", "tools", "knowledge", "guardrails", "examples", "preamble"}
+    skip = {
+        "overview",
+        "behavior",
+        "persona",
+        "tools",
+        "knowledge",
+        "guardrails",
+        "examples",
+        "preamble",
+    }
     for key, val in sections.items():
         if key not in skip and val:
             heading = key.replace("-", " ").title()

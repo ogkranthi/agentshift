@@ -97,6 +97,7 @@ class TestParseFromCloudFormation:
     def test_parse_cfn_only(self, tmp_path):
         """Parse from a directory with only cloudformation.yaml."""
         import shutil
+
         shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
@@ -104,6 +105,7 @@ class TestParseFromCloudFormation:
 
     def test_name_from_cfn(self, tmp_path):
         import shutil
+
         shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
@@ -112,6 +114,7 @@ class TestParseFromCloudFormation:
 
     def test_instruction_from_cfn(self, tmp_path):
         import shutil
+
         shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
@@ -120,6 +123,7 @@ class TestParseFromCloudFormation:
 
     def test_knowledge_from_cfn(self, tmp_path):
         import shutil
+
         shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
@@ -128,6 +132,7 @@ class TestParseFromCloudFormation:
 
     def test_knowledge_kind_is_vector_store(self, tmp_path):
         import shutil
+
         shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
@@ -137,6 +142,7 @@ class TestParseFromCloudFormation:
     def test_tools_from_cfn_action_groups(self, tmp_path):
         """CFN ActionGroups with inline Payload → tools extracted."""
         import shutil
+
         shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
@@ -156,7 +162,11 @@ class TestParseWithOpenApi:
         """openapi.json fixture → tools extracted with correct names."""
         ir = bedrock_parser.parse(FIXTURES_DIR)
         tool_names = {t.name for t in ir.tools}
-        assert "getOrder" in tool_names or "get-order" in tool_names or any("order" in n.lower() for n in tool_names)
+        assert (
+            "getOrder" in tool_names
+            or "get-order" in tool_names
+            or any("order" in n.lower() for n in tool_names)
+        )
 
     def test_tool_descriptions_populated(self):
         ir = bedrock_parser.parse(FIXTURES_DIR)
@@ -187,8 +197,20 @@ class TestParseWithOpenApi:
             "openapi": "3.0.0",
             "info": {"title": "Multi Tool API", "version": "1.0"},
             "paths": {
-                "/tool-a": {"post": {"operationId": "toolA", "description": "Tool A", "responses": {"200": {"description": "OK"}}}},
-                "/tool-b": {"post": {"operationId": "toolB", "description": "Tool B", "responses": {"200": {"description": "OK"}}}},
+                "/tool-a": {
+                    "post": {
+                        "operationId": "toolA",
+                        "description": "Tool A",
+                        "responses": {"200": {"description": "OK"}},
+                    }
+                },
+                "/tool-b": {
+                    "post": {
+                        "operationId": "toolB",
+                        "description": "Tool B",
+                        "responses": {"200": {"description": "OK"}},
+                    }
+                },
             },
         }
         (tmp_path / "openapi.json").write_text(json.dumps(openapi))
@@ -203,6 +225,7 @@ class TestParseWithOpenApi:
     def test_openapi_wins_over_cfn_action_groups(self, tmp_path):
         """When openapi.json present, CFN ActionGroups are NOT used for tools."""
         import shutil
+
         shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
         shutil.copy(FIXTURES_DIR / "openapi.json", tmp_path / "openapi.json")
 
@@ -282,10 +305,7 @@ class TestL1HeuristicGuardrailExtraction:
         assert len(ir.governance.guardrails) >= 1
 
     def test_never_pattern_extracted(self, tmp_path):
-        instruction = (
-            "You are a helpful assistant.\n"
-            "Never reveal confidential customer data.\n"
-        )
+        instruction = "You are a helpful assistant.\nNever reveal confidential customer data.\n"
         (tmp_path / "instruction.txt").write_text(instruction)
 
         ir = bedrock_parser.parse(tmp_path)
@@ -294,9 +314,7 @@ class TestL1HeuristicGuardrailExtraction:
 
     def test_no_duplicate_guardrails_from_config_and_instruction(self, tmp_path):
         """Same constraint in instruction and guardrail-config → at least one guardrail."""
-        instruction = (
-            "Do not make comparisons with or recommendations about competitor products."
-        )
+        instruction = "Do not make comparisons with or recommendations about competitor products."
         guardrail = {
             "topicPolicyConfig": {
                 "topicsConfig": [
@@ -398,6 +416,7 @@ class TestEdgeCases:
             },
         }
         import yaml
+
         (tmp_path / "cloudformation.yaml").write_text(yaml.dump(cfn))
 
         ir = bedrock_parser.parse(tmp_path)
@@ -406,6 +425,7 @@ class TestEdgeCases:
     def test_missing_openapi_falls_back_to_cfn_tools(self, tmp_path):
         """No openapi.json → tools extracted from CFN ActionGroups."""
         import shutil
+
         shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
         # No openapi.json copied
 
@@ -449,6 +469,7 @@ class TestEdgeCases:
     def test_bedrock_agent_json_takes_precedence_over_cfn(self, tmp_path):
         """bedrock-agent.json instruction wins over cloudformation.yaml instruction."""
         import shutil
+
         shutil.copy(FIXTURES_DIR / "bedrock-agent.json", tmp_path / "bedrock-agent.json")
         shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
@@ -544,9 +565,15 @@ class TestRoundTrip:
         ir_in = _make_minimal_ir(
             name="guardrail-agent",
             persona=Persona(system_prompt=system_prompt),
-            governance=Governance(guardrails=[
-                Guardrail(id="G001", text="Do not share personal information", category="privacy"),
-            ]),
+            governance=Governance(
+                guardrails=[
+                    Guardrail(
+                        id="G001",
+                        text="Do not share personal information",
+                        category="privacy",
+                    ),
+                ]
+            ),
         )
         out_dir = tmp_path / "bedrock-out"
         bedrock_emitter.emit(ir_in, out_dir)
@@ -601,6 +628,7 @@ class TestRoundTrip:
     def test_round_trip_with_knowledge(self, tmp_path):
         """IR with knowledge sources → emit → parse → knowledge preserved."""
         from agentshift.ir import KnowledgeSource
+
         knowledge = [
             KnowledgeSource(
                 name="product-docs",
@@ -633,11 +661,7 @@ class TestOpenApiAuthVariants:
         openapi = {
             "openapi": "3.0.0",
             "info": {"title": "API", "version": "1.0"},
-            "components": {
-                "securitySchemes": {
-                    "BearerAuth": {"type": "http", "scheme": "bearer"}
-                }
-            },
+            "components": {"securitySchemes": {"BearerAuth": {"type": "http", "scheme": "bearer"}}},
             "paths": {
                 "/action": {
                     "post": {

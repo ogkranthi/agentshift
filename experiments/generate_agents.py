@@ -7,8 +7,14 @@ from pathlib import Path
 AGENTS_DIR = Path(__file__).parent / "agents"
 
 
-def write_agent(agent_id: str, meta: dict, skill_md: str, soul_md: str,
-                tools: dict[str, dict], annotations: list[dict] | None = None):
+def write_agent(
+    agent_id: str,
+    meta: dict,
+    skill_md: str,
+    soul_md: str,
+    tools: dict[str, dict],
+    annotations: list[dict] | None = None,
+):
     """Write a complete agent directory."""
     agent_dir = AGENTS_DIR / agent_id
     agent_dir.mkdir(parents=True, exist_ok=True)
@@ -361,7 +367,10 @@ Use `calculation-engine` for financial calculations.
             "kind": "pii_detection",
             "description": "Mask SSN/account numbers in responses (Bedrock sensitiveInfoPolicy)",
             "platform_target": "bedrock",
-            "config": {"policy": "sensitiveInfoPolicy", "types": ["SSN", "ACCOUNT_NUMBER"]},
+            "config": {
+                "policy": "sensitiveInfoPolicy",
+                "types": ["SSN", "ACCOUNT_NUMBER"],
+            },
         },
         {
             "id": "L3-A5-003",
@@ -447,7 +456,10 @@ Use `emergency-services` for emergency situations.
             "kind": "content_filter",
             "description": "Block dangerous medical misinformation (Vertex DANGEROUS_CONTENT)",
             "platform_target": "vertex-ai",
-            "config": {"category": "DANGEROUS_CONTENT", "threshold": "BLOCK_LOW_AND_ABOVE"},
+            "config": {
+                "category": "DANGEROUS_CONTENT",
+                "threshold": "BLOCK_LOW_AND_ABOVE",
+            },
         },
         {
             "id": "L3-A6-002",

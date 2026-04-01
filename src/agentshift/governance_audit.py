@@ -121,7 +121,12 @@ def audit_conversion(
     audit.cfs_memory_handled = True  # Memory is explicitly not converted (documented)
     audit.cfs_schema_valid = True  # Assume valid (validate command checks this)
 
-    cfs_checks = [audit.cfs_identity, audit.cfs_tools_listed, audit.cfs_memory_handled, audit.cfs_schema_valid]
+    cfs_checks = [
+        audit.cfs_identity,
+        audit.cfs_tools_listed,
+        audit.cfs_memory_handled,
+        audit.cfs_schema_valid,
+    ]
     audit.cfs = sum(cfs_checks) / len(cfs_checks)
 
     # Elevation details for paper
@@ -180,7 +185,9 @@ def render_audit_table(audits: list[GovernanceAudit]) -> None:
         gpr_l1_color = "green" if a.gpr_l1 >= 0.9 else "yellow" if a.gpr_l1 >= 0.5 else "red"
         gpr_l2_color = "green" if a.gpr_l2 >= 0.9 else "yellow" if a.gpr_l2 >= 0.5 else "red"
         gpr_l3_color = "green" if a.gpr_l3 >= 0.9 else "yellow" if a.gpr_l3 >= 0.5 else "red"
-        gpr_all_color = "green" if a.gpr_overall >= 0.9 else "yellow" if a.gpr_overall >= 0.5 else "red"
+        gpr_all_color = (
+            "green" if a.gpr_overall >= 0.9 else "yellow" if a.gpr_overall >= 0.5 else "red"
+        )
 
         table.add_row(
             a.agent_id,
@@ -318,35 +325,48 @@ def export_csv(audits: list[GovernanceAudit], output_path: Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     fieldnames = [
-        "Agent", "Target", "Domain", "Complexity",
-        "L1 Total", "L1 Preserved", "GPR-L1",
-        "L2 Total", "L2 Preserved", "L2 Elevated", "GPR-L2",
-        "L3 Total", "L3 Preserved", "GPR-L3",
-        "GPR-Overall", "CFS",
+        "Agent",
+        "Target",
+        "Domain",
+        "Complexity",
+        "L1 Total",
+        "L1 Preserved",
+        "GPR-L1",
+        "L2 Total",
+        "L2 Preserved",
+        "L2 Elevated",
+        "GPR-L2",
+        "L3 Total",
+        "L3 Preserved",
+        "GPR-L3",
+        "GPR-Overall",
+        "CFS",
     ]
 
     with output_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for a in audits:
-            writer.writerow({
-                "Agent": a.agent_id,
-                "Target": a.target,
-                "Domain": a.domain,
-                "Complexity": a.complexity,
-                "L1 Total": a.l1_total,
-                "L1 Preserved": a.l1_preserved,
-                "GPR-L1": f"{a.gpr_l1:.4f}",
-                "L2 Total": a.l2_total,
-                "L2 Preserved": a.l2_preserved,
-                "L2 Elevated": a.l2_elevated,
-                "GPR-L2": f"{a.gpr_l2:.4f}",
-                "L3 Total": a.l3_total,
-                "L3 Preserved": a.l3_preserved,
-                "GPR-L3": f"{a.gpr_l3:.4f}",
-                "GPR-Overall": f"{a.gpr_overall:.4f}",
-                "CFS": f"{a.cfs:.4f}",
-            })
+            writer.writerow(
+                {
+                    "Agent": a.agent_id,
+                    "Target": a.target,
+                    "Domain": a.domain,
+                    "Complexity": a.complexity,
+                    "L1 Total": a.l1_total,
+                    "L1 Preserved": a.l1_preserved,
+                    "GPR-L1": f"{a.gpr_l1:.4f}",
+                    "L2 Total": a.l2_total,
+                    "L2 Preserved": a.l2_preserved,
+                    "L2 Elevated": a.l2_elevated,
+                    "GPR-L2": f"{a.gpr_l2:.4f}",
+                    "L3 Total": a.l3_total,
+                    "L3 Preserved": a.l3_preserved,
+                    "GPR-L3": f"{a.gpr_l3:.4f}",
+                    "GPR-Overall": f"{a.gpr_overall:.4f}",
+                    "CFS": f"{a.cfs:.4f}",
+                }
+            )
 
 
 def export_json(audits: list[GovernanceAudit], output_path: Path) -> None:

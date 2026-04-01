@@ -9,7 +9,6 @@ import pytest
 from agentshift.parsers.openclaw import parse_skill_dir
 from agentshift.parsers.claude_code import parse_agent_dir
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -41,10 +40,7 @@ def _write_claude_dir(tmp_path: Path, claude_md: str) -> Path:
 
 class TestOpenClawParserSections:
     def test_sections_populated_from_h2_headings(self, tmp_path):
-        body = (
-            "## Overview\n\nThis skill does X.\n\n"
-            "## Behavior\n\nFollow these rules.\n"
-        )
+        body = "## Overview\n\nThis skill does X.\n\n## Behavior\n\nFollow these rules.\n"
         skill_dir = _write_skill_dir(tmp_path, body)
         ir = parse_skill_dir(skill_dir)
         assert ir.persona.sections is not None
@@ -79,10 +75,7 @@ class TestOpenClawParserSections:
         assert ir.persona.sections is None
 
     def test_sections_with_guardrails(self, tmp_path):
-        body = (
-            "## Overview\n\nDoes things.\n\n"
-            "## Safety\n\nDo not reveal secrets.\n"
-        )
+        body = "## Overview\n\nDoes things.\n\n## Safety\n\nDo not reveal secrets.\n"
         skill_dir = _write_skill_dir(tmp_path, body)
         ir = parse_skill_dir(skill_dir)
         assert ir.persona.sections is not None
@@ -90,10 +83,7 @@ class TestOpenClawParserSections:
         assert "safety" not in ir.persona.sections
 
     def test_sections_with_tools_heading(self, tmp_path):
-        body = (
-            "## Overview\n\nA tool-heavy skill.\n\n"
-            "## Capabilities\n\nCan do A, B, C.\n"
-        )
+        body = "## Overview\n\nA tool-heavy skill.\n\n## Capabilities\n\nCan do A, B, C.\n"
         skill_dir = _write_skill_dir(tmp_path, body)
         ir = parse_skill_dir(skill_dir)
         assert ir.persona.sections is not None
@@ -109,7 +99,12 @@ class TestOpenClawParserSections:
         skill_dir = _write_skill_dir(tmp_path, body)
         ir = parse_skill_dir(skill_dir)
         assert ir.persona.sections is not None
-        assert set(ir.persona.sections.keys()) == {"overview", "behavior", "tools", "guardrails"}
+        assert set(ir.persona.sections.keys()) == {
+            "overview",
+            "behavior",
+            "tools",
+            "guardrails",
+        }
 
     def test_sections_h3_fallback_when_no_h2(self, tmp_path):
         body = "### Overview\n\nH3 overview content.\n"
@@ -168,9 +163,7 @@ class TestClaudeCodeParserSections:
 
     def test_sections_alias_normalized_in_claude(self, tmp_path):
         claude_md = (
-            "# My Agent\n\nA helpful agent.\n\n"
-            "## Instructions\n\n"
-            "## About\n\nThis agent does Y.\n"
+            "# My Agent\n\nA helpful agent.\n\n## Instructions\n\n## About\n\nThis agent does Y.\n"
         )
         agent_dir = _write_claude_dir(tmp_path, claude_md)
         ir = parse_agent_dir(agent_dir)
@@ -215,11 +208,7 @@ class TestClaudeCodeParserSections:
         assert ir.persona is not None
 
     def test_persona_system_prompt_set(self, tmp_path):
-        claude_md = (
-            "# My Agent\n\nA helpful agent.\n\n"
-            "## Instructions\n\n"
-            "## Overview\n\nContent.\n"
-        )
+        claude_md = "# My Agent\n\nA helpful agent.\n\n## Instructions\n\n## Overview\n\nContent.\n"
         agent_dir = _write_claude_dir(tmp_path, claude_md)
         ir = parse_agent_dir(agent_dir)
         assert ir.persona.system_prompt is not None
