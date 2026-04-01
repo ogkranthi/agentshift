@@ -9,9 +9,7 @@ from pathlib import Path
 from agentshift.parsers.openclaw import parse_skill_dir
 
 SKILL_DIRS = [
-    Path(
-        "/Users/kranthikumar/.nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills"
-    ),
+    Path("/Users/kranthikumar/.nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills"),
     Path("/Users/kranthikumar/.openclaw/skills"),
 ]
 
@@ -35,9 +33,7 @@ def check_skill(skill_path: Path) -> tuple[str, list[str]]:
     if not ir.description or not ir.description.strip():
         issues.append("description is empty")
     if ir.metadata.source_platform != "openclaw":
-        issues.append(
-            f"source_platform={ir.metadata.source_platform!r}, expected 'openclaw'"
-        )
+        issues.append(f"source_platform={ir.metadata.source_platform!r}, expected 'openclaw'")
 
     # No raw Python object reprs in emitted output
     import tempfile
@@ -75,9 +71,7 @@ def check_skill(skill_path: Path) -> tuple[str, list[str]]:
 
 
 def main() -> int:
-    rows: list[tuple[str, str, list[str], str]] = (
-        []
-    )  # (dir_label, skill_name, issues, status)
+    rows: list[tuple[str, str, list[str], str]] = []  # (dir_label, skill_name, issues, status)
 
     for skills_dir in SKILL_DIRS:
         if not skills_dir.exists():
@@ -116,9 +110,7 @@ def main() -> int:
                 issue_str = issue_str[: COL_ISSUES - 3] + "..."
 
         status_icon = "✓" if status == "PASS" else "✗"
-        print(
-            f"{display_name:<{COL_SKILL}} {status_icon} {status:<{COL_STATUS - 2}} {issue_str}"
-        )
+        print(f"{display_name:<{COL_SKILL}} {status_icon} {status:<{COL_STATUS - 2}} {issue_str}")
 
     print("-" * 90)
     print(f"Total: {total}  Passed: {passed}  Failed: {failed}")

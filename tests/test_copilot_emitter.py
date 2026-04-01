@@ -80,17 +80,13 @@ class TestCopilotEmitterBasic:
 
 class TestCopilotEmitterTools:
     def test_shell_tool_maps_to_run_in_terminal(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         content = (tmp_path / "test-skill.agent.md").read_text()
         assert "execute/runInTerminal" in content
 
     def test_mcp_tool_adds_comment(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="slack", description="Slack MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
         emit(ir, tmp_path)
         content = (tmp_path / "test-skill.agent.md").read_text()
         assert "MCP" in content
@@ -231,9 +227,7 @@ class TestCopilotAgentMdSchema:
         assert isinstance(fm.get("tools"), list)
 
     def test_frontmatter_no_python_reprs(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         content = self._get_agent_md(tmp_path, ir)
         fm_text = content[3 : content.find("---", 3)]
         assert "<agentshift." not in fm_text
@@ -242,9 +236,7 @@ class TestCopilotAgentMdSchema:
     def test_frontmatter_yaml_parses_cleanly(self, tmp_path):
         import yaml
 
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         content = self._get_agent_md(tmp_path, ir)
         assert content.startswith("---")
         end = content.find("---", 3)
@@ -254,9 +246,7 @@ class TestCopilotAgentMdSchema:
         assert parsed is not None
 
     def test_body_contains_system_prompt(self, tmp_path):
-        ir = make_simple_ir(
-            persona=Persona(system_prompt="You are an expert assistant.")
-        )
+        ir = make_simple_ir(persona=Persona(system_prompt="You are an expert assistant."))
         content = self._get_agent_md(tmp_path, ir)
         # Body is after the second ---
         end = content.find("---", 3)
@@ -378,10 +368,7 @@ class TestCopilotEmitterRealSkills:
     def test_github_skill_converts(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
 
-        skill = (
-            Path.home()
-            / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
-        )
+        skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
         if not skill.exists():
             pytest.skip("github skill not installed")
         ir = parse_skill_dir(skill)
@@ -393,10 +380,7 @@ class TestCopilotEmitterRealSkills:
     def test_slack_skill_converts(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
 
-        skill = (
-            Path.home()
-            / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/slack"
-        )
+        skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/slack"
         if not skill.exists():
             pytest.skip("slack skill not installed")
         ir = parse_skill_dir(skill)
@@ -407,10 +391,7 @@ class TestCopilotEmitterRealSkills:
     def test_weather_skill_converts(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
 
-        skill = (
-            Path.home()
-            / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/weather"
-        )
+        skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/weather"
         if not skill.exists():
             pytest.skip("weather skill not installed")
         ir = parse_skill_dir(skill)
@@ -426,9 +407,7 @@ class TestCopilotEmitterRealSkills:
         content.decode("utf-8")  # should not raise
 
     def test_no_raw_python_reprs(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         content = (tmp_path / "test-skill.agent.md").read_text()
         assert "<agentshift." not in content

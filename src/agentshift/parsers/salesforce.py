@@ -140,9 +140,7 @@ def _parse_agent_create_response(data: dict, source_file: str = "") -> AgentIR:
     sample_utterances = agent_def.get("sampleUtterances", [])
     personality_notes = None
     if sample_utterances:
-        personality_notes = "Sample utterances:\n" + "\n".join(
-            f"- {u}" for u in sample_utterances
-        )
+        personality_notes = "Sample utterances:\n" + "\n".join(f"- {u}" for u in sample_utterances)
 
     # Guardrails from topic instructions
     guardrails = extract_guardrails_from_text(system_prompt) if system_prompt else []
@@ -269,9 +267,7 @@ def _parse_xml_directory(
 
     # Identity
     name = slugify(
-        bot_data.get("label", "")
-        or planner_data.get("masterLabel", "")
-        or input_dir.name
+        bot_data.get("label", "") or planner_data.get("masterLabel", "") or input_dir.name
     )
     description = bot_data.get("description", "") or planner_data.get("description", "")
 
@@ -335,9 +331,7 @@ def _parse_xml_directory(
     metadata = Metadata(
         source_platform="salesforce",
         source_file=(
-            str(bot_files[0])
-            if bot_files
-            else str(planner_files[0]) if planner_files else None
+            str(bot_files[0]) if bot_files else str(planner_files[0]) if planner_files else None
         ),
         platform_extensions={"salesforce": extensions} if extensions else {},
     )
@@ -427,9 +421,7 @@ def _extract_context_variables(root: ET.Element) -> list[dict[str, str]]:
                 {
                     "name": name_el.text.strip(),
                     "dataType": (
-                        type_el.text.strip()
-                        if type_el is not None and type_el.text
-                        else "Text"
+                        type_el.text.strip() if type_el is not None and type_el.text else "Text"
                     ),
                 }
             )
@@ -494,9 +486,7 @@ def _parse_planner_topic(topic_el: ET.Element) -> dict[str, Any]:
 
     # Actions
     actions: list[dict[str, str]] = []
-    for action_el in topic_el.findall(
-        f"{{{_SF_NS}}}plannerActions/{{{_SF_NS}}}plannerAction"
-    ):
+    for action_el in topic_el.findall(f"{{{_SF_NS}}}plannerActions/{{{_SF_NS}}}plannerAction"):
         action_name_el = action_el.find(f"{{{_SF_NS}}}action")
         action_type_el = action_el.find(f"{{{_SF_NS}}}actionType")
         if action_name_el is not None and action_name_el.text:

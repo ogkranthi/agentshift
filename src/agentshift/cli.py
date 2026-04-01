@@ -102,12 +102,8 @@ def _parse_with_errors(parse_fn, source: Path):
     """Run a parser and surface friendly errors for common failure modes."""
     # Check source directory exists first
     if not source.exists():
-        err_console.print(
-            f"[red]Error:[/red] Source directory not found: [cyan]{source}[/cyan]"
-        )
-        err_console.print(
-            "  Tip: provide the path to a directory containing a SKILL.md file."
-        )
+        err_console.print(f"[red]Error:[/red] Source directory not found: [cyan]{source}[/cyan]")
+        err_console.print("  Tip: provide the path to a directory containing a SKILL.md file.")
         raise typer.Exit(1)
 
     try:
@@ -119,9 +115,7 @@ def _parse_with_errors(parse_fn, source: Path):
             err_console.print(
                 f"  Tip: [cyan]{source}[/cyan] must contain a SKILL.md file with valid YAML frontmatter."
             )
-            err_console.print(
-                "  See: https://github.com/ogkranthi/agentshift#skill-format"
-            )
+            err_console.print("  See: https://github.com/ogkranthi/agentshift#skill-format")
         elif "agent.json" in msg:
             err_console.print(
                 f"  Tip: [cyan]{source}[/cyan] must contain an agent.json file (Vertex AI agent definition)."
@@ -144,9 +138,7 @@ def _parse_with_errors(parse_fn, source: Path):
         if state.verbose:
             err_console.print(traceback.format_exc())
         else:
-            err_console.print(
-                "  Re-run with [bold]--verbose[/bold] for full traceback."
-            )
+            err_console.print("  Re-run with [bold]--verbose[/bold] for full traceback.")
         raise typer.Exit(1) from e
 
     if state.verbose:
@@ -206,9 +198,7 @@ def convert(
             if state.verbose:
                 err_console.print(traceback.format_exc())
             continue
-        console.print(
-            f"  [green]✓[/green] [bold]{target}[/bold] → [cyan]{target_dir}[/cyan]"
-        )
+        console.print(f"  [green]✓[/green] [bold]{target}[/bold] → [cyan]{target_dir}[/cyan]")
 
     if to_platform == "all":
         console.print(
@@ -220,9 +210,7 @@ def convert(
 def diff(
     source: Path = typer.Argument(help="Path to source agent directory"),
     from_platform: str = typer.Option("openclaw", "--from", help="Source platform"),
-    targets: str = typer.Option(
-        "all", "--targets", help="Comma-separated targets or 'all'"
-    ),
+    targets: str = typer.Option("all", "--targets", help="Comma-separated targets or 'all'"),
 ) -> None:
     """Show portability matrix — what converts cleanly vs. what needs manual work."""
     from agentshift.diff import PLATFORM_SUPPORT, render_diff_table
@@ -277,9 +265,7 @@ def mcp_to_openapi(
     ]
 
     if state.verbose:
-        console.print(
-            f"[dim]Converting {len(mcp_tools)} MCP/shell tools to OpenAPI schema[/dim]"
-        )
+        console.print(f"[dim]Converting {len(mcp_tools)} MCP/shell tools to OpenAPI schema[/dim]")
 
     schema = _mcp_to_openapi(mcp_tools, server_name=ir.name, title=f"{ir.name} Tools")
     output_json = json.dumps(schema, indent=2)
@@ -299,9 +285,7 @@ def validate(
         ...,
         help=f"Target platform: {', '.join(['claude-code', 'copilot', 'bedrock', 'm365', 'vertex'])}",
     ),
-    as_json: bool = typer.Option(
-        False, "--json", help="Emit machine-readable JSON report"
-    ),
+    as_json: bool = typer.Option(False, "--json", help="Emit machine-readable JSON report"),
 ) -> None:
     """Validate a generated config against the target platform's schema."""
     from agentshift.validators import validate_output
@@ -317,9 +301,7 @@ def validate(
 
     source_path = Path(source)
     if not source_path.exists():
-        err_console.print(
-            f"[red]Error:[/red] Directory not found: [cyan]{source}[/cyan]"
-        )
+        err_console.print(f"[red]Error:[/red] Directory not found: [cyan]{source}[/cyan]")
         err_console.print(
             "  Run [bold]agentshift convert[/bold] first to generate output before validating."
         )
@@ -337,19 +319,11 @@ def audit(
     targets: str = typer.Option(
         "claude-code,copilot", "--targets", help="Comma-separated target platforms"
     ),
-    agent_id: str = typer.Option(
-        "", "--agent-id", help="Agent ID for the audit report"
-    ),
-    domain: str = typer.Option(
-        "", "--domain", help="Agent domain (e.g., General, Finance)"
-    ),
-    complexity: str = typer.Option(
-        "", "--complexity", help="Agent complexity (Low/Medium/High)"
-    ),
+    agent_id: str = typer.Option("", "--agent-id", help="Agent ID for the audit report"),
+    domain: str = typer.Option("", "--domain", help="Agent domain (e.g., General, Finance)"),
+    complexity: str = typer.Option("", "--complexity", help="Agent complexity (Low/Medium/High)"),
     output_csv: Path | None = typer.Option(None, "--csv", help="Export results to CSV"),
-    output_json: Path | None = typer.Option(
-        None, "--json", help="Export results to JSON"
-    ),
+    output_json: Path | None = typer.Option(None, "--json", help="Export results to JSON"),
 ) -> None:
     """Run governance preservation audit on an agent conversion."""
     from agentshift.governance_audit import (
@@ -392,9 +366,7 @@ def audit_batch_cmd(
         "claude-code,copilot", "--targets", help="Comma-separated target platforms"
     ),
     output_csv: Path | None = typer.Option(None, "--csv", help="Export results to CSV"),
-    output_json: Path | None = typer.Option(
-        None, "--json", help="Export results to JSON"
-    ),
+    output_json: Path | None = typer.Option(None, "--json", help="Export results to JSON"),
 ) -> None:
     """Run governance audit across all agents in a directory (batch mode for paper)."""
     from agentshift.governance_audit import (

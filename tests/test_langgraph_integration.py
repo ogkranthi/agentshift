@@ -11,9 +11,7 @@ from agentshift.emitters.langgraph import emit
 from agentshift.parsers.openclaw import parse_skill_dir
 
 _VENV_BIN = Path(__file__).parent.parent / ".venv" / "bin" / "agentshift"
-_AGENTSHIFT = (
-    [str(_VENV_BIN)] if _VENV_BIN.exists() else [sys.executable, "-m", "agentshift"]
-)
+_AGENTSHIFT = [str(_VENV_BIN)] if _VENV_BIN.exists() else [sys.executable, "-m", "agentshift"]
 
 FIXTURES = Path(__file__).parent / "fixtures"
 PREGNANCY = FIXTURES / "pregnancy-companion"
@@ -136,8 +134,6 @@ def test_pregnancy_companion_cli_convert_to_langgraph(tmp_path):
         capture_output=True,
         text=True,
     )
-    assert (
-        result.returncode == 0
-    ), f"CLI failed:\nstdout: {result.stdout}\nstderr: {result.stderr}"
+    assert result.returncode == 0, f"CLI failed:\nstdout: {result.stdout}\nstderr: {result.stderr}"
     for fname in OUTPUT_FILES:
         assert (tmp_path / fname).exists(), f"CLI did not create: {fname}"

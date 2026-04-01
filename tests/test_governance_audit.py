@@ -65,10 +65,7 @@ def _make_ir(
 
 
 def _safety_guardrail(n: int = 1) -> list[Guardrail]:
-    return [
-        Guardrail(id=f"g{i}", text=f"Safety rule {i}", category="safety")
-        for i in range(n)
-    ]
+    return [Guardrail(id=f"g{i}", text=f"Safety rule {i}", category="safety") for i in range(n)]
 
 
 def _bedrock_annotation(n: int = 1) -> list[PlatformAnnotation]:
@@ -199,12 +196,8 @@ class TestGPRL2:
         """gpr_l2 = l2_preserved / l2_total when l2_total > 0."""
         ir = _make_ir(
             tool_permissions=[
-                ToolPermission(
-                    tool_name="exec", enabled=False
-                ),  # bedrock preserves this
-                ToolPermission(
-                    tool_name="shell", rate_limit="5/min"
-                ),  # always elevated
+                ToolPermission(tool_name="exec", enabled=False),  # bedrock preserves this
+                ToolPermission(tool_name="shell", rate_limit="5/min"),  # always elevated
             ]
         )
         audit = audit_conversion(ir, "bedrock")
@@ -348,9 +341,7 @@ class TestGPROverall:
         ir = _make_ir(
             guardrails=_safety_guardrail(2),  # L1: 2 total, 2 preserved
             tool_permissions=[
-                ToolPermission(
-                    tool_name="t1", enabled=False
-                ),  # L2: depends on platform
+                ToolPermission(tool_name="t1", enabled=False),  # L2: depends on platform
             ],
             platform_annotations=[
                 PlatformAnnotation(id="a1", kind="content_filter", description="cf"),
@@ -450,9 +441,7 @@ class TestElevationTracking:
 
     def test_disabled_tool_elevated_on_copilot(self):
         """Copilot has no disable mechanism — disabled tool should be elevated."""
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="shell", enabled=False)]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="shell", enabled=False)])
         audit = audit_conversion(ir, "copilot")
         assert audit.l2_elevated == 1
         assert len(audit.elevated_artifacts) >= 1
@@ -462,9 +451,7 @@ class TestElevationTracking:
 
     def test_deny_patterns_elevated_on_copilot(self):
         ir = _make_ir(
-            tool_permissions=[
-                ToolPermission(tool_name="exec", deny_patterns=["rm -rf", "sudo"])
-            ]
+            tool_permissions=[ToolPermission(tool_name="exec", deny_patterns=["rm -rf", "sudo"])]
         )
         audit = audit_conversion(ir, "copilot")
         assert len(audit.elevated_artifacts) >= 2
@@ -474,9 +461,7 @@ class TestElevationTracking:
     def test_rate_limit_elevated_everywhere(self):
         """Rate limits should always be elevated."""
         ir = _make_ir(
-            tool_permissions=[
-                ToolPermission(tool_name="web_search", rate_limit="5/minute")
-            ]
+            tool_permissions=[ToolPermission(tool_name="web_search", rate_limit="5/minute")]
         )
         for target in ["claude-code", "copilot", "bedrock", "vertex"]:
             audit = audit_conversion(ir, target)
@@ -486,9 +471,7 @@ class TestElevationTracking:
     def test_l3_annotation_elevated_on_claude_code(self):
         ir = _make_ir(
             platform_annotations=[
-                PlatformAnnotation(
-                    id="cf1", kind="content_filter", description="Block harmful"
-                )
+                PlatformAnnotation(id="cf1", kind="content_filter", description="Block harmful")
             ]
         )
         audit = audit_conversion(ir, "claude-code")
@@ -500,9 +483,7 @@ class TestElevationTracking:
     def test_l3_annotation_preserved_on_bedrock(self):
         ir = _make_ir(
             platform_annotations=[
-                PlatformAnnotation(
-                    id="cf1", kind="content_filter", description="Block harmful"
-                )
+                PlatformAnnotation(id="cf1", kind="content_filter", description="Block harmful")
             ]
         )
         audit = audit_conversion(ir, "bedrock")
@@ -511,9 +492,7 @@ class TestElevationTracking:
         assert len(audit.elevated_artifacts) == 0
 
     def test_elevated_artifact_has_required_keys(self):
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="shell", enabled=False)]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="shell", enabled=False)])
         audit = audit_conversion(ir, "copilot")
         assert len(audit.elevated_artifacts) > 0
         ea = audit.elevated_artifacts[0]
@@ -528,14 +507,10 @@ class TestElevationTracking:
         assert required_keys.issubset(ea.keys())
 
     def test_elevated_instruction_is_nonempty(self):
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="exec", rate_limit="1/hour")]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="exec", rate_limit="1/hour")])
         audit = audit_conversion(ir, "copilot")
         for ea in audit.elevated_artifacts:
-            assert ea[
-                "elevated_instruction"
-            ], "elevated_instruction should not be empty"
+            assert ea["elevated_instruction"], "elevated_instruction should not be empty"
 
     def test_allow_pattern_elevated_on_unsupported_platform(self):
         """Allow patterns are elevated on platforms without allow_list support (e.g., bedrock)."""
@@ -550,11 +525,7 @@ class TestElevationTracking:
 
     def test_no_elevation_on_claude_code_with_deny_patterns(self):
         """Claude-code supports deny_patterns → no elevation needed."""
-        ir = _make_ir(
-            tool_permissions=[
-                ToolPermission(tool_name="exec", deny_patterns=["rm -rf"])
-            ]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="exec", deny_patterns=["rm -rf"])])
         audit = audit_conversion(ir, "claude-code")
         types = [a["artifact_type"] for a in audit.elevated_artifacts]
         assert "deny_pattern" not in types
@@ -750,9 +721,7 @@ class TestJSONExport:
         assert l1["gpr"] == pytest.approx(1.0)
 
     def test_json_l2_subkeys(self):
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="exec", enabled=False)]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="exec", enabled=False)])
         audit = audit_conversion(ir, "copilot")
         with tempfile.TemporaryDirectory() as tmpdir:
             json_path = Path(tmpdir) / "r.json"
@@ -776,9 +745,7 @@ class TestJSONExport:
         assert set(l3.keys()) >= {"total", "preserved", "elevated", "dropped", "gpr"}
 
     def test_json_elevated_artifacts_is_list(self):
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="shell", enabled=False)]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="shell", enabled=False)])
         audit = audit_conversion(ir, "copilot")
         with tempfile.TemporaryDirectory() as tmpdir:
             json_path = Path(tmpdir) / "r.json"
@@ -789,9 +756,7 @@ class TestJSONExport:
         assert len(artifacts) >= 1
 
     def test_json_elevated_artifact_keys(self):
-        ir = _make_ir(
-            tool_permissions=[ToolPermission(tool_name="shell", enabled=False)]
-        )
+        ir = _make_ir(tool_permissions=[ToolPermission(tool_name="shell", enabled=False)])
         audit = audit_conversion(ir, "copilot")
         with tempfile.TemporaryDirectory() as tmpdir:
             json_path = Path(tmpdir) / "r.json"
@@ -835,10 +800,7 @@ class TestAuditBatch:
     """Tests for audit_batch (multi-agent × multi-target)."""
 
     def test_batch_produces_agents_times_targets(self):
-        agents = [
-            (_make_ir(name=f"agent-{i}"), f"agent-{i}", "domain", "low")
-            for i in range(3)
-        ]
+        agents = [(_make_ir(name=f"agent-{i}"), f"agent-{i}", "domain", "low") for i in range(3)]
         targets = ["copilot", "bedrock"]
         audits = audit_batch(agents, targets)
         assert len(audits) == 6  # 3 × 2
@@ -900,9 +862,7 @@ class TestEdgeCases:
         ir = _make_ir(
             guardrails=_safety_guardrail(3),
             platform_annotations=[
-                PlatformAnnotation(
-                    id="cf1", kind="content_filter", description="safety"
-                ),
+                PlatformAnnotation(id="cf1", kind="content_filter", description="safety"),
                 PlatformAnnotation(id="pii1", kind="pii_detection", description="pii"),
             ],
         )

@@ -170,41 +170,31 @@ class TestBedrockOpenApiJson:
         assert "paths" in schema
 
     def test_shell_tool_appears_as_run_path(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         schema = json.loads((tmp_path / "openapi.json").read_text())
         assert "/gh/run" in schema["paths"]
 
     def test_mcp_tool_appears_as_action_path(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="slack", description="Slack MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
         emit(ir, tmp_path)
         schema = json.loads((tmp_path / "openapi.json").read_text())
         assert "/slack/action" in schema["paths"]
 
     def test_shell_tool_path_uses_post(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         schema = json.loads((tmp_path / "openapi.json").read_text())
         assert "post" in schema["paths"]["/gh/run"]
 
     def test_shell_tool_has_stub_marker(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         schema = json.loads((tmp_path / "openapi.json").read_text())
         assert schema["paths"]["/gh/run"]["post"].get("x-agentshift-stub") is True
 
     def test_mcp_tool_has_stub_marker(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="slack", description="Slack MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
         emit(ir, tmp_path)
         schema = json.loads((tmp_path / "openapi.json").read_text())
         assert schema["paths"]["/slack/action"]["post"].get("x-agentshift-stub") is True
@@ -273,9 +263,7 @@ class TestBedrockCloudFormation:
         assert "anthropic.claude-3-5-sonnet-20241022-v2:0" in cf
 
     def test_cf_has_instruction(self, tmp_path):
-        ir = make_simple_ir(
-            persona=Persona(system_prompt="You are a helpful assistant.")
-        )
+        ir = make_simple_ir(persona=Persona(system_prompt="You are a helpful assistant."))
         emit(ir, tmp_path)
         cf = (tmp_path / "cloudformation.yaml").read_text()
         assert "Instruction:" in cf
@@ -287,9 +275,7 @@ class TestBedrockCloudFormation:
         assert "AutoPrepare: true" in cf
 
     def test_cf_shell_tool_creates_action_group(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         cf = (tmp_path / "cloudformation.yaml").read_text()
         assert "ActionGroups" in cf
@@ -297,11 +283,7 @@ class TestBedrockCloudFormation:
 
     def test_cf_knowledge_source_creates_kb_entry(self, tmp_path):
         ir = make_simple_ir(
-            knowledge=[
-                KnowledgeSource(
-                    name="pregnancy-guide", kind="file", path="/tmp/guide.md"
-                )
-            ]
+            knowledge=[KnowledgeSource(name="pregnancy-guide", kind="file", path="/tmp/guide.md")]
         )
         emit(ir, tmp_path)
         cf = (tmp_path / "cloudformation.yaml").read_text()
@@ -309,11 +291,7 @@ class TestBedrockCloudFormation:
 
     def test_cf_knowledge_source_has_todo_comment(self, tmp_path):
         ir = make_simple_ir(
-            knowledge=[
-                KnowledgeSource(
-                    name="pregnancy-guide", kind="file", path="/tmp/guide.md"
-                )
-            ]
+            knowledge=[KnowledgeSource(name="pregnancy-guide", kind="file", path="/tmp/guide.md")]
         )
         emit(ir, tmp_path)
         cf = (tmp_path / "cloudformation.yaml").read_text()
@@ -329,9 +307,7 @@ class TestBedrockCloudFormation:
         assert "AliasId" in cf
 
     def test_cf_mcp_tool_has_todo_comment(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="slack", description="Slack MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
         emit(ir, tmp_path)
         cf = (tmp_path / "cloudformation.yaml").read_text()
         assert "TODO [agentshift]" in cf
@@ -394,9 +370,7 @@ class TestBedrockReadme:
         assert "Prerequisites" in readme or "IAM" in readme
 
     def test_readme_mentions_lambda_when_tools(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         readme = (tmp_path / "README.md").read_text()
         assert "Lambda" in readme
@@ -423,36 +397,28 @@ class TestBedrockReadme:
 
 class TestNoRawPythonReprs:
     def test_no_python_repr_in_instruction(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         content = (tmp_path / "instruction.txt").read_text()
         assert "<agentshift." not in content
         assert "object at 0x" not in content
 
     def test_no_python_repr_in_cloudformation(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         cf = (tmp_path / "cloudformation.yaml").read_text()
         assert "<agentshift." not in cf
         assert "object at 0x" not in cf
 
     def test_no_python_repr_in_openapi(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         openapi = (tmp_path / "openapi.json").read_text()
         assert "<agentshift." not in openapi
         assert "object at 0x" not in openapi
 
     def test_no_python_repr_in_readme(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         readme = (tmp_path / "README.md").read_text()
         assert "<agentshift." not in readme
@@ -468,10 +434,7 @@ class TestBedrockRealSkills:
     def test_github_skill_converts(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
 
-        skill = (
-            Path.home()
-            / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
-        )
+        skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
         if not skill.exists():
             pytest.skip("github skill not installed")
         ir = parse_skill_dir(skill)
@@ -485,10 +448,7 @@ class TestBedrockRealSkills:
     def test_github_skill_instruction_within_limit(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
 
-        skill = (
-            Path.home()
-            / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
-        )
+        skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
         if not skill.exists():
             pytest.skip("github skill not installed")
         ir = parse_skill_dir(skill)
@@ -500,10 +460,7 @@ class TestBedrockRealSkills:
     def test_github_skill_openapi_is_valid_json(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
 
-        skill = (
-            Path.home()
-            / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
-        )
+        skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
         if not skill.exists():
             pytest.skip("github skill not installed")
         ir = parse_skill_dir(skill)
@@ -516,10 +473,7 @@ class TestBedrockRealSkills:
     def test_github_skill_cloudformation_has_bedrock_agent(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
 
-        skill = (
-            Path.home()
-            / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
-        )
+        skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
         if not skill.exists():
             pytest.skip("github skill not installed")
         ir = parse_skill_dir(skill)
@@ -532,10 +486,7 @@ class TestBedrockRealSkills:
     def test_github_skill_shell_tools_in_openapi(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
 
-        skill = (
-            Path.home()
-            / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
-        )
+        skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
         if not skill.exists():
             pytest.skip("github skill not installed")
         ir = parse_skill_dir(skill)
@@ -599,9 +550,7 @@ class TestBedrockKnowledgeSourcesDetailed:
 
     def test_knowledge_source_name_in_cf(self, tmp_path):
         ir = make_simple_ir(
-            knowledge=[
-                KnowledgeSource(name="pregnancy-guide", kind="file", path="/tmp/pg.md")
-            ]
+            knowledge=[KnowledgeSource(name="pregnancy-guide", kind="file", path="/tmp/pg.md")]
         )
         emit(ir, tmp_path)
         cf = (tmp_path / "cloudformation.yaml").read_text()
@@ -635,69 +584,47 @@ class TestBedrockMcpToolsOpenApiDetailed:
     """More detailed MCP tools in openapi.json tests."""
 
     def test_mcp_tool_request_body_has_action_field(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="slack", description="Slack MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
         emit(ir, tmp_path)
         schema = json.loads((tmp_path / "openapi.json").read_text())
         post = schema["paths"]["/slack/action"]["post"]
-        props = post["requestBody"]["content"]["application/json"]["schema"][
-            "properties"
-        ]
+        props = post["requestBody"]["content"]["application/json"]["schema"]["properties"]
         assert "action" in props
 
     def test_mcp_tool_request_body_has_params_field(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="slack", description="Slack MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
         emit(ir, tmp_path)
         schema = json.loads((tmp_path / "openapi.json").read_text())
         post = schema["paths"]["/slack/action"]["post"]
-        props = post["requestBody"]["content"]["application/json"]["schema"][
-            "properties"
-        ]
+        props = post["requestBody"]["content"]["application/json"]["schema"]["properties"]
         assert "params" in props
 
     def test_mcp_tool_action_is_required(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="slack", description="Slack MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
         emit(ir, tmp_path)
         schema = json.loads((tmp_path / "openapi.json").read_text())
         post = schema["paths"]["/slack/action"]["post"]
-        required = post["requestBody"]["content"]["application/json"]["schema"].get(
-            "required", []
-        )
+        required = post["requestBody"]["content"]["application/json"]["schema"].get("required", [])
         assert "action" in required
 
     def test_shell_tool_request_body_has_command_field(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         schema = json.loads((tmp_path / "openapi.json").read_text())
         post = schema["paths"]["/gh/run"]["post"]
-        props = post["requestBody"]["content"]["application/json"]["schema"][
-            "properties"
-        ]
+        props = post["requestBody"]["content"]["application/json"]["schema"]["properties"]
         assert "command" in props
 
     def test_shell_tool_command_is_required(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="gh", description="GitHub CLI", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="gh", description="GitHub CLI", kind="shell")])
         emit(ir, tmp_path)
         schema = json.loads((tmp_path / "openapi.json").read_text())
         post = schema["paths"]["/gh/run"]["post"]
-        required = post["requestBody"]["content"]["application/json"]["schema"].get(
-            "required", []
-        )
+        required = post["requestBody"]["content"]["application/json"]["schema"].get("required", [])
         assert "command" in required
 
     def test_mcp_tool_has_200_response(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="slack", description="Slack MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="slack", description="Slack MCP", kind="mcp")])
         emit(ir, tmp_path)
         schema = json.loads((tmp_path / "openapi.json").read_text())
         post = schema["paths"]["/slack/action"]["post"]
@@ -807,10 +734,7 @@ class TestBedrockCloudFormationYAMLValidity:
     def test_github_skill_cloudformation_valid(self, tmp_path):
         from agentshift.parsers.openclaw import parse_skill_dir
 
-        skill = (
-            Path.home()
-            / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
-        )
+        skill = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
         if not skill.exists():
             pytest.skip("github skill not installed")
         ir = parse_skill_dir(skill)

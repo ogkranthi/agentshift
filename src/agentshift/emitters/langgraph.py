@@ -88,9 +88,7 @@ def _uses_requests(ir: AgentIR) -> bool:
 
 def _uses_anthropic(ir: AgentIR) -> bool:
     """Prefer Anthropic unless platform_extensions say otherwise."""
-    provider = ir.metadata.platform_extensions.get("langgraph", {}).get(
-        "llm_provider", "anthropic"
-    )
+    provider = ir.metadata.platform_extensions.get("langgraph", {}).get("llm_provider", "anthropic")
     return provider != "openai"
 
 
@@ -115,9 +113,7 @@ def _write_agent_py(ir: AgentIR, output_dir: Path) -> None:
         lines.append(f"Source created: {created}")
     lines.append("")
     lines.append("Exports:")
-    lines.append(
-        "  graph  — compiled CompiledStateGraph ready for LangGraph Platform deployment"
-    )
+    lines.append("  graph  — compiled CompiledStateGraph ready for LangGraph Platform deployment")
     lines.append('"""')
     lines.append("")
     lines.append("from __future__ import annotations")
@@ -146,9 +142,7 @@ def _write_agent_py(ir: AgentIR, output_dir: Path) -> None:
         lines.append(
             "# ---------------------------------------------------------------------------"
         )
-        lines.append(
-            "# Knowledge sources (always-load) — inject into system prompt or preload"
-        )
+        lines.append("# Knowledge sources (always-load) — inject into system prompt or preload")
         lines.append(
             "# ---------------------------------------------------------------------------"
         )
@@ -224,9 +218,7 @@ def _write_agent_py(ir: AgentIR, output_dir: Path) -> None:
         )
         lines.append(f'_llm = ChatAnthropic(model="{model_id}", temperature=0)')
     else:
-        model_id = ir.metadata.platform_extensions.get("langgraph", {}).get(
-            "model", "gpt-4o"
-        )
+        model_id = ir.metadata.platform_extensions.get("langgraph", {}).get("model", "gpt-4o")
         lines.append(f'_llm = ChatOpenAI(model="{model_id}", temperature=0)')
 
     lines.append("")
@@ -234,25 +226,19 @@ def _write_agent_py(ir: AgentIR, output_dir: Path) -> None:
 
     # call_llm node
     lines.append("def _call_llm(state: AgentState) -> dict:")
-    lines.append(
-        '    """Invoke the LLM with tools bound and system prompt prepended."""'
-    )
+    lines.append('    """Invoke the LLM with tools bound and system prompt prepended."""')
     lines.append("    tools = get_tools()")
     lines.append("    llm_with_tools = _llm.bind_tools(tools)")
     lines.append('    messages = state["messages"]')
     lines.append("    if _SYSTEM_PROMPT:")
-    lines.append(
-        "        messages = [SystemMessage(content=_SYSTEM_PROMPT)] + list(messages)"
-    )
+    lines.append("        messages = [SystemMessage(content=_SYSTEM_PROMPT)] + list(messages)")
     lines.append("    response = llm_with_tools.invoke(messages)")
     lines.append('    return {"messages": [response]}')
     lines.append("")
     lines.append("")
 
     # Routing function
-    lines.append(
-        'def _should_continue(state: AgentState) -> Literal["tools", "__end__"]:'
-    )
+    lines.append('def _should_continue(state: AgentState) -> Literal["tools", "__end__"]:')
     lines.append('    """Route to tools if the LLM made a tool call, otherwise end."""')
     lines.append('    last_msg = state["messages"][-1]')
     lines.append('    if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:')
@@ -292,14 +278,10 @@ def _trigger_comment(lines: list[str], trig: Trigger) -> None:
     if trig.kind == "cron":
         expr = trig.cron_expr or trig.every or "?"
         lines.append(f"# Trigger [{trig.id or 'unnamed'}]: cron — schedule: {expr}")
-        lines.append(
-            "#   Use APScheduler, `schedule` lib, or LangSmith Deployment cron jobs."
-        )
+        lines.append("#   Use APScheduler, `schedule` lib, or LangSmith Deployment cron jobs.")
         lines.append("#   Example:")
         lines.append("#     import schedule")
-        lines.append(
-            f"#     schedule.every().day.do(lambda: graph.invoke(...))  # {expr}"
-        )
+        lines.append(f"#     schedule.every().day.do(lambda: graph.invoke(...))  # {expr}")
     elif trig.kind == "webhook":
         path = trig.webhook_path or "/webhook"
         lines.append(f"# Trigger [{trig.id or 'unnamed'}]: webhook — path: {path}")
@@ -307,13 +289,9 @@ def _trigger_comment(lines: list[str], trig: Trigger) -> None:
     elif trig.kind == "message":
         msg = trig.message or "(any message)"
         lines.append(f"# Trigger [{trig.id or 'unnamed'}]: message — pattern: {msg}")
-        lines.append(
-            "#   Connect via messaging platform webhook → FastAPI → graph.invoke()."
-        )
+        lines.append("#   Connect via messaging platform webhook → FastAPI → graph.invoke().")
     elif trig.kind == "event":
-        lines.append(
-            f"# Trigger [{trig.id or 'unnamed'}]: event — name: {trig.event_name or '?'}"
-        )
+        lines.append(f"# Trigger [{trig.id or 'unnamed'}]: event — name: {trig.event_name or '?'}")
         lines.append("#   Subscribe your event bus consumer to call graph.invoke().")
 
 
@@ -359,9 +337,7 @@ def _write_tools_py(ir: AgentIR, output_dir: Path) -> None:
     # Emit tool functions
     for t in ir.tools:
         if t.kind == "builtin":
-            lines.append(
-                f"# NOTE: Skipping builtin tool '{t.name}' — no LangGraph equivalent."
-            )
+            lines.append(f"# NOTE: Skipping builtin tool '{t.name}' — no LangGraph equivalent.")
             lines.append("")
             continue
 
@@ -384,9 +360,7 @@ def _write_tools_py(ir: AgentIR, output_dir: Path) -> None:
                     else param_name
                 )
                 p_type = _json_type_to_py(
-                    param_info.get("type", "string")
-                    if isinstance(param_info, dict)
-                    else "string"
+                    param_info.get("type", "string") if isinstance(param_info, dict) else "string"
                 )
                 p_default = "" if param_name in required_params else " = None"
                 lines.append(
@@ -402,9 +376,7 @@ def _write_tools_py(ir: AgentIR, output_dir: Path) -> None:
         sig_parts: list[str] = []
         for param_name, param_info in props.items():
             p_type = _json_type_to_py(
-                param_info.get("type", "string")
-                if isinstance(param_info, dict)
-                else "string"
+                param_info.get("type", "string") if isinstance(param_info, dict) else "string"
             )
             if param_name not in required_params:
                 sig_parts.append(f"{param_name}: {p_type} | None = None")
@@ -454,12 +426,8 @@ def _write_tools_py(ir: AgentIR, output_dir: Path) -> None:
             lines.append(
                 f"    # MCP tool — connect to server: {endpoint or '(endpoint not specified)'}"
             )
-            lines.append(
-                "    # Use langchain-mcp-adapters to load tools from an MCP server."
-            )
-            lines.append(
-                "    # See: https://github.com/langchain-ai/langchain-mcp-adapters"
-            )
+            lines.append("    # Use langchain-mcp-adapters to load tools from an MCP server.")
+            lines.append("    # See: https://github.com/langchain-ai/langchain-mcp-adapters")
             lines.append("    # TODO: implement MCP invocation")
             lines.append("    raise NotImplementedError")
 
@@ -499,14 +467,10 @@ def _write_tools_py(ir: AgentIR, output_dir: Path) -> None:
                 lines.append("    # TODO: specify URL for this knowledge source")
                 lines.append("    raise NotImplementedError")
         elif ks.kind == "vector_store":
-            lines.append(
-                f"    # TODO: connect to vector store at {ks.path or '(path not set)'}"
-            )
+            lines.append(f"    # TODO: connect to vector store at {ks.path or '(path not set)'}")
             lines.append("    raise NotImplementedError")
         elif ks.kind == "database":
-            lines.append(
-                f"    # TODO: connect to database at {ks.path or '(path not set)'}"
-            )
+            lines.append(f"    # TODO: connect to database at {ks.path or '(path not set)'}")
             lines.append("    raise NotImplementedError")
         elif ks.kind == "s3":
             lines.append("    # TODO: implement S3 retrieval")
@@ -605,9 +569,7 @@ def _write_requirements_txt(ir: AgentIR, output_dir: Path) -> None:
 
     lines.append("")
 
-    (output_dir / "requirements.txt").write_text(
-        "\n".join(lines) + "\n", encoding="utf-8"
-    )
+    (output_dir / "requirements.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -820,9 +782,7 @@ def _write_readme(ir: AgentIR, output_dir: Path) -> None:
             "",
         ]
         for ch in set(channels_from_triggers):
-            lines.append(
-                f"- **{ch}** — TODO: connect channel to `graph.invoke()` endpoint"
-            )
+            lines.append(f"- **{ch}** — TODO: connect channel to `graph.invoke()` endpoint")
         lines.append("")
 
     # Knowledge

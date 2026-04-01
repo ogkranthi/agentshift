@@ -113,9 +113,7 @@ def audit_conversion(
     # GPR-Overall: weighted by artifact count
     total_artifacts = audit.l1_total + audit.l2_total + audit.l3_total
     total_preserved = audit.l1_preserved + audit.l2_preserved + audit.l3_preserved
-    audit.gpr_overall = (
-        total_preserved / total_artifacts if total_artifacts > 0 else 1.0
-    )
+    audit.gpr_overall = total_preserved / total_artifacts if total_artifacts > 0 else 1.0
 
     # CFS (simple checks)
     audit.cfs_identity = bool(ir.name and ir.description)
@@ -184,19 +182,11 @@ def render_audit_table(audits: list[GovernanceAudit]) -> None:
     table.add_column("CFS", justify="right")
 
     for a in audits:
-        gpr_l1_color = (
-            "green" if a.gpr_l1 >= 0.9 else "yellow" if a.gpr_l1 >= 0.5 else "red"
-        )
-        gpr_l2_color = (
-            "green" if a.gpr_l2 >= 0.9 else "yellow" if a.gpr_l2 >= 0.5 else "red"
-        )
-        gpr_l3_color = (
-            "green" if a.gpr_l3 >= 0.9 else "yellow" if a.gpr_l3 >= 0.5 else "red"
-        )
+        gpr_l1_color = "green" if a.gpr_l1 >= 0.9 else "yellow" if a.gpr_l1 >= 0.5 else "red"
+        gpr_l2_color = "green" if a.gpr_l2 >= 0.9 else "yellow" if a.gpr_l2 >= 0.5 else "red"
+        gpr_l3_color = "green" if a.gpr_l3 >= 0.9 else "yellow" if a.gpr_l3 >= 0.5 else "red"
         gpr_all_color = (
-            "green"
-            if a.gpr_overall >= 0.9
-            else "yellow" if a.gpr_overall >= 0.5 else "red"
+            "green" if a.gpr_overall >= 0.9 else "yellow" if a.gpr_overall >= 0.5 else "red"
         )
 
         table.add_row(

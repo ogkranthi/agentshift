@@ -320,21 +320,15 @@ class TestIrToolToOpenapiPath:
             "properties": {"city": {"type": "string"}},
             "required": ["city"],
         }
-        tool = Tool(
-            name="weather", description="Weather tool", kind="mcp", parameters=params
-        )
+        tool = Tool(name="weather", description="Weather tool", kind="mcp", parameters=params)
         _, path_item = ir_tool_to_openapi_path(tool)
-        body_schema = path_item["post"]["requestBody"]["content"]["application/json"][
-            "schema"
-        ]
+        body_schema = path_item["post"]["requestBody"]["content"]["application/json"]["schema"]
         assert "city" in body_schema.get("properties", {})
 
     def test_tool_without_parameters_uses_empty_schema(self):
         tool = Tool(name="ping", description="Ping tool", kind="mcp")
         _, path_item = ir_tool_to_openapi_path(tool)
-        body_schema = path_item["post"]["requestBody"]["content"]["application/json"][
-            "schema"
-        ]
+        body_schema = path_item["post"]["requestBody"]["content"]["application/json"]["schema"]
         assert body_schema.get("type") == "object"
 
     def test_shell_tool_produces_path(self):

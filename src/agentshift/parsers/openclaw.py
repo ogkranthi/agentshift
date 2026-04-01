@@ -299,9 +299,7 @@ def _extract_tools(body: str) -> list[Tool]:
     seen: set[str] = set()
 
     # --- Shell binaries from ```bash / ```sh / ```shell code blocks ---
-    bash_block_re = re.compile(
-        r"```(?:bash|sh|shell)\n(.*?)```", re.DOTALL | re.IGNORECASE
-    )
+    bash_block_re = re.compile(r"```(?:bash|sh|shell)\n(.*?)```", re.DOTALL | re.IGNORECASE)
     _heredoc_start_re = re.compile(r"<<[-]?\s*['\"]?([A-Z_][A-Z0-9_]*)['\"]?")
     found_bash_block = False
     for block_match in bash_block_re.finditer(body):
@@ -345,11 +343,7 @@ def _extract_tools(body: str) -> list[Tool]:
             if binary in _SHELL_BUILTINS:
                 continue
             if binary not in seen:
-                tools.append(
-                    Tool(
-                        name=binary, description=f"Run {binary} commands", kind="shell"
-                    )
-                )
+                tools.append(Tool(name=binary, description=f"Run {binary} commands", kind="shell"))
                 seen.add(binary)
 
     # Fallback: bash block existed but no specific binaries found → generic bash
@@ -368,9 +362,7 @@ def _extract_tools(body: str) -> list[Tool]:
             seen.add(name)
 
     # Pattern 2: "use `<name>`" or "use the `<name>`"
-    use_backtick_re = re.compile(
-        r"use\s+(?:the\s+)?`([a-z][a-z0-9_-]*)`", re.IGNORECASE
-    )
+    use_backtick_re = re.compile(r"use\s+(?:the\s+)?`([a-z][a-z0-9_-]*)`", re.IGNORECASE)
     for m in use_backtick_re.finditer(body):
         name = m.group(1).lower()
         if name in _KNOWN_MCP_TOOLS and name not in seen:
@@ -433,15 +425,9 @@ def _extract_tools(body: str) -> list[Tool]:
         if bin_name in _SHELL_BUILTINS or bin_name in seen:
             continue
         if bin_name in _KNOWN_MCP_TOOLS:
-            tools.append(
-                Tool(name=bin_name, description=f"{bin_name} MCP tool", kind="mcp")
-            )
+            tools.append(Tool(name=bin_name, description=f"{bin_name} MCP tool", kind="mcp"))
         else:
-            tools.append(
-                Tool(
-                    name=bin_name, description=f"Run {bin_name} commands", kind="shell"
-                )
-            )
+            tools.append(Tool(name=bin_name, description=f"Run {bin_name} commands", kind="shell"))
         seen.add(bin_name)
 
     return tools
@@ -551,9 +537,7 @@ def _classify_guardrail(text: str) -> str:
 def _infer_severity(text: str) -> str:
     """Infer severity from guardrail language."""
     lower = text.lower()
-    if any(
-        w in lower for w in ["never", "immediately", "hard stop", "halt", "emergency"]
-    ):
+    if any(w in lower for w in ["never", "immediately", "hard stop", "halt", "emergency"]):
         return "critical"
     if any(w in lower for w in ["always", "must", "require", "do not"]):
         return "high"
@@ -583,11 +567,7 @@ def _parse_soul_md(path: Path) -> list[Guardrail]:
             m = re.search(r'"([^"]+)"', stripped)
             if m:
                 rule_text = m.group(1)
-        elif (
-            stripped.startswith("- ")
-            and len(stripped) > 3
-            and not stripped.startswith("- #")
-        ):
+        elif stripped.startswith("- ") and len(stripped) > 3 and not stripped.startswith("- #"):
             # Plain bullet items that look like rules
             candidate = stripped[2:].strip()
             if any(

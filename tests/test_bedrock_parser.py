@@ -69,9 +69,7 @@ class TestParseFromBedrockAgentJson:
     def test_foundation_model_in_extensions(self):
         ir = bedrock_parser.parse(FIXTURES_DIR)
         ext = ir.metadata.platform_extensions.get("bedrock", {})
-        assert (
-            ext.get("foundation_model") == "anthropic.claude-3-5-sonnet-20241022-v2:0"
-        )
+        assert ext.get("foundation_model") == "anthropic.claude-3-5-sonnet-20241022-v2:0"
 
     def test_agent_id_in_extensions(self):
         ir = bedrock_parser.parse(FIXTURES_DIR)
@@ -100,9 +98,7 @@ class TestParseFromCloudFormation:
         """Parse from a directory with only cloudformation.yaml."""
         import shutil
 
-        shutil.copy(
-            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
-        )
+        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
         assert isinstance(ir, AgentIR)
@@ -110,9 +106,7 @@ class TestParseFromCloudFormation:
     def test_name_from_cfn(self, tmp_path):
         import shutil
 
-        shutil.copy(
-            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
-        )
+        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
         # "CustomerSupportBot" → slugified (lowercased)
@@ -121,9 +115,7 @@ class TestParseFromCloudFormation:
     def test_instruction_from_cfn(self, tmp_path):
         import shutil
 
-        shutil.copy(
-            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
-        )
+        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
         assert ir.persona.system_prompt is not None
@@ -132,9 +124,7 @@ class TestParseFromCloudFormation:
     def test_knowledge_from_cfn(self, tmp_path):
         import shutil
 
-        shutil.copy(
-            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
-        )
+        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
         # Should extract KnowledgeBase resource
@@ -143,9 +133,7 @@ class TestParseFromCloudFormation:
     def test_knowledge_kind_is_vector_store(self, tmp_path):
         import shutil
 
-        shutil.copy(
-            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
-        )
+        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
         kb = ir.knowledge[0]
@@ -155,9 +143,7 @@ class TestParseFromCloudFormation:
         """CFN ActionGroups with inline Payload → tools extracted."""
         import shutil
 
-        shutil.copy(
-            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
-        )
+        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
         # The CFN fixture has an ActionGroup with an inline OpenAPI payload
@@ -240,9 +226,7 @@ class TestParseWithOpenApi:
         """When openapi.json present, CFN ActionGroups are NOT used for tools."""
         import shutil
 
-        shutil.copy(
-            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
-        )
+        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
         shutil.copy(FIXTURES_DIR / "openapi.json", tmp_path / "openapi.json")
 
         ir = bedrock_parser.parse(tmp_path)
@@ -321,10 +305,7 @@ class TestL1HeuristicGuardrailExtraction:
         assert len(ir.governance.guardrails) >= 1
 
     def test_never_pattern_extracted(self, tmp_path):
-        instruction = (
-            "You are a helpful assistant.\n"
-            "Never reveal confidential customer data.\n"
-        )
+        instruction = "You are a helpful assistant.\nNever reveal confidential customer data.\n"
         (tmp_path / "instruction.txt").write_text(instruction)
 
         ir = bedrock_parser.parse(tmp_path)
@@ -333,9 +314,7 @@ class TestL1HeuristicGuardrailExtraction:
 
     def test_no_duplicate_guardrails_from_config_and_instruction(self, tmp_path):
         """Same constraint in instruction and guardrail-config → at least one guardrail."""
-        instruction = (
-            "Do not make comparisons with or recommendations about competitor products."
-        )
+        instruction = "Do not make comparisons with or recommendations about competitor products."
         guardrail = {
             "topicPolicyConfig": {
                 "topicsConfig": [
@@ -447,9 +426,7 @@ class TestEdgeCases:
         """No openapi.json → tools extracted from CFN ActionGroups."""
         import shutil
 
-        shutil.copy(
-            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
-        )
+        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
         # No openapi.json copied
 
         ir = bedrock_parser.parse(tmp_path)
@@ -493,12 +470,8 @@ class TestEdgeCases:
         """bedrock-agent.json instruction wins over cloudformation.yaml instruction."""
         import shutil
 
-        shutil.copy(
-            FIXTURES_DIR / "bedrock-agent.json", tmp_path / "bedrock-agent.json"
-        )
-        shutil.copy(
-            FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml"
-        )
+        shutil.copy(FIXTURES_DIR / "bedrock-agent.json", tmp_path / "bedrock-agent.json")
+        shutil.copy(FIXTURES_DIR / "cloudformation.yaml", tmp_path / "cloudformation.yaml")
 
         ir = bedrock_parser.parse(tmp_path)
         # bedrock-agent.json has a specific instruction
@@ -642,9 +615,7 @@ class TestRoundTrip:
         }
         ir_in = _make_minimal_ir(
             name="sections-agent",
-            persona=Persona(
-                sections=sections, system_prompt="You are a helpful agent."
-            ),
+            persona=Persona(sections=sections, system_prompt="You are a helpful agent."),
         )
         out_dir = tmp_path / "bedrock-out"
         bedrock_emitter.emit(ir_in, out_dir)
@@ -690,9 +661,7 @@ class TestOpenApiAuthVariants:
         openapi = {
             "openapi": "3.0.0",
             "info": {"title": "API", "version": "1.0"},
-            "components": {
-                "securitySchemes": {"BearerAuth": {"type": "http", "scheme": "bearer"}}
-            },
+            "components": {"securitySchemes": {"BearerAuth": {"type": "http", "scheme": "bearer"}}},
             "paths": {
                 "/action": {
                     "post": {

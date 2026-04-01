@@ -113,9 +113,7 @@ def _write_agent_md(ir: AgentIR, output_dir: Path, elevation: ElevationResult) -
     # MCP comment block (before body)
     if mcp_names:
         for mcp in mcp_names:
-            lines.append(
-                f"<!-- MCP: configure {mcp} server separately in VS Code settings -->"
-            )
+            lines.append(f"<!-- MCP: configure {mcp} server separately in VS Code settings -->")
         lines.append("")
 
     # Body: system prompt
@@ -140,12 +138,8 @@ def _write_agent_md(ir: AgentIR, output_dir: Path, elevation: ElevationResult) -
     if elevation.extra_instructions:
         lines.append("## Governance Constraints (Elevated)")
         lines.append("")
-        lines.append(
-            "<!-- These constraints were elevated from enforcement-level (L2/L3)"
-        )
-        lines.append(
-            "     to prompt-level (L1) because GitHub Copilot does not natively support"
-        )
+        lines.append("<!-- These constraints were elevated from enforcement-level (L2/L3)")
+        lines.append("     to prompt-level (L1) because GitHub Copilot does not natively support")
         lines.append("     the original enforcement mechanism. -->")
         lines.append("")
         for instr in elevation.extra_instructions:

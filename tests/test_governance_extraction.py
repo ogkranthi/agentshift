@@ -466,9 +466,7 @@ class TestPlatformAnnotationsInGovernance:
         gov = Governance(
             platform_annotations=[
                 PlatformAnnotation(id="a", description="d", platform_target="bedrock"),
-                PlatformAnnotation(
-                    id="b", description="d", platform_target="vertex-ai"
-                ),
+                PlatformAnnotation(id="b", description="d", platform_target="vertex-ai"),
                 PlatformAnnotation(id="c", description="d", platform_target="any"),
             ]
         )

@@ -31,9 +31,7 @@ def make_skill_dir(tmp_path: Path, content: str) -> Path:
 
 class TestNoFrontmatter:
     def test_parses_without_exception(self, tmp_path):
-        d = make_skill_dir(
-            tmp_path, "# My Skill\n\nThis is the body with no frontmatter.\n"
-        )
+        d = make_skill_dir(tmp_path, "# My Skill\n\nThis is the body with no frontmatter.\n")
         ir = parse_skill_dir(d)
         assert isinstance(ir, AgentIR)
 
@@ -101,18 +99,14 @@ class TestSpecialCharsInName:
         assert ir.name  # non-empty
 
     def test_unicode_in_name(self, tmp_path):
-        content = (
-            "---\nname: '日本語スキル'\ndescription: 'Unicode name'\n---\n\nBody.\n"
-        )
+        content = "---\nname: '日本語スキル'\ndescription: 'Unicode name'\n---\n\nBody.\n"
         d = make_skill_dir(tmp_path, content)
         ir = parse_skill_dir(d)
         assert isinstance(ir, AgentIR)
         assert ir.name  # non-empty
 
     def test_quotes_in_name(self, tmp_path):
-        content = (
-            "---\nname: \"my 'cool' skill\"\ndescription: Quotes test\n---\n\nBody.\n"
-        )
+        content = "---\nname: \"my 'cool' skill\"\ndescription: Quotes test\n---\n\nBody.\n"
         d = make_skill_dir(tmp_path, content)
         ir = parse_skill_dir(d)
         assert isinstance(ir, AgentIR)
@@ -257,9 +251,9 @@ class TestEmitterFidelityRealSkills:
         ir = parse_skill_dir(skill_path)
         emit(ir, tmp_path)
         content = (tmp_path / "CLAUDE.md").read_text(encoding="utf-8")
-        assert (
-            skill_name[:5].lower() in content.lower()
-        ), f"Skill name prefix {skill_name[:5]!r} not found in CLAUDE.md"
+        assert skill_name[:5].lower() in content.lower(), (
+            f"Skill name prefix {skill_name[:5]!r} not found in CLAUDE.md"
+        )
 
     @pytest.mark.parametrize("skill_name", RICH_SKILLS)
     def test_valid_utf8_non_empty(self, skill_name, tmp_path):
@@ -280,12 +274,8 @@ class TestEmitterFidelityRealSkills:
         ir = parse_skill_dir(skill_path)
         emit(ir, tmp_path)
         content = (tmp_path / "CLAUDE.md").read_text(encoding="utf-8")
-        assert (
-            "<agentshift." not in content
-        ), "Raw Python object repr found in CLAUDE.md"
-        assert (
-            "object at 0x" not in content
-        ), "Raw Python object repr found in CLAUDE.md"
+        assert "<agentshift." not in content, "Raw Python object repr found in CLAUDE.md"
+        assert "object at 0x" not in content, "Raw Python object repr found in CLAUDE.md"
 
     @pytest.mark.parametrize("skill_name", RICH_SKILLS)
     def test_description_in_claude_md(self, skill_name, tmp_path):
@@ -299,9 +289,9 @@ class TestEmitterFidelityRealSkills:
         if ir.description:
             # Check at least a meaningful prefix is present
             desc_prefix = ir.description[:30].strip()
-            assert (
-                desc_prefix in content
-            ), f"Description prefix {desc_prefix!r} not found in CLAUDE.md"
+            assert desc_prefix in content, (
+                f"Description prefix {desc_prefix!r} not found in CLAUDE.md"
+            )
 
     @pytest.mark.parametrize("skill_name", RICH_SKILLS)
     def test_settings_json_valid(self, skill_name, tmp_path):

@@ -349,10 +349,7 @@ def _infer_auth_from_openapi(openapi: dict, operation: dict) -> ToolAuth:
                     return ToolAuth(type="basic")
             if scheme_type == "oauth2":
                 scopes = list(
-                    scheme.get("flows", {})
-                    .get("clientCredentials", {})
-                    .get("scopes", {})
-                    .keys()
+                    scheme.get("flows", {}).get("clientCredentials", {}).get("scopes", {}).keys()
                 )
                 return ToolAuth(type="oauth2", scopes=scopes)
 
@@ -384,9 +381,7 @@ def _extract_tools_from_cfn(cfn_yaml: dict) -> list[Tool]:
             payload = api_schema.get("Payload")
             if payload:
                 try:
-                    schema = (
-                        json.loads(payload) if isinstance(payload, str) else payload
-                    )
+                    schema = json.loads(payload) if isinstance(payload, str) else payload
                     sub_tools = _extract_tools_from_openapi(schema)
                     tools.extend(sub_tools)
                     continue

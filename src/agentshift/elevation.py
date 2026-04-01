@@ -26,9 +26,7 @@ class ElevatedArtifact:
 
     source_layer: str  # "L2" or "L3"
     artifact_id: str
-    artifact_type: (
-        str  # e.g. "deny_pattern", "rate_limit", "disabled_tool", "content_filter"
-    )
+    artifact_type: str  # e.g. "deny_pattern", "rate_limit", "disabled_tool", "content_filter"
     original_text: str
     elevated_instruction: str
     target_platform: str
@@ -121,7 +119,9 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
                 pass  # Platform supports deny patterns
             else:
                 for pattern in perm.deny_patterns:
-                    instruction = f"When using {perm.tool_name}, NEVER access paths matching: {pattern}"
+                    instruction = (
+                        f"When using {perm.tool_name}, NEVER access paths matching: {pattern}"
+                    )
                     artifacts.append(
                         ElevatedArtifact(
                             source_layer="L2",
@@ -161,9 +161,7 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
 
         # Rate limits
         if perm.rate_limit:
-            instruction = (
-                f"Rate limit for {perm.tool_name}: do not exceed {perm.rate_limit}."
-            )
+            instruction = f"Rate limit for {perm.tool_name}: do not exceed {perm.rate_limit}."
             artifacts.append(
                 ElevatedArtifact(
                     source_layer="L2",
@@ -180,9 +178,7 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
 
         # Max value constraints
         if perm.max_value:
-            instruction = (
-                f"Maximum value constraint for {perm.tool_name}: {perm.max_value}."
-            )
+            instruction = f"Maximum value constraint for {perm.tool_name}: {perm.max_value}."
             artifacts.append(
                 ElevatedArtifact(
                     source_layer="L2",
@@ -201,7 +197,9 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
         if perm.allow_patterns:
             if "allow_list" not in l2_caps:
                 for pattern in perm.allow_patterns:
-                    instruction = f"The {perm.tool_name} tool may ONLY be used for paths matching: {pattern}"
+                    instruction = (
+                        f"The {perm.tool_name} tool may ONLY be used for paths matching: {pattern}"
+                    )
                     artifacts.append(
                         ElevatedArtifact(
                             source_layer="L2",

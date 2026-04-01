@@ -19,9 +19,7 @@ from agentshift.ir import (
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
-_GITHUB_SKILL = (
-    Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
-)
+_GITHUB_SKILL = Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/github"
 _WEATHER_SKILL = (
     Path.home() / ".nvm/versions/node/v22.22.1/lib/node_modules/openclaw/skills/weather"
 )
@@ -186,45 +184,35 @@ class TestDeclarativeAgentFields:
 
 class TestM365Capabilities:
     def test_teams_mcp_tool_maps_to_teams_messages(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="teams", description="Microsoft Teams", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="teams", description="Microsoft Teams", kind="mcp")])
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
         caps = doc.get("capabilities", [])
         assert any(c.get("name") == "TeamsMessages" for c in caps)
 
     def test_email_mcp_tool_maps_to_email(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="email", description="Email tool", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="email", description="Email tool", kind="mcp")])
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
         caps = doc.get("capabilities", [])
         assert any(c.get("name") == "Email" for c in caps)
 
     def test_graph_mcp_tool_maps_to_graph_connectors(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="graph", description="MS Graph", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="graph", description="MS Graph", kind="mcp")])
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
         caps = doc.get("capabilities", [])
         assert any(c.get("name") == "GraphConnectors" for c in caps)
 
     def test_notion_mcp_tool_maps_to_graph_connectors(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="notion", description="Notion MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="notion", description="Notion MCP", kind="mcp")])
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
         caps = doc.get("capabilities", [])
         assert any(c.get("name") == "GraphConnectors" for c in caps)
 
     def test_unknown_mcp_tool_dropped(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="custom-mcp", description="Custom MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="custom-mcp", description="Custom MCP", kind="mcp")])
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
         caps = doc.get("capabilities", [])
@@ -250,9 +238,7 @@ class TestM365Capabilities:
 
     def test_shell_tool_with_curl_maps_to_websearch(self, tmp_path):
         ir = make_simple_ir(
-            tools=[
-                Tool(name="curl", description="HTTP requests via curl", kind="shell")
-            ]
+            tools=[Tool(name="curl", description="HTTP requests via curl", kind="shell")]
         )
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
@@ -260,9 +246,7 @@ class TestM365Capabilities:
         assert any(c.get("name") == "WebSearch" for c in caps)
 
     def test_shell_tool_without_web_dropped(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="jq", description="JSON processor", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="jq", description="JSON processor", kind="shell")])
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
         caps = doc.get("capabilities", [])
@@ -279,9 +263,7 @@ class TestM365Capabilities:
     def test_no_duplicate_websearch_capability(self, tmp_path):
         ir = make_simple_ir(
             tools=[Tool(name="curl", description="curl", kind="shell")],
-            knowledge=[
-                KnowledgeSource(name="site", kind="url", path="https://example.com")
-            ],
+            knowledge=[KnowledgeSource(name="site", kind="url", path="https://example.com")],
         )
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
@@ -394,27 +376,21 @@ class TestManifestFields:
 
 class TestNoRawPythonReprs:
     def test_no_python_repr_in_declarative_agent(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="teams", description="Teams MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="teams", description="Teams MCP", kind="mcp")])
         emit(ir, tmp_path)
         raw = (tmp_path / "declarative-agent.json").read_text()
         assert "<agentshift." not in raw
         assert "object at 0x" not in raw
 
     def test_no_python_repr_in_manifest(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="teams", description="Teams MCP", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="teams", description="Teams MCP", kind="mcp")])
         emit(ir, tmp_path)
         raw = (tmp_path / "manifest.json").read_text()
         assert "<agentshift." not in raw
         assert "object at 0x" not in raw
 
     def test_no_python_repr_in_readme(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="jq", description="JSON processor", kind="shell")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="jq", description="JSON processor", kind="shell")])
         emit(ir, tmp_path)
         raw = (tmp_path / "README.md").read_text()
         assert "<agentshift." not in raw
@@ -510,9 +486,7 @@ class TestM365InstructionTruncationDetailed:
         ir = make_simple_ir(persona=Persona(system_prompt=prompt))
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
-        assert (
-            "8,000" in doc["instructions"] or "truncated" in doc["instructions"].lower()
-        )
+        assert "8,000" in doc["instructions"] or "truncated" in doc["instructions"].lower()
 
 
 class TestM365McpCapabilitiesDetailed:
@@ -533,9 +507,7 @@ class TestM365McpCapabilitiesDetailed:
         assert "Email" in cap_names
 
     def test_graph_connectors_has_connections_field(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="graph", description="MS Graph", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="graph", description="MS Graph", kind="mcp")])
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
         caps = doc.get("capabilities", [])
@@ -543,9 +515,7 @@ class TestM365McpCapabilitiesDetailed:
         assert "connections" in gc
 
     def test_graph_connectors_connection_has_todo_placeholder(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="notion", description="Notion", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="notion", description="Notion", kind="mcp")])
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())
         caps = doc.get("capabilities", [])
@@ -554,9 +524,7 @@ class TestM365McpCapabilitiesDetailed:
         assert any("TODO" in str(conn.get("connectionId", "")) for conn in connections)
 
     def test_graph_connectors_readme_has_setup_note(self, tmp_path):
-        ir = make_simple_ir(
-            tools=[Tool(name="graph", description="MS Graph", kind="mcp")]
-        )
+        ir = make_simple_ir(tools=[Tool(name="graph", description="MS Graph", kind="mcp")])
         emit(ir, tmp_path)
         readme = (tmp_path / "README.md").read_text()
         assert "Graph Connector" in readme or "connection" in readme.lower()
@@ -599,12 +567,8 @@ class TestM365WebSearchCapabilityDetailed:
     def test_two_url_knowledge_sources_both_in_sites(self, tmp_path):
         ir = make_simple_ir(
             knowledge=[
-                KnowledgeSource(
-                    name="docs1", kind="url", path="https://docs1.example.com"
-                ),
-                KnowledgeSource(
-                    name="docs2", kind="url", path="https://docs2.example.com"
-                ),
+                KnowledgeSource(name="docs1", kind="url", path="https://docs1.example.com"),
+                KnowledgeSource(name="docs2", kind="url", path="https://docs2.example.com"),
             ]
         )
         emit(ir, tmp_path)
@@ -636,9 +600,7 @@ class TestM365WebSearchCapabilityDetailed:
     def test_curl_and_url_knowledge_merge_into_single_websearch(self, tmp_path):
         ir = make_simple_ir(
             tools=[Tool(name="curl", description="HTTP curl", kind="shell")],
-            knowledge=[
-                KnowledgeSource(name="site", kind="url", path="https://example.com")
-            ],
+            knowledge=[KnowledgeSource(name="site", kind="url", path="https://example.com")],
         )
         emit(ir, tmp_path)
         doc = json.loads((tmp_path / "declarative-agent.json").read_text())

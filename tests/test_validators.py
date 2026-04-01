@@ -13,9 +13,7 @@ from agentshift.validators import run_validation
 
 FIXTURES = Path(__file__).parent / "fixtures"
 _VENV_BIN = Path(__file__).parent.parent / ".venv" / "bin" / "agentshift"
-AGENTSHIFT = (
-    [str(_VENV_BIN)] if _VENV_BIN.exists() else [sys.executable, "-m", "agentshift"]
-)
+AGENTSHIFT = [str(_VENV_BIN)] if _VENV_BIN.exists() else [sys.executable, "-m", "agentshift"]
 
 
 # ---------------------------------------------------------------------------
@@ -96,9 +94,7 @@ def make_m365_dir(tmp_path: Path, *, instructions: str = "Be helpful.") -> Path:
     manifest = {
         "$schema": "https://developer.microsoft.com/json-schemas/teams/vDevPreview/MicrosoftTeams.schema.json",
         "manifestVersion": "devPreview",
-        "copilotAgents": {
-            "declarativeAgents": [{"id": "da1", "file": "declarative-agent.json"}]
-        },
+        "copilotAgents": {"declarativeAgents": [{"id": "da1", "file": "declarative-agent.json"}]},
     }
     (tmp_path / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
     return tmp_path
@@ -156,16 +152,12 @@ class TestClaudeCodeValidator:
         assert any("permissions" in e.name for e in report.errors)
 
     def test_allow_not_list_fails(self, tmp_path):
-        make_claude_code_dir(
-            tmp_path, settings={"permissions": {"allow": "Bash(*)", "deny": []}}
-        )
+        make_claude_code_dir(tmp_path, settings={"permissions": {"allow": "Bash(*)", "deny": []}})
         report = run_validation(tmp_path, "claude-code")
         assert not report.ok
 
     def test_bash_star_is_warning_not_error(self, tmp_path):
-        make_claude_code_dir(
-            tmp_path, settings={"permissions": {"allow": ["Bash(*)"], "deny": []}}
-        )
+        make_claude_code_dir(tmp_path, settings={"permissions": {"allow": ["Bash(*)"], "deny": []}})
         report = run_validation(tmp_path, "claude-code")
         # should still pass (no hard errors) but emit a warning
         assert report.ok
@@ -256,9 +248,7 @@ class TestBedrockValidator:
 
     def test_openapi_missing_keys_fails(self, tmp_path):
         make_bedrock_dir(tmp_path)
-        (tmp_path / "openapi.json").write_text(
-            json.dumps({"openapi": "3.0.0"}), encoding="utf-8"
-        )
+        (tmp_path / "openapi.json").write_text(json.dumps({"openapi": "3.0.0"}), encoding="utf-8")
         report = run_validation(tmp_path, "bedrock")
         assert not report.ok
 

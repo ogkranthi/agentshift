@@ -112,9 +112,7 @@ class TestParseToolDefinitions:
 
     def test_tool_parameters_extracted(self):
         ir = vertex_parser.parse(FIXTURES_DIR)
-        weather_tool = next(
-            (t for t in ir.tools if t.name == "get_current_weather"), None
-        )
+        weather_tool = next((t for t in ir.tools if t.name == "get_current_weather"), None)
         assert weather_tool is not None
         assert weather_tool.parameters is not None
         assert "location" in weather_tool.parameters.get("properties", {})
@@ -395,9 +393,7 @@ class TestEdgeCases:
             "goal": "You are a test agent.",
             "instructions": [],
             "tools": [
-                {
-                    "name": "projects/my-project/locations/us-central1/agents/123/tools/search-tool"
-                }
+                {"name": "projects/my-project/locations/us-central1/agents/123/tools/search-tool"}
             ],
         }
         (tmp_path / "agent.json").write_text(json.dumps(agent))
@@ -526,9 +522,7 @@ class TestRoundTrip:
 
     def test_round_trip_system_prompt_preserved(self, tmp_path):
         """System prompt → emit → parse → goal contains prompt content."""
-        system_prompt = (
-            "You are a Vertex round-trip test assistant. Be helpful and precise."
-        )
+        system_prompt = "You are a Vertex round-trip test assistant. Be helpful and precise."
         ir_in = _make_minimal_ir(
             name="vertex-trip-agent",
             persona=Persona(system_prompt=system_prompt),
@@ -629,9 +623,7 @@ class TestRoundTrip:
         """Language field present in emitted agent.json (even if defaulted to 'en' by emitter)."""
         ir_in = _make_minimal_ir(
             name="fr-agent",
-            persona=Persona(
-                system_prompt="Vous êtes un assistant utile.", language="fr"
-            ),
+            persona=Persona(system_prompt="Vous êtes un assistant utile.", language="fr"),
         )
         out_dir = tmp_path / "vertex-out"
         vertex_emitter.emit(ir_in, out_dir)
@@ -665,13 +657,7 @@ class TestRoundTrip:
             }
         )
         tools_str = json.dumps(
-            [
-                {
-                    "functionDeclarations": [
-                        {"name": "my_tool", "description": "A test tool"}
-                    ]
-                }
-            ]
+            [{"functionDeclarations": [{"name": "my_tool", "description": "A test tool"}]}]
         )
         ir = vertex_parser.parse_agent_json(agent_str, tools_str)
         assert any(t.name == "my_tool" for t in ir.tools)
