@@ -13,14 +13,13 @@ Tests for BedrockParser (src/agentshift/parsers/bedrock.py):
 from __future__ import annotations
 
 import json
-import tempfile
 from pathlib import Path
 
 import pytest
 
+from agentshift.emitters import bedrock as bedrock_emitter
 from agentshift.ir import AgentIR, Governance, Guardrail, Persona, Tool
 from agentshift.parsers import bedrock as bedrock_parser
-from agentshift.emitters import bedrock as bedrock_emitter
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -518,7 +517,6 @@ class TestRoundTrip:
 
     def test_round_trip_tools_preserved_mcp(self, tmp_path):
         """IR with MCP tools → emit → parse → tool names preserved (emitter generates paths for mcp kind)."""
-        from agentshift.ir import Tool
 
         tools = [
             Tool(name="search", description="Search the web", kind="mcp"),
@@ -539,7 +537,6 @@ class TestRoundTrip:
 
     def test_round_trip_function_tools_in_cfn(self, tmp_path):
         """IR with function tools → emit → CFN ActionGroups present (tools in CFN not openapi)."""
-        from agentshift.ir import Tool
 
         tools = [
             Tool(name="search", description="Search the web", kind="function"),

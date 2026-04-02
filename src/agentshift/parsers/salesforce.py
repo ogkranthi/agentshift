@@ -350,7 +350,7 @@ def _parse_xml_directory(
 def _parse_bot_xml(path: Path) -> dict[str, Any]:
     """Parse a .bot-meta.xml file and return structured data."""
     try:
-        tree = ET.parse(path)  # noqa: S314
+        tree = ET.parse(path)
     except ET.ParseError as e:
         raise ValueError(f"Invalid XML in {path}: {e}") from e
 
@@ -431,7 +431,7 @@ def _extract_context_variables(root: ET.Element) -> list[dict[str, str]]:
 def _parse_planner_xml(path: Path) -> dict[str, Any]:
     """Parse a .genAiPlanner-meta.xml file and return structured data."""
     try:
-        tree = ET.parse(path)  # noqa: S314
+        tree = ET.parse(path)
     except ET.ParseError as e:
         raise ValueError(f"Invalid XML in {path}: {e}") from e
 

@@ -10,14 +10,13 @@ Tests for VertexParser (src/agentshift/parsers/vertex.py):
 from __future__ import annotations
 
 import json
-import tempfile
 from pathlib import Path
 
 import pytest
 
-from agentshift.ir import AgentIR, Governance, Guardrail, Persona, Tool
-from agentshift.parsers import vertex as vertex_parser
 from agentshift.emitters import vertex as vertex_emitter
+from agentshift.ir import AgentIR, Persona, Tool
+from agentshift.parsers import vertex as vertex_parser
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -302,7 +301,7 @@ class TestEdgeCases:
             vertex_parser.parse(file_path)
 
     def test_missing_agent_json_raises(self, tmp_path):
-        with pytest.raises(FileNotFoundError, match="agent.json"):
+        with pytest.raises(FileNotFoundError, match=r"agent\.json"):
             vertex_parser.parse(tmp_path)
 
     def test_invalid_agent_json_raises(self, tmp_path):

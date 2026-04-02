@@ -13,15 +13,14 @@ from __future__ import annotations
 
 import csv
 import json
-from dataclasses import asdict, dataclass, field
-from io import StringIO
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from rich import box
 from rich.console import Console
 from rich.table import Table
 
-from agentshift.elevation import ElevationResult, elevate_governance
+from agentshift.elevation import elevate_governance
 from agentshift.ir import AgentIR
 
 
@@ -149,7 +148,7 @@ def audit_batch(
     agents: list[tuple[AgentIR, str, str, str]],  # (ir, agent_id, domain, complexity)
     targets: list[str],
 ) -> list[GovernanceAudit]:
-    """Run governance audits for all agents × all targets."""
+    """Run governance audits for all agents x all targets."""
     audits: list[GovernanceAudit] = []
     for ir, agent_id, domain, complexity in agents:
         for target in targets:

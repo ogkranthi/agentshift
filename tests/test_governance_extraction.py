@@ -16,8 +16,6 @@ from agentshift.ir import (
     AgentIR,
     Governance,
     Guardrail,
-    Metadata,
-    Persona,
     PlatformAnnotation,
     ToolPermission,
 )

@@ -13,22 +13,17 @@ Tests for:
 from __future__ import annotations
 
 import csv
-import io
 import json
 import tempfile
+import typing
 from pathlib import Path
 
 import pytest
 
 from agentshift.elevation import (
-    PLATFORM_L2_CAPABILITIES,
-    PLATFORM_L3_CAPABILITIES,
-    ElevatedArtifact,
-    ElevationResult,
     elevate_governance,
 )
 from agentshift.governance_audit import (
-    GovernanceAudit,
     audit_batch,
     audit_conversion,
     export_csv,
@@ -539,7 +534,7 @@ class TestElevationTracking:
 class TestCSVExport:
     """Tests for export_csv: format, column headers, row data."""
 
-    EXPECTED_HEADERS = [
+    EXPECTED_HEADERS: typing.ClassVar[list[str]] = [
         "Agent",
         "Target",
         "Domain",
@@ -645,7 +640,7 @@ class TestCSVExport:
             export_csv([], csv_path)
             with csv_path.open() as f:
                 content = f.read()
-            lines = [l for l in content.strip().splitlines() if l]
+            lines = [ln for ln in content.strip().splitlines() if ln]
             assert len(lines) == 1  # header only
 
 
@@ -797,13 +792,13 @@ class TestJSONExport:
 
 
 class TestAuditBatch:
-    """Tests for audit_batch (multi-agent × multi-target)."""
+    """Tests for audit_batch (multi-agent x multi-target)."""
 
     def test_batch_produces_agents_times_targets(self):
         agents = [(_make_ir(name=f"agent-{i}"), f"agent-{i}", "domain", "low") for i in range(3)]
         targets = ["copilot", "bedrock"]
         audits = audit_batch(agents, targets)
-        assert len(audits) == 6  # 3 × 2
+        assert len(audits) == 6  # 3 x 2
 
     def test_batch_all_targets_represented(self):
         agents = [(_make_ir(name="a1"), "a1", "", "")]

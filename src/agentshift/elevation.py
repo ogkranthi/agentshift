@@ -13,7 +13,6 @@ from dataclasses import dataclass, field
 
 from agentshift.ir import (
     AgentIR,
-    Governance,
     Guardrail,
     PlatformAnnotation,
     ToolPermission,
@@ -194,25 +193,24 @@ def elevate_governance(ir: AgentIR, target: str) -> ElevationResult:
             elevated = True
 
         # Allow patterns (directory restrictions)
-        if perm.allow_patterns:
-            if "allow_list" not in l2_caps:
-                for pattern in perm.allow_patterns:
-                    instruction = (
-                        f"The {perm.tool_name} tool may ONLY be used for paths matching: {pattern}"
+        if perm.allow_patterns and "allow_list" not in l2_caps:
+            for pattern in perm.allow_patterns:
+                instruction = (
+                    f"The {perm.tool_name} tool may ONLY be used for paths matching: {pattern}"
+                )
+                artifacts.append(
+                    ElevatedArtifact(
+                        source_layer="L2",
+                        artifact_id=f"L2-{perm.tool_name}-allow-{pattern}",
+                        artifact_type="allow_pattern",
+                        original_text=f"{perm.tool_name} allow: {pattern}",
+                        elevated_instruction=instruction,
+                        target_platform=target,
+                        reason=f"{target} has no allow-pattern support",
                     )
-                    artifacts.append(
-                        ElevatedArtifact(
-                            source_layer="L2",
-                            artifact_id=f"L2-{perm.tool_name}-allow-{pattern}",
-                            artifact_type="allow_pattern",
-                            original_text=f"{perm.tool_name} allow: {pattern}",
-                            elevated_instruction=instruction,
-                            target_platform=target,
-                            reason=f"{target} has no allow-pattern support",
-                        )
-                    )
-                    result.extra_instructions.append(instruction)
-                    elevated = True
+                )
+                result.extra_instructions.append(instruction)
+                elevated = True
 
         if elevated:
             result.l2_elevated.append(perm)

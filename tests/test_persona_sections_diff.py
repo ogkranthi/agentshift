@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from agentshift.diff import (
     FULL,
     NONE,
@@ -60,7 +58,7 @@ class TestCountMappedSections:
 
     def test_guardrails_maps_to_bedrock(self):
         sections = {"guardrails": "G"}
-        mapped, total = _count_mapped_sections(sections, "bedrock")
+        mapped, _total = _count_mapped_sections(sections, "bedrock")
         assert mapped == 1
 
     def test_unknown_section_maps_to_claude_code(self):
@@ -100,7 +98,7 @@ class TestComputeDiffPersonaSections:
         ir = _make_ir(sections=sections)
         result = compute_diff(ir, ["bedrock"])
         comp_data = result["components"]["persona_sections"]["bedrock"]
-        fidelity, label, note = comp_data
+        fidelity, label, _note = comp_data
         assert fidelity == FULL
         assert "1/1" in label
 
@@ -110,7 +108,7 @@ class TestComputeDiffPersonaSections:
         ir = _make_ir(sections=sections)
         result = compute_diff(ir, ["bedrock"])
         comp_data = result["components"]["persona_sections"]["bedrock"]
-        fidelity, label, note = comp_data
+        fidelity, label, _note = comp_data
         assert fidelity == NONE
         assert "0/1" in label
 
@@ -120,7 +118,7 @@ class TestComputeDiffPersonaSections:
         ir = _make_ir(sections=sections)
         result = compute_diff(ir, ["bedrock"])
         comp_data = result["components"]["persona_sections"]["bedrock"]
-        fidelity, label, note = comp_data
+        fidelity, label, _note = comp_data
         assert fidelity == PARTIAL
         assert "1/2" in label
 
@@ -129,7 +127,7 @@ class TestComputeDiffPersonaSections:
         ir = _make_ir(sections=sections)
         result = compute_diff(ir, ["claude-code"])
         comp_data = result["components"]["persona_sections"]["claude-code"]
-        fidelity, label, note = comp_data
+        _fidelity, label, _note = comp_data
         # Label should include N/M format
         assert "/" in label
         assert "mapped" in label
@@ -147,7 +145,7 @@ class TestComputeDiffPersonaSections:
         ir = _make_ir(sections=sections)
         result = compute_diff(ir, ["claude-code"])
         comp_data = result["components"]["persona_sections"]["claude-code"]
-        fidelity, label, note = comp_data
+        _fidelity, _label, note = comp_data
         assert note is None
 
     def test_persona_sections_multiple_targets(self):

@@ -4,10 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
-from agentshift.parsers.openclaw import parse_skill_dir
 from agentshift.parsers.claude_code import parse_agent_dir
+from agentshift.parsers.openclaw import parse_skill_dir
 
 # ---------------------------------------------------------------------------
 # Helpers

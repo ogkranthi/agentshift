@@ -401,12 +401,11 @@ def audit_batch_cmd(
         meta_file = subdir / "agent_meta.json"
         meta = {}
         if meta_file.exists():
+            import contextlib
             import json as _json
 
-            try:
+            with contextlib.suppress(Exception):
                 meta = _json.loads(meta_file.read_text(encoding="utf-8"))
-            except Exception:
-                pass
 
         agent_id = meta.get("id", subdir.name)
         domain_val = meta.get("domain", "")

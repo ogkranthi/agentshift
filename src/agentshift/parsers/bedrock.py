@@ -93,7 +93,7 @@ def parse(input_dir: Path) -> AgentIR:
     instruction = _resolve_instruction(agent_json, cfn_yaml, instruction_txt)
 
     # Strip truncation notice if present
-    instruction, was_truncated = _strip_truncation_notice(instruction)
+    instruction, _was_truncated = _strip_truncation_notice(instruction)
 
     # Build persona
     sections = extract_sections(instruction) if instruction else None
@@ -179,7 +179,7 @@ def _resolve_identity(
 
         # Agent alias ID from outputs
         outputs = cfn_yaml.get("Outputs", {})
-        for key, val in outputs.items():
+        for key, _val in outputs.items():
             if "AgentId" in key and not agent_id:
                 # Usually a !GetAtt reference — can't resolve statically
                 pass
@@ -276,7 +276,7 @@ def _extract_tools_from_openapi(openapi: dict | None) -> list[Tool]:
     paths = openapi.get("paths", {})
 
     for path, path_item in paths.items():
-        for method, operation in path_item.items():
+        for _method, operation in path_item.items():
             if not isinstance(operation, dict):
                 continue
 
