@@ -141,9 +141,7 @@ class TestSkillsMapping:
         assert "bash" in skill_ids
 
     def test_skill_has_required_fields(self, tmp_path):
-        ir = _make_ir(
-            tools=[Tool(name="my-tool", description="Does stuff", kind="function")]
-        )
+        ir = _make_ir(tools=[Tool(name="my-tool", description="Does stuff", kind="function")])
         card = _emit_and_load(ir, tmp_path)
         skill = card["skills"][0]
         assert "id" in skill
@@ -160,18 +158,14 @@ class TestSkillsMapping:
         assert "calculate" in skill["description"].lower()
 
     def test_skill_name_humanized(self, tmp_path):
-        ir = _make_ir(
-            tools=[Tool(name="web_search", description="Search", kind="builtin")]
-        )
+        ir = _make_ir(tools=[Tool(name="web_search", description="Search", kind="builtin")])
         card = _emit_and_load(ir, tmp_path)
         # "web_search" → "Web Search" (title case)
         skill = card["skills"][0]
         assert skill["name"] == "Web Search"
 
     def test_skill_tags_include_kind(self, tmp_path):
-        ir = _make_ir(
-            tools=[Tool(name="bash", description="Run shell commands", kind="shell")]
-        )
+        ir = _make_ir(tools=[Tool(name="bash", description="Run shell commands", kind="shell")])
         card = _emit_and_load(ir, tmp_path)
         skill = next(s for s in card["skills"] if s["id"] == "bash")
         assert "shell" in skill["tags"]
@@ -222,7 +216,14 @@ class TestNoToolsEdgeCase:
     def test_no_tools_required_fields_still_present(self, tmp_path):
         ir = _make_ir(tools=[])
         card = _emit_and_load(ir, tmp_path)
-        for field in ("name", "description", "version", "supportedInterfaces", "capabilities", "skills"):
+        for field in (
+            "name",
+            "description",
+            "version",
+            "supportedInterfaces",
+            "capabilities",
+            "skills",
+        ):
             assert field in card, f"Required field {field!r} missing from minimal card"
 
     def test_no_tools_streaming_false(self, tmp_path):
@@ -269,7 +270,7 @@ class TestSecuritySchemes:
         )
         card = _emit_and_load(ir, tmp_path)
         assert "securitySchemes" in card
-        scheme = list(card["securitySchemes"].values())[0]
+        scheme = next(iter(card["securitySchemes"].values()))
         assert "httpAuthSecurityScheme" in scheme
 
     def test_oauth2_auth_produces_scheme(self, tmp_path):
@@ -285,13 +286,11 @@ class TestSecuritySchemes:
         )
         card = _emit_and_load(ir, tmp_path)
         assert "securitySchemes" in card
-        scheme = list(card["securitySchemes"].values())[0]
+        scheme = next(iter(card["securitySchemes"].values()))
         assert "oauth2SecurityScheme" in scheme
 
     def test_no_auth_no_security_schemes(self, tmp_path):
-        ir = _make_ir(
-            tools=[Tool(name="public-tool", description="Public", kind="function")]
-        )
+        ir = _make_ir(tools=[Tool(name="public-tool", description="Public", kind="function")])
         card = _emit_and_load(ir, tmp_path)
         assert "securitySchemes" not in card or not card.get("securitySchemes")
 
@@ -309,7 +308,7 @@ class TestSecuritySchemes:
         card = _emit_and_load(ir, tmp_path)
         assert "securityRequirements" in card
         scheme_names = set(card["securitySchemes"].keys())
-        req_names = {list(req.keys())[0] for req in card["securityRequirements"]}
+        req_names = {next(iter(req.keys())) for req in card["securityRequirements"]}
         assert scheme_names == req_names
 
 
@@ -453,7 +452,14 @@ class TestFixtureConversion:
         ir = parse_openclaw(PREGNANCY_COMPANION_DIR)
         card = _emit_and_load(ir, tmp_path)
 
-        for field in ("name", "description", "version", "supportedInterfaces", "capabilities", "skills"):
+        for field in (
+            "name",
+            "description",
+            "version",
+            "supportedInterfaces",
+            "capabilities",
+            "skills",
+        ):
             assert field in card, f"Required field {field!r} missing"
 
     @pytest.mark.skipif(

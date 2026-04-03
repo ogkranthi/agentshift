@@ -17,9 +17,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
-from agentshift.ir import AgentIR, Governance, Guardrail, Persona, Tool
+from agentshift.ir import AgentIR, Persona, Tool
 from agentshift.registry import DriftChange, DriftReport, Registry, RegistryEntry
 
 # ---------------------------------------------------------------------------
@@ -272,7 +270,8 @@ class TestDiffNoDrift:
         reg.register("meta-stable", "/path", "openclaw", ir_dict)
 
         # Create a copy with modified metadata (source_file changed)
-        from agentshift.ir import AgentIR, Metadata, Persona
+        from agentshift.ir import AgentIR, Persona
+
         ir = AgentIR(
             name="meta-stable",
             description="A test agent.",
@@ -463,7 +462,14 @@ class TestExport:
         result = json.loads(reg.export())
         entry = result["agents"]["full-agent"]
 
-        for field in ("name", "source_path", "platform", "ir_snapshot", "registered_at", "content_hash"):
+        for field in (
+            "name",
+            "source_path",
+            "platform",
+            "ir_snapshot",
+            "registered_at",
+            "content_hash",
+        ):
             assert field in entry, f"Entry missing field {field!r}"
 
     def test_export_multi_agent_all_included(self, tmp_path):
@@ -501,7 +507,14 @@ class TestRegistryEntrySerialization:
         reg = _make_registry(tmp_path)
         entry = reg.register("fields-check", "/p", "vertex", _make_ir_dict())
         d = entry.to_dict()
-        for key in ("name", "source_path", "platform", "ir_snapshot", "registered_at", "content_hash"):
+        for key in (
+            "name",
+            "source_path",
+            "platform",
+            "ir_snapshot",
+            "registered_at",
+            "content_hash",
+        ):
             assert key in d
 
     def test_registry_file_has_version_field(self, tmp_path):

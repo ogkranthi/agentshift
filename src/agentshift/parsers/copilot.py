@@ -209,9 +209,7 @@ def parse(input_dir: Path) -> AgentIR:
 
     agent_files = sorted(input_dir.glob("*.agent.md"))
     if not agent_files:
-        raise FileNotFoundError(
-            f"No .agent.md files found in {input_dir}"
-        )
+        raise FileNotFoundError(f"No .agent.md files found in {input_dir}")
 
     primary = agent_files[0]
     content = primary.read_text(encoding="utf-8")
@@ -232,9 +230,7 @@ def parse_multiple(input_dir: Path) -> list[AgentIR]:
 
     agent_files = sorted(input_dir.glob("*.agent.md"))
     if not agent_files:
-        raise FileNotFoundError(
-            f"No .agent.md files found in {input_dir}"
-        )
+        raise FileNotFoundError(f"No .agent.md files found in {input_dir}")
 
     readme = _load_text(input_dir / "README.md")
     results = []
@@ -376,7 +372,7 @@ def _split_frontmatter(content: str, filename: str) -> tuple[dict[str, Any], str
         return {}, content.strip()
 
     yaml_text = m.group(1)
-    body = content[m.end():].strip()
+    body = content[m.end() :].strip()
 
     try:
         fm = yaml.safe_load(yaml_text)
@@ -538,9 +534,7 @@ def _build_governance(
             if parsed:
                 kind, data = parsed
                 if kind == "tool_permission":
-                    data["notes"] = (
-                        "Elevated from L2 — recovered from Copilot prompt instruction"
-                    )
+                    data["notes"] = "Elevated from L2 — recovered from Copilot prompt instruction"
                     tool_permissions.append(ToolPermission(**data))
                 elif kind == "platform_annotation":
                     data["id"] = f"PA-{pa_idx:03d}"

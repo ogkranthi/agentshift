@@ -485,7 +485,9 @@ def registry_list() -> None:
     agents = registry.list_agents()
 
     if not agents:
-        console.print("[dim]No agents registered. Use [bold]agentshift registry register[/bold] to add one.[/dim]")
+        console.print(
+            "[dim]No agents registered. Use [bold]agentshift registry register[/bold] to add one.[/dim]"
+        )
         return
 
     from rich.table import Table

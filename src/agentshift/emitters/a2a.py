@@ -83,9 +83,7 @@ def _build_agent_card(ir: AgentIR) -> dict[str, Any]:
     security_schemes = _build_security_schemes(ir)
     if security_schemes:
         card["securitySchemes"] = security_schemes
-        card["securityRequirements"] = [
-            {name: []} for name in security_schemes
-        ]
+        card["securityRequirements"] = [{name: []} for name in security_schemes]
 
     return card
 
@@ -142,13 +140,9 @@ def _build_capabilities(ir: AgentIR) -> dict[str, Any]:
 
     # Governance extension
     gov = ir.governance
-    has_governance = (
-        gov.guardrails or gov.tool_permissions or gov.platform_annotations
-    )
+    has_governance = gov.guardrails or gov.tool_permissions or gov.platform_annotations
     if has_governance:
-        categories = sorted(
-            {g.category for g in gov.guardrails if g.category != "general"}
-        )
+        categories = sorted({g.category for g in gov.guardrails if g.category != "general"})
         caps["extensions"] = [
             {
                 "uri": "https://agentshift.sh/extensions/governance/v1",
@@ -243,9 +237,7 @@ def _build_security_schemes(ir: AgentIR) -> dict[str, Any]:
                     "flows": {
                         "clientCredentials": {
                             "tokenUrl": "https://TODO.example.com/oauth/token",
-                            "scopes": {
-                                s: s for s in (tool.auth.scopes or [])
-                            },
+                            "scopes": {s: s for s in (tool.auth.scopes or [])},
                         }
                     }
                 }

@@ -124,10 +124,13 @@ class TestParseFixture:
         """## Governance Constraints (Elevated) → tool_permissions."""
         ir = copilot_parser.parse(FIXTURES_DIR)
         # The fixture has "The edit/editFiles tool is READ-ONLY"
-        tp = ir.governance.tool_permissions
         # May be empty if reverse elevation didn't match; check leniently
         # At minimum, content policy should generate a platform_annotation
-        all_gov = ir.governance.guardrails + ir.governance.tool_permissions + ir.governance.platform_annotations
+        all_gov = (
+            ir.governance.guardrails
+            + ir.governance.tool_permissions
+            + ir.governance.platform_annotations
+        )
         assert len(all_gov) > 0
 
 
@@ -217,7 +220,7 @@ class TestEdgeCases:
 
     def test_directory_without_agent_md_raises(self, tmp_path):
         (tmp_path / "README.md").write_text("# No agent here")
-        with pytest.raises(FileNotFoundError, match="No .agent.md files found"):
+        with pytest.raises(FileNotFoundError, match=r"No \.agent\.md files found"):
             copilot_parser.parse(tmp_path)
 
     def test_invalid_yaml_frontmatter_gracefully_handled(self):
@@ -265,12 +268,8 @@ class TestEdgeCases:
 
     def test_parse_multiple_returns_list(self, tmp_path):
         """parse_multiple() returns one IR per .agent.md file."""
-        (tmp_path / "agent-a.agent.md").write_text(
-            "---\nname: agent-a\ntools: []\n---\nAgent A."
-        )
-        (tmp_path / "agent-b.agent.md").write_text(
-            "---\nname: agent-b\ntools: []\n---\nAgent B."
-        )
+        (tmp_path / "agent-a.agent.md").write_text("---\nname: agent-a\ntools: []\n---\nAgent A.")
+        (tmp_path / "agent-b.agent.md").write_text("---\nname: agent-b\ntools: []\n---\nAgent B.")
         irs = copilot_parser.parse_multiple(tmp_path)
         assert len(irs) == 2
         names = {ir.name for ir in irs}

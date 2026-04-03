@@ -10,10 +10,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-
 
 _DEFAULT_REGISTRY_DIR = Path.home() / ".agentshift"
 _REGISTRY_FILE = "registry.json"
@@ -98,9 +97,7 @@ class Registry:
         self.registry_dir.mkdir(parents=True, exist_ok=True)
         data = {
             "version": "1.0",
-            "agents": {
-                name: entry.to_dict() for name, entry in self._entries.items()
-            },
+            "agents": {name: entry.to_dict() for name, entry in self._entries.items()},
         }
         self.registry_file.write_text(
             json.dumps(data, indent=2, ensure_ascii=False) + "\n",
@@ -121,7 +118,7 @@ class Registry:
             source_path=source_path,
             platform=platform,
             ir_snapshot=ir_dict,
-            registered_at=datetime.now(timezone.utc).isoformat(),
+            registered_at=datetime.now(UTC).isoformat(),
             content_hash=content_hash,
         )
         self._entries[name] = entry
@@ -176,11 +173,9 @@ class Registry:
         """Export the full registry."""
         data = {
             "version": "1.0",
-            "exported_at": datetime.now(timezone.utc).isoformat(),
+            "exported_at": datetime.now(UTC).isoformat(),
             "agent_count": len(self._entries),
-            "agents": {
-                name: entry.to_dict() for name, entry in self._entries.items()
-            },
+            "agents": {name: entry.to_dict() for name, entry in self._entries.items()},
         }
         return json.dumps(data, indent=2, ensure_ascii=False)
 
@@ -270,12 +265,10 @@ def _compute_changes(
                         )
                     )
                 else:
-                    for i, (a, b) in enumerate(zip(old_val, new_val)):
+                    for i, (a, b) in enumerate(zip(old_val, new_val, strict=False)):
                         if a != b:
                             if isinstance(a, dict) and isinstance(b, dict):
-                                changes.extend(
-                                    _compute_changes(a, b, prefix=f"{path}[{i}]")
-                                )
+                                changes.extend(_compute_changes(a, b, prefix=f"{path}[{i}]"))
                             else:
                                 changes.append(
                                     DriftChange(
@@ -287,9 +280,7 @@ def _compute_changes(
                                 )
             else:
                 changes.append(
-                    DriftChange(
-                        field=path, kind="modified", old_value=old_val, new_value=new_val
-                    )
+                    DriftChange(field=path, kind="modified", old_value=old_val, new_value=new_val)
                 )
 
     return changes
