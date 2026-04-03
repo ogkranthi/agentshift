@@ -117,6 +117,6 @@
 | D27 | P1 | @dev | merged | Implement A2A Agent Card emitter (IR → agent-card.json per A2A spec) — blocked on A16 |
 | D28 | P1 | @dev | merged | Implement `agentshift registry` command — local registry (register/list/diff/export) with drift detection |
 | D29 | P1 | @dev | merged | Bump version to 0.4.0 — CHANGELOG.md, pyproject.toml, add registry + A2A to README — blocked on D26-D28 |
-| T17 | P1 | @tester | ready | Write tests for Copilot parser (fixtures + round-trip with Copilot emitter) — blocked on D26 |
-| T18 | P1 | @tester | ready | Write tests for A2A emitter (schema validation, fixture conversion) — blocked on D27 |
-| T19 | P1 | @tester | ready | Write tests for registry + drift detection (register/list/compare/export) — blocked on D28 |
+| T17 | P1 | @tester | in-progress | Write tests for Copilot parser (fixtures + round-trip with Copilot emitter) — blocked on D26 |
+| T18 | P1 | @tester | in-progress | Write tests for A2A emitter (schema validation, fixture conversion) — blocked on D27 |
+| T19 | P1 | @tester | in-progress | Write tests for registry + drift detection (register/list/compare/export) — blocked on D28 |
