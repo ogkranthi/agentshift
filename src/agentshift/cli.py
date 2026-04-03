@@ -436,5 +436,157 @@ def audit_batch_cmd(
         console.print(f"[green]✓[/green] JSON exported → [cyan]{output_json}[/cyan]")
 
 
+# ---------------------------------------------------------------------------
+# Registry subcommand group
+# ---------------------------------------------------------------------------
+
+registry_app = typer.Typer(
+    name="registry",
+    help="Local agent registry — register, list, diff, and export agent snapshots.",
+    no_args_is_help=True,
+)
+app.add_typer(registry_app, name="registry")
+
+
+@registry_app.command(name="register")
+def registry_register(
+    source: Path = typer.Argument(help="Path to agent directory"),
+    from_platform: str = typer.Option(
+        "openclaw", "--from", help=f"Source platform: {', '.join(_PARSERS)}"
+    ),
+    name: str = typer.Option("", "--name", help="Override agent name"),
+) -> None:
+    """Register an agent in the local registry (snapshot for drift detection)."""
+    from agentshift.registry import Registry
+
+    parse_fn = _get_parser(from_platform)
+    ir = _parse_with_errors(parse_fn, source)
+
+    agent_name = name or ir.name
+    registry = Registry()
+    entry = registry.register(
+        name=agent_name,
+        source_path=str(source.resolve()),
+        platform=from_platform,
+        ir_dict=ir.model_dump(),
+    )
+    console.print(
+        f"[green]✓[/green] Registered [bold]{agent_name}[/bold] "
+        f"(hash: {entry.content_hash}) from [cyan]{source}[/cyan]"
+    )
+
+
+@registry_app.command(name="list")
+def registry_list() -> None:
+    """List all registered agents."""
+    from agentshift.registry import Registry
+
+    registry = Registry()
+    agents = registry.list_agents()
+
+    if not agents:
+        console.print("[dim]No agents registered. Use [bold]agentshift registry register[/bold] to add one.[/dim]")
+        return
+
+    from rich.table import Table
+
+    table = Table(title="Registered Agents")
+    table.add_column("Name", style="bold")
+    table.add_column("Platform")
+    table.add_column("Source Path")
+    table.add_column("Registered At")
+    table.add_column("Hash", style="dim")
+
+    for agent in agents:
+        table.add_row(
+            agent.name,
+            agent.platform,
+            agent.source_path,
+            agent.registered_at[:19],
+            agent.content_hash[:8],
+        )
+
+    console.print(table)
+
+
+@registry_app.command(name="diff")
+def registry_diff(
+    name: str = typer.Argument(help="Registered agent name to compare"),
+    source: Path = typer.Option(
+        None, "--source", help="Path to current agent (default: use registered source_path)"
+    ),
+    from_platform: str = typer.Option(
+        "", "--from", help="Source platform (default: use registered platform)"
+    ),
+) -> None:
+    """Compare current agent state against registered snapshot (drift detection)."""
+    from agentshift.registry import Registry
+
+    registry = Registry()
+    entry = registry.get(name)
+    if entry is None:
+        err_console.print(f"[red]Agent not found in registry:[/red] {name!r}")
+        err_console.print("  Use [bold]agentshift registry list[/bold] to see registered agents.")
+        raise typer.Exit(1)
+
+    # Resolve source path
+    agent_path = source or Path(entry.source_path)
+    platform = from_platform or entry.platform
+
+    parse_fn = _get_parser(platform)
+    ir = _parse_with_errors(parse_fn, agent_path)
+
+    report = registry.diff(name, ir.model_dump())
+
+    if not report.has_drift:
+        console.print(f"[green]✓[/green] [bold]{name}[/bold] — no drift detected")
+        return
+
+    console.print(f"[yellow]⚠[/yellow] [bold]{name}[/bold] — drift detected!")
+    console.print()
+
+    from rich.table import Table
+
+    table = Table(title=f"Drift Report: {name}")
+    table.add_column("Field", style="bold")
+    table.add_column("Change")
+    table.add_column("Old Value", style="red")
+    table.add_column("New Value", style="green")
+
+    for change in report.changes:
+        old_str = _truncate(str(change.old_value), 60) if change.old_value is not None else ""
+        new_str = _truncate(str(change.new_value), 60) if change.new_value is not None else ""
+        table.add_row(change.field, change.kind, old_str, new_str)
+
+    console.print(table)
+
+
+@registry_app.command(name="export")
+def registry_export(
+    output: Path | None = typer.Option(
+        None, "--output", "-o", help="Output file (default: stdout)"
+    ),
+) -> None:
+    """Export the full registry as JSON."""
+    from agentshift.registry import Registry
+
+    registry = Registry()
+    export_data = registry.export()
+
+    if output:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(export_data + "\n", encoding="utf-8")
+        console.print(f"[green]✓[/green] Registry exported → [cyan]{output}[/cyan]")
+    else:
+        console.print(export_data)
+
+
+def _truncate(s: str, max_len: int) -> str:
+    """Truncate a string for display."""
+    if len(s) <= max_len:
+        return s
+    return s[: max_len - 3] + "..."
+
+
 if __name__ == "__main__":
     app()
