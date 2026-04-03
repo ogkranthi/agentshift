@@ -28,6 +28,7 @@ _PARSERS = {
     "bedrock": "agentshift.parsers.bedrock:parse",
     "vertex": "agentshift.parsers.vertex:parse",
     "copilot": "agentshift.parsers.copilot:parse",
+    "agents-md": "agentshift.parsers.agents_md:parse",
 }
 
 _EMITTERS = {

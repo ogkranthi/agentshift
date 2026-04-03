@@ -160,7 +160,10 @@ class Metadata(BaseModel):
     model_config = {"extra": "forbid"}
 
     source_platform: (
-        Literal["openclaw", "claude-code", "copilot", "bedrock", "vertex-ai", "unknown"] | None
+        Literal[
+            "openclaw", "claude-code", "copilot", "bedrock", "vertex-ai", "agents-md", "unknown"
+        ]
+        | None
     ) = None
     target_platforms: list[
         Literal["openclaw", "claude-code", "copilot", "bedrock", "vertex-ai"]
