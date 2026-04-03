@@ -71,11 +71,17 @@ agentshift convert ./bedrock-output/ --from bedrock --to openclaw --output ./my-
 # Parse Vertex AI artifacts → convert to Claude Code
 agentshift convert ./vertex-output/ --from vertex --to claude-code --output ./claude-output
 
+# Parse Copilot .agent.md → convert to Bedrock
+agentshift convert ./my-copilot/ --from copilot --to bedrock --output ./bedrock-output
+
 # Diff portability from Bedrock source
 agentshift diff ./bedrock-output/ --from bedrock --targets claude-code,copilot
 
 # Governance audit: Vertex → Bedrock round-trip
 agentshift audit ./vertex-output/ --from vertex --targets bedrock
+
+# Generate A2A Agent Card for platform interoperability
+agentshift convert ~/.openclaw/skills/weather --from openclaw --to a2a --output ./weather-a2a
 ```
 
 ## See portability before converting
@@ -114,17 +120,38 @@ agentshift audit ./my-bedrock-agent/ --from bedrock --targets claude-code
 agentshift audit ./vertex-output/ --from vertex --targets bedrock,claude-code
 ```
 
+## Agent registry
+
+Track your agents and detect configuration drift across environments:
+
+```bash
+# Register an agent
+agentshift registry register ~/.openclaw/skills/weather
+
+# List all registered agents
+agentshift registry list
+
+# Detect drift since last registration
+agentshift registry diff weather
+
+# Export registry as JSON
+agentshift registry export
+```
+
+Registry is stored at `~/.agentshift/registry.json` and works offline.
+
 ## Supported platforms
 
 | Platform | Read (parser) | Write (emitter) | Status |
 |---|:---:|:---:|---|
 | OpenClaw | ✅ | ✅ | **Works today** |
 | Claude Code | ✅ | ✅ | **Works today** |
-| GitHub Copilot | — | ✅ | **Works today** |
+| GitHub Copilot | ✅ `--from copilot` | ✅ | **Works today** |
 | AWS Bedrock | ✅ `--from bedrock` | ✅ | **Works today** |
 | Microsoft 365 Copilot | — | ✅ | **Works today** |
 | GCP Vertex AI | ✅ `--from vertex` | ✅ | **Works today** |
-| LangGraph | — | — | Planned |
+| A2A Agent Card | — | ✅ `--to a2a` | **Works today** |
+| LangGraph | — | ✅ | **Works today** |
 | CrewAI | — | — | Planned |
 
 ## Guides
