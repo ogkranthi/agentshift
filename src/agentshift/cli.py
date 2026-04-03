@@ -37,6 +37,7 @@ _EMITTERS = {
     "m365": "agentshift.emitters.m365:emit",
     "vertex": "agentshift.emitters.vertex:emit",
     "langgraph": "agentshift.emitters.langgraph:emit",
+    "a2a": "agentshift.emitters.a2a:emit",
 }
 
 
