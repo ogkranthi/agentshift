@@ -511,6 +511,76 @@ def compliance(
         render_compliance_report(ir, framework, checks)
 
 
+@app.command()
+def migrate(
+    source: Path = typer.Option(
+        Path.home() / ".openclaw", "--source", help="OpenClaw install directory"
+    ),
+    from_platform: str = typer.Option(
+        "openclaw", "--from", help="Source platform (currently: openclaw)"
+    ),
+    to_platform: str = typer.Option(
+        "nemoclaw", "--to", help="Target platform (currently: nemoclaw)"
+    ),
+    cloud: str = typer.Option(
+        "docker", "--cloud", help="Cloud target: aws, gcp, azure, docker, bare-metal"
+    ),
+    output: Path = typer.Option(Path("./migration-package"), "--output", "-o"),
+) -> None:
+    """Migrate an entire agent installation to a new platform (e.g. OpenClaw -> NemoClaw)."""
+    from agentshift.migrator import migrate_openclaw_to_nemoclaw
+
+    valid_clouds = ["aws", "gcp", "azure", "docker", "bare-metal"]
+    if cloud not in valid_clouds:
+        err_console.print(f"[red]Unknown cloud target:[/red] {cloud!r}")
+        err_console.print(f"  Supported: {', '.join(valid_clouds)}")
+        raise typer.Exit(1)
+
+    if from_platform != "openclaw":
+        err_console.print(f"[red]Unsupported source platform:[/red] {from_platform!r}")
+        err_console.print("  Currently supported: openclaw")
+        raise typer.Exit(1)
+
+    if to_platform != "nemoclaw":
+        err_console.print(f"[red]Unsupported target platform:[/red] {to_platform!r}")
+        err_console.print("  Currently supported: nemoclaw")
+        raise typer.Exit(1)
+
+    if not source.exists():
+        err_console.print(f"[red]Source directory not found:[/red] {source}")
+        raise typer.Exit(1)
+
+    console.print(
+        f"[bold]AgentShift migrate[/bold] [cyan]{source}[/cyan] "
+        f"({from_platform}) → [green]{to_platform}[/green] (cloud: {cloud})"
+    )
+
+    from rich.progress import Progress
+
+    with Progress(console=console) as progress:
+        task = progress.add_task("Migrating...", total=None)
+        result = migrate_openclaw_to_nemoclaw(source, output, cloud=cloud)
+        progress.update(task, completed=True)
+
+    # Summary
+    console.print()
+    console.print("[bold]Migration complete![/bold]")
+    console.print(f"  Skills: {result.skills_migrated}/{result.skills_total} migrated")
+    if result.skills_skipped:
+        console.print(f"  Skipped: {', '.join(result.skills_skipped)}")
+    console.print(f"  Cron jobs: {result.cron_jobs_migrated}/{result.cron_jobs_total} migrated")
+    if result.credentials_required:
+        console.print(f"  Credentials to re-enter: {len(result.credentials_required)}")
+    if result.warnings:
+        for w in result.warnings:
+            console.print(f"  [yellow]Warning:[/yellow] {w}")
+    if result.errors:
+        for e in result.errors:
+            console.print(f"  [red]Error:[/red] {e}")
+    console.print(f"\n[green]✓[/green] Output → [cyan]{output}[/cyan]")
+    console.print(f"  Report: [cyan]{output}/MIGRATION_REPORT.md[/cyan]")
+
+
 # ---------------------------------------------------------------------------
 # Registry subcommand group
 # ---------------------------------------------------------------------------

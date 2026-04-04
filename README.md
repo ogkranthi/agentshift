@@ -111,6 +111,15 @@ agentshift audit ./vertex-output/ --from vertex --targets bedrock
 agentshift convert ~/.openclaw/skills/weather --from openclaw --to a2a --output ./weather-a2a
 ```
 
+## Full-installation migration
+
+```bash
+# Migrate entire OpenClaw install to NemoClaw (any cloud)
+agentshift migrate --source ~/.openclaw --to nemoclaw --cloud aws --output ./migration
+```
+
+Supports `--cloud aws | gcp | azure | docker | bare-metal`. Migrates all skills, cron jobs, network policies, and generates cloud deploy files.
+
 ## New in v0.4.0
 
 ```bash
