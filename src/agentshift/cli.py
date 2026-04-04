@@ -39,6 +39,7 @@ _EMITTERS = {
     "vertex": "agentshift.emitters.vertex:emit",
     "langgraph": "agentshift.emitters.langgraph:emit",
     "a2a": "agentshift.emitters.a2a:emit",
+    "nemoclaw": "agentshift.emitters.nemoclaw:emit",
 }
 
 

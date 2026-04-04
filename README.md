@@ -203,6 +203,7 @@ Registry is stored at `~/.agentshift/registry.json` and works offline.
 | Microsoft 365 | — | ✅ | Works today |
 | Google A2A | — | ✅ | Works today |
 | LangGraph | — | ✅ | Works today |
+| NVIDIA NemoClaw | — | ✅ | Works today |
 
 ## Guides
 
