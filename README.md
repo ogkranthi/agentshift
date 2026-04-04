@@ -11,6 +11,8 @@
 
 ---
 
+> **OpenClaw users:** Anthropic is [ending Claude subscription access for third-party tools](https://www.theverge.com/news/643004/anthropic-bans-openclaw-claude-extra-pay) on **April 4th, 2025**. AgentShift converts your OpenClaw agents to Claude Code, Copilot, or any supported platform — with governance preserved. **[Migrate now &rarr;](#migrate-from-openclaw)**
+
 Your OpenClaw skill shouldn't be locked to one platform. **AgentShift converts it to Claude Code, GitHub Copilot, AWS Bedrock, Microsoft 365 Copilot, GCP Vertex AI, and more.**
 
 ## Install
@@ -51,6 +53,31 @@ weather-claude/               weather-copilot/
 ├── CLAUDE.md                 ├── weather.agent.md
 └── settings.json             └── README.md
 ```
+
+## Migrate from OpenClaw
+
+With Anthropic ending Claude subscription access for OpenClaw on April 4th, here's how to move your agents:
+
+```bash
+# 1. Install
+pip install agentshift
+
+# 2. Convert to Claude Code (recommended — closest to OpenClaw)
+agentshift convert ~/.openclaw/skills/my-agent --from openclaw --to claude-code -o ./my-agent-claude/
+
+# 3. Audit governance preservation
+agentshift audit ~/.openclaw/skills/my-agent --targets claude-code,copilot
+
+# 4. Convert to ALL platforms at once
+agentshift convert ~/.openclaw/skills/my-agent --from openclaw --to all -o ./my-agent-output/
+```
+
+**Governance preservation** — AgentShift tracks three layers:
+- **L1 (Prompt guardrails):** 100% preserved on all platforms
+- **L2 (Tool permissions):** 93% on Claude Code, 37% on Copilot (rest elevated to instructions)
+- **L3 (Platform-native):** Elevated to prompt instructions with 93.6% behavioral equivalence
+
+Run `agentshift audit` to see exactly what survives for your specific agent.
 
 ## How it works
 
