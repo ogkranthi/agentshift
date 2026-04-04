@@ -120,3 +120,25 @@
 | T17 | P1 | @tester | merged | Write tests for Copilot parser (fixtures + round-trip with Copilot emitter) — blocked on D26 |
 | T18 | P1 | @tester | merged | Write tests for A2A emitter (schema validation, fixture conversion) — blocked on D27 |
 | T19 | P1 | @tester | merged | Write tests for registry + drift detection (register/list/compare/export) — blocked on D28 |
+
+## Week 9: OSS Frameworks + PyPI Publish + DX Polish (v0.5)
+
+> Expands into the OSS multi-agent framework ecosystem (OpenAI Agents SDK, CrewAI, AutoGen),
+> adds automated PyPI publish via GitHub Actions (Trusted Publisher), and polishes the
+> developer experience with `agentshift init` scaffolding and better error messages.
+
+| ID | Priority | Owner | Status | Title |
+|----|----------|-------|--------|-------|
+| A17 | P0 | @architect | ready | Spec OpenAI Agents SDK emitter format — Python code-gen strategy, tool stubs, handoffs |
+| A18 | P0 | @architect | ready | Spec CrewAI parser + emitter — agents.yaml / tasks.yaml bidirectional mapping |
+| A19 | P1 | @architect | ready | Spec AutoGen AgentChat emitter — JSON component model, team config, model clients |
+| D30 | P1 | @dev | ready | Implement OpenAI Agents SDK emitter (IR → agent.py + tools.py + README) — blocked on A17 |
+| D31 | P1 | @dev | ready | Implement CrewAI emitter (IR → agents.yaml + tasks.yaml + crew.py + README) — blocked on A18 |
+| D32 | P1 | @dev | ready | Implement CrewAI parser (agents.yaml + tasks.yaml → IR) — blocked on A18 |
+| D33 | P1 | @dev | ready | Implement AutoGen emitter (IR → agent_config.json + tools.py + run.py) — blocked on A19 |
+| D34 | P2 | @dev | ready | Implement `agentshift init` scaffold command — interactive new-agent wizard (name, format, tools) |
+| D35 | P2 | @dev | ready | Automated PyPI publish via GitHub Actions Trusted Publisher — on tag push, wheel + sdist |
+| D36 | P1 | @dev | ready | Bump version to 0.5.0 — CHANGELOG.md, pyproject.toml, add new platforms to README — blocked on D30-D33 |
+| T20 | P1 | @tester | ready | Write tests for OpenAI Agents SDK emitter (fixture conversion, tool stub generation) — blocked on D30 |
+| T21 | P1 | @tester | ready | Write tests for CrewAI parser + emitter (agents.yaml round-trip, task mapping) — blocked on D31-D32 |
+| T22 | P1 | @tester | ready | Write tests for AutoGen emitter (JSON schema validation, fixture conversion) — blocked on D33 |
