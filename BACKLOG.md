@@ -132,10 +132,10 @@
 | A17 | P0 | @architect | merged | Spec OpenAI Agents SDK emitter format — Python code-gen strategy, tool stubs, handoffs |
 | A18 | P0 | @architect | merged | Spec CrewAI parser + emitter — agents.yaml / tasks.yaml bidirectional mapping |
 | A19 | P1 | @architect | merged | Spec AutoGen AgentChat emitter — JSON component model, team config, model clients |
-| D30 | P1 | @dev | ready | Implement OpenAI Agents SDK emitter (IR → agent.py + tools.py + README) — blocked on A17 |
-| D31 | P1 | @dev | ready | Implement CrewAI emitter (IR → agents.yaml + tasks.yaml + crew.py + README) — blocked on A18 |
-| D32 | P1 | @dev | ready | Implement CrewAI parser (agents.yaml + tasks.yaml → IR) — blocked on A18 |
-| D33 | P1 | @dev | ready | Implement AutoGen emitter (IR → agent_config.json + tools.py + run.py) — blocked on A19 |
+| D30 | P1 | @dev | merged | Implement OpenAI Agents SDK emitter (IR → agent.py + tools.py + README) — blocked on A17 |
+| D31 | P1 | @dev | merged | Implement CrewAI emitter (IR → agents.yaml + tasks.yaml + crew.py + README) — blocked on A18 |
+| D32 | P1 | @dev | merged | Implement CrewAI parser (agents.yaml + tasks.yaml → IR) — blocked on A18 |
+| D33 | P1 | @dev | merged | Implement AutoGen emitter (IR → agent_config.json + tools.py + run.py) — blocked on A19 |
 | D34 | P2 | @dev | ready | Implement `agentshift init` scaffold command — interactive new-agent wizard (name, format, tools) |
 | D35 | P2 | @dev | ready | Automated PyPI publish via GitHub Actions Trusted Publisher — on tag push, wheel + sdist |
 | D36 | P1 | @dev | ready | Bump version to 0.5.0 — CHANGELOG.md, pyproject.toml, add new platforms to README — blocked on D30-D33 |
