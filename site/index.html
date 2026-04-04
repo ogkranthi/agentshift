@@ -29,17 +29,24 @@
     </div>
   </nav>
 
+  <section class="banner">
+    <div class="banner-inner">
+      <strong>OpenClaw users:</strong> Anthropic is cutting off Claude subscriptions for third-party tools on April 4th.
+      Migrate your agents now &mdash; <a href="#migrate">see how</a>
+    </div>
+  </section>
+
   <section class="hero">
     <div class="hero-badge">Open Source &middot; Apache 2.0</div>
-    <h1>Define once,<br>run <span class="highlight">anywhere</span>.</h1>
-    <p class="hero-sub">AgentShift converts AI agents between platforms.<br>Your OpenClaw skill shouldn't be locked to one ecosystem.</p>
+    <h1>Migrate your OpenClaw agents.<br><span class="highlight">Keep your guardrails.</span></h1>
+    <p class="hero-sub">AgentShift converts AI agents between platforms in seconds. OpenClaw &rarr; Claude Code, GitHub Copilot, AWS Bedrock, and more. Your governance rules survive the move.</p>
     <div class="hero-install">
       <code>pip install agentshift</code>
       <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install agentshift');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
     </div>
     <div class="hero-actions">
-      <a href="https://github.com/ogkranthi/agentshift" class="btn btn-primary">View on GitHub</a>
-      <a href="https://github.com/ogkranthi/agentshift/blob/main/README.md" class="btn btn-secondary">Read the docs</a>
+      <a href="#migrate" class="btn btn-primary">Migration Guide</a>
+      <a href="https://github.com/ogkranthi/agentshift" class="btn btn-secondary">View on GitHub</a>
     </div>
   </section>
 
@@ -178,13 +185,72 @@ weather-copilot/<br>
     </div>
   </section>
 
+  <section id="migrate" class="migrate">
+    <h2>Migrate from OpenClaw in 3 commands</h2>
+    <p class="section-sub">Anthropic is ending Claude subscription access for OpenClaw on April 4th. Move your agents to Claude Code or any supported platform &mdash; with governance preserved.</p>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">migration</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line"><span class="prompt">#</span> Step 1: Install AgentShift</div>
+        <div class="terminal-line"><span class="prompt">$</span> pip install agentshift</div>
+        <div class="terminal-output"></div>
+        <div class="terminal-line"><span class="prompt">#</span> Step 2: Convert your OpenClaw skill to Claude Code</div>
+        <div class="terminal-line"><span class="prompt">$</span> agentshift convert ~/.openclaw/skills/my-agent --from openclaw --to claude-code -o ./my-agent-claude/</div>
+        <div class="terminal-output">
+&#x2714; Parsed OpenClaw skill: my-agent<br>
+&#x2714; Preserved 8/8 guardrails (L1)<br>
+&#x2714; Preserved 5/5 tool permissions (L2)<br>
+&#x2714; Elevated 3 platform annotations to instructions<br>
+&#x2714; Generated Claude Code config &rarr; ./my-agent-claude/<br>
+        </div>
+        <div class="terminal-line"><span class="prompt">#</span> Step 3: Audit what survived the conversion</div>
+        <div class="terminal-line"><span class="prompt">$</span> agentshift audit ~/.openclaw/skills/my-agent --targets claude-code,copilot</div>
+        <div class="terminal-output diff-output">
+ Target &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GPR-L1 &nbsp;GPR-L2 &nbsp;GPR-L3 &nbsp;Overall<br>
+&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;<br>
+ Claude Code &nbsp;&nbsp;<span class="g">1.00</span> &nbsp;&nbsp;&nbsp;<span class="g">0.93</span> &nbsp;&nbsp;&nbsp;<span class="y">0.00*</span> &nbsp;&nbsp;<span class="g">0.83</span><br>
+ Copilot &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="g">1.00</span> &nbsp;&nbsp;&nbsp;<span class="y">0.37</span> &nbsp;&nbsp;&nbsp;<span class="y">0.00*</span> &nbsp;&nbsp;<span class="y">0.62</span><br>
+&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;<br>
+ * L3 annotations elevated to prompt instructions<br>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="governance">
+    <h2>Governance-aware conversion</h2>
+    <p class="section-sub">AgentShift doesn't just copy configs. It understands three layers of governance and tells you exactly what survives the move.</p>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon" style="color: var(--green);">L1</div>
+        <h3>Prompt guardrails</h3>
+        <p><strong style="color: var(--green);">100% preserved.</strong> Safety rules, disclaimers, scope limits &mdash; these live in your instructions and always transfer.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" style="color: var(--yellow);">L2</div>
+        <h3>Tool permissions</h3>
+        <p><strong style="color: var(--yellow);">37&ndash;93% preserved</strong> depending on target. Deny lists, rate limits, read-only flags. What can't be enforced natively gets elevated to instructions.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon" style="color: var(--red);">L3</div>
+        <h3>Platform-native controls</h3>
+        <p><strong style="color: var(--red);">0% natively</strong> &mdash; but <strong style="color: var(--green);">93.6% behaviorally equivalent</strong> via elevation. Content filters, PII detection, grounding checks become prompt-level rules.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="why">
     <h2>Why AgentShift?</h2>
     <div class="why-grid">
       <div class="why-card">
         <div class="why-icon">&#x1F512;</div>
         <h3>No more lock-in</h3>
-        <p>60-70% of an agent is inherently portable &mdash; instructions, tools, knowledge. Don't rewrite it for every platform.</p>
+        <p>Don't rewrite agents for every platform. Convert once, deploy anywhere. Especially relevant now that Anthropic is restricting OpenClaw access.</p>
       </div>
       <div class="why-card">
         <div class="why-icon">&#x26A1;</div>
@@ -193,8 +259,8 @@ weather-copilot/<br>
       </div>
       <div class="why-card">
         <div class="why-icon">&#x1F50D;</div>
-        <h3>Portability scoring</h3>
-        <p><code>agentshift diff</code> tells you exactly what ports cleanly and what needs manual work. No surprises.</p>
+        <h3>Governance audit</h3>
+        <p><code>agentshift audit</code> gives you GPR scores showing exactly how much governance survived the conversion. No guessing.</p>
       </div>
       <div class="why-card">
         <div class="why-icon">&#x1F9E9;</div>
@@ -205,7 +271,7 @@ weather-copilot/<br>
   </section>
 
   <section class="cta">
-    <h2>Get started in 30 seconds</h2>
+    <h2>Migrate before April 4th</h2>
     <div class="hero-install">
       <code>pip install agentshift</code>
       <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install agentshift');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
