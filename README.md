@@ -223,7 +223,11 @@ Registry is stored at `~/.agentshift/registry.json` and works offline.
 | AWS Bedrock | [docs/bedrock.md](docs/bedrock.md) | [examples/github-to-bedrock](examples/github-to-bedrock/) |
 | Microsoft 365 | [docs/m365.md](docs/m365.md) | [examples/github-to-m365](examples/github-to-m365/) |
 | GCP Vertex AI | [docs/vertex.md](docs/vertex.md) | [examples/github-to-vertex](examples/github-to-vertex/) |
+| NVIDIA NemoClaw | [docs/nemoclaw.md](docs/nemoclaw.md) | — |
 | Architecture | [docs/architecture.md](docs/architecture.md) | — |
+| Migration guide | [docs/migrate.md](docs/migrate.md) | — |
+| EU AI Act compliance | [docs/compliance.md](docs/compliance.md) | — |
+| AGENTS.md source | [docs/agents-md.md](docs/agents-md.md) | — |
 
 ## Contributing
 
