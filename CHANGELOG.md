@@ -9,32 +9,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [0.4.0] — 2026-04-03
 
-Week 8 release — Copilot parser + A2A Agent Card emitter + local agent registry (v0.4).
-
 ### Added
-- **Copilot parser** (`--from copilot`) — reads `.agent.md` files (YAML frontmatter + markdown
-  body) and optional `manifest.json`/`README.md` and reconstructs an `AgentIR`
-  - Parses Copilot-specific tool IDs (e.g. `execute/runInTerminal` → `bash`) via a standard
-    mapping table
-  - Extracts MCP server references from `<!-- MCP: configure X server separately -->` comments
-  - Reconstructs `Guardrail` objects from `## Guardrails` sections
-  - Recovers elevated governance constraints from `## Governance Constraints (Elevated)` sections
-  - Heuristic reversal of elevation templates (disabled tools, deny patterns, rate limits, etc.)
-- **A2A Agent Card emitter** — generates `agent-card.json` conforming to the A2A Agent Card
-  specification (google.github.io/a2a)
-  - Maps IR identity, capabilities, and tools to A2A `AgentCard` schema fields
-  - Exports governance guardrails as A2A capability annotations
-  - Generates `README.md` with manual integration instructions
-- **`agentshift registry` command** — local agent registry with drift detection
-  - `registry register <path>` — register an agent directory with snapshot
-  - `registry list` — list all registered agents with status
-  - `registry diff <name>` — detect drift between registered snapshot and current state
-  - `registry export` — export registry as JSON
-  - Persistent JSON store at `~/.agentshift/registry.json`
+- `--from agents-md`: Parse AGENTS.md files (60,000+ GitHub repos)
+- `--from copilot`: Parse GitHub Copilot `.agent.md` + `manifest.json`
+- `--from bedrock`: Parse Bedrock agent JSON + CloudFormation
+- `--from vertex`: Parse Vertex AI `agent.json`
+- `--from salesforce`: Parse Salesforce Agentforce `bot-meta.xml` + `genAiPlanner-meta.xml`
+- `--to a2a`: Emit Google A2A Agent Card (`agent-card.json`)
+- `--to langgraph`: Emit LangGraph agent scaffold
+- `agentshift compliance`: EU AI Act compliance checker (Art. 9, 10, 13, 14, 52)
+- `agentshift registry`: Local agent registry with drift detection
+- `agentshift diff --output-format json`: Machine-readable portability scores
+- GitHub Action: `ogkranthi/agentshift/.github/actions/portability-report@main`
+- Governance IR: L1/L2/L3 layers, GPR/CFS scoring for research (GovPort paper)
 
 ### Changed
-- **Supported platforms table** updated: Copilot parser now `✅`, A2A added as new row
-- Version bumped to `0.4.0`
+- IR extended with governance fields (tool_permissions, guardrail_classification, audit_annotations)
+- `agentshift audit` now supports batch mode (`audit-batch`)
+
+### Fixed
+- CloudFormation YAML: Description values with colons now properly quoted
+- pydantic-core binary compatibility on fresh installs
 
 ---
 

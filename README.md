@@ -55,11 +55,11 @@ weather-claude/               weather-copilot/
 ## How it works
 
 ```
-  Parser  →  SKILL.md · CLAUDE.md · manifest.json · jobs.json
+1. Parse  →  SKILL.md · CLAUDE.md · .agent.md · AGENTS.md · bot-meta.xml · bedrock-agent.json
               ↓
-  IR      →  identity · tools · knowledge · triggers · constraints
+2. IR     →  identity · tools · knowledge · triggers · constraints · governance
               ↓
-  Emitter →  Claude Code ✅  |  Copilot ✅  |  Bedrock ✅  |  M365 ✅  |  Vertex AI ✅
+3. Emit   →  Claude Code ✅ | Copilot ✅ | Bedrock ✅ | M365 ✅ | Vertex ✅ | A2A ✅ | LangGraph ✅
 ```
 
 ## Parse cloud agent artifacts
@@ -83,6 +83,28 @@ agentshift audit ./vertex-output/ --from vertex --targets bedrock
 # Generate A2A Agent Card for platform interoperability
 agentshift convert ~/.openclaw/skills/weather --from openclaw --to a2a --output ./weather-a2a
 ```
+
+## New in v0.4.0
+
+```bash
+# EU AI Act compliance check
+agentshift compliance ./my-agent --from claude-code --framework eu-ai-act
+
+# Machine-readable portability scores
+agentshift diff ./my-agent --from openclaw --output-format json
+
+# Local agent registry
+agentshift registry register ./my-agent --name "github-assistant" --from openclaw
+```
+
+## Using with GitHub Actions
+
+```yaml
+# Add to .github/workflows/portability.yml
+- uses: ogkranthi/agentshift/.github/actions/portability-report@main
+```
+
+Automatically comments portability scores on PRs.
 
 ## See portability before converting
 
@@ -144,15 +166,16 @@ Registry is stored at `~/.agentshift/registry.json` and works offline.
 
 | Platform | Read (parser) | Write (emitter) | Status |
 |---|:---:|:---:|---|
-| OpenClaw | ✅ | ✅ | **Works today** |
-| Claude Code | ✅ | ✅ | **Works today** |
-| GitHub Copilot | ✅ `--from copilot` | ✅ | **Works today** |
-| AWS Bedrock | ✅ `--from bedrock` | ✅ | **Works today** |
-| Microsoft 365 Copilot | — | ✅ | **Works today** |
-| GCP Vertex AI | ✅ `--from vertex` | ✅ | **Works today** |
-| A2A Agent Card | — | ✅ `--to a2a` | **Works today** |
-| LangGraph | — | ✅ | **Works today** |
-| CrewAI | — | — | Planned |
+| OpenClaw | ✅ | ✅ | Works today |
+| Claude Code | ✅ | ✅ | Works today |
+| GitHub Copilot | ✅ | ✅ | Works today |
+| AWS Bedrock | ✅ | ✅ | Works today |
+| GCP Vertex AI | ✅ | ✅ | Works today |
+| AGENTS.md | ✅ | — | Works today |
+| Salesforce Agentforce | ✅ | — | Works today |
+| Microsoft 365 | — | ✅ | Works today |
+| Google A2A | — | ✅ | Works today |
+| LangGraph | — | ✅ | Works today |
 
 ## Guides
 
