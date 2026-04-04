@@ -214,9 +214,12 @@ def diff(
     source: Path = typer.Argument(help="Path to source agent directory"),
     from_platform: str = typer.Option("openclaw", "--from", help="Source platform"),
     targets: str = typer.Option("all", "--targets", help="Comma-separated targets or 'all'"),
+    output_format: str = typer.Option(
+        "text", "--output-format", help="Output format: text or json"
+    ),
 ) -> None:
     """Show portability matrix — what converts cleanly vs. what needs manual work."""
-    from agentshift.diff import PLATFORM_SUPPORT, render_diff_table
+    from agentshift.diff import PLATFORM_SUPPORT, compute_diff, render_diff_table
 
     parse_fn = _get_parser(from_platform)
     ir = _parse_with_errors(parse_fn, source)
@@ -238,7 +241,28 @@ def diff(
         err_console.print(f"  Supported: {', '.join(PLATFORM_SUPPORT)}")
         raise typer.Exit(1)
 
-    render_diff_table(ir, target_list)
+    if output_format == "json":
+        from agentshift.diff import _component_display
+
+        result = compute_diff(ir, target_list)
+        scores = {t: int(s) for t, s in result["scores"].items()}
+        components = []
+        for comp in result["active"]:
+            row: dict = {"name": _component_display(comp, ir), "source": True}
+            for target in target_list:
+                fidelity, _, _ = result["components"][comp][target]
+                row[target] = fidelity
+            components.append(row)
+        payload = {
+            "agent_name": ir.name,
+            "source_platform": ir.metadata.source_platform or from_platform,
+            "targets": target_list,
+            "scores": scores,
+            "components": components,
+        }
+        print(json.dumps(payload, indent=2))
+    else:
+        render_diff_table(ir, target_list)
 
 
 @app.command(name="mcp-to-openapi")
@@ -435,6 +459,55 @@ def audit_batch_cmd(
     if output_json:
         export_json(audits, output_json)
         console.print(f"[green]✓[/green] JSON exported → [cyan]{output_json}[/cyan]")
+
+
+@app.command()
+def compliance(
+    source: Path = typer.Argument(help="Path to source agent directory"),
+    from_platform: str = typer.Option("openclaw", "--from", help="Source platform"),
+    framework: str = typer.Option(
+        "eu-ai-act", "--framework", help="Compliance framework: eu-ai-act"
+    ),
+    output_format: str = typer.Option(
+        "text", "--output-format", help="Output format: text or json"
+    ),
+) -> None:
+    """Run compliance checks against a regulatory framework (e.g., EU AI Act)."""
+    from agentshift.compliance import (
+        compliance_score,
+        render_compliance_report,
+        run_compliance,
+    )
+
+    parse_fn = _get_parser(from_platform)
+    ir = _parse_with_errors(parse_fn, source)
+
+    try:
+        checks = run_compliance(ir, framework)
+    except ValueError as e:
+        err_console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1) from e
+
+    if output_format == "json":
+        score = compliance_score(checks)
+        payload = {
+            "agent": ir.name,
+            "framework": framework,
+            "score": score,
+            "checks": [
+                {
+                    "article": c.article,
+                    "requirement": c.requirement,
+                    "status": c.status,
+                    "evidence": c.evidence,
+                    "recommendation": c.recommendation,
+                }
+                for c in checks
+            ],
+        }
+        print(json.dumps(payload, indent=2))
+    else:
+        render_compliance_report(ir, framework, checks)
 
 
 # ---------------------------------------------------------------------------
