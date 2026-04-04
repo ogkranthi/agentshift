@@ -49,7 +49,9 @@ agent = Agent(
 
 ---
 
-## Tool Definition (`@function_tool`)
+## Tool Types
+
+### 1. `@function_tool` — Custom Python functions
 
 ```python
 from agents import function_tool
@@ -63,6 +65,43 @@ def get_weather(city: str) -> str:
 - Decorator reads the Python docstring as the tool description
 - Parameter types are auto-converted to JSON Schema via type hints
 - Supports `async def` tools natively
+
+### 2. MCP Servers — `MCPServerStdio` / `MCPServerSse`
+
+```python
+from agents.mcp import MCPServerStdio, MCPServerSse
+
+# Stdio-based MCP server
+mcp_stdio = MCPServerStdio(
+    name="filesystem",
+    params={"command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]},
+)
+
+# SSE-based (HTTP) MCP server
+mcp_http = MCPServerSse(
+    name="my-server",
+    params={"url": "http://localhost:8000/sse"},
+)
+
+agent = Agent(
+    name="MCP Agent",
+    instructions="...",
+    mcp_servers=[mcp_stdio, mcp_http],
+)
+```
+
+MCP tools are discovered at runtime — the agent calls `list_tools()` on the server.
+
+### 3. Hosted Tools (OpenAI platform)
+
+| Tool | Usage | Notes |
+|------|-------|-------|
+| `WebSearchTool()` | `from agents import WebSearchTool` | OpenAI web search |
+| `FileSearchTool(vector_store_ids=[...])` | `from agents import FileSearchTool` | OpenAI file search on vector stores |
+| `CodeInterpreterTool()` | `from agents import CodeInterpreterTool` | Sandboxed Python execution |
+| `ComputerTool()` | `from agents import ComputerTool` | Computer use (CUA) |
+
+These are OpenAI-hosted; only available when using OpenAI models.
 
 ---
 
@@ -121,17 +160,22 @@ def {tool_snake_name}({params}) -> str:
 
 | IR Field | OpenAI Agents SDK | Notes |
 |----------|-------------------|-------|
-| `identity.name` | `Agent(name=...)` | Direct |
-| `identity.description` | Module docstring | Informational |
-| `instructions` | `Agent(instructions=...)` | Direct; no char limit |
-| `tools[].name` | `@function_tool` function name | snake_case conversion |
+| `name` | `Agent(name=...)` | Direct |
+| `description` | Module docstring | Informational |
+| `persona.system_prompt` | `Agent(instructions=...)` | Direct; no char limit |
+| `persona.sections` | Prepended to instructions | Sections joined with `## headers` |
+| `tools[kind=function]` | `@function_tool` with typed params | Generate stub with docstring + type hints |
+| `tools[kind=shell]` | `@function_tool` stub calling `subprocess.run()` | Wrap shell command in function |
+| `tools[kind=mcp]` | `MCPServerStdio` or `MCPServerSse` | Stdio for local, SSE for remote |
+| `tools[kind=builtin]` | `WebSearchTool` / `FileSearchTool` etc. | Map known builtins; stub others |
+| `tools[].name` | Function name (snake_case) | Auto-converted |
 | `tools[].description` | Function docstring | Used by SDK for tool description |
-| `tools[].parameters` | Function type hints | Converted from JSON Schema |
+| `tools[].parameters` | Function type hints | Converted from JSON Schema → Python types |
 | `model` | `Agent(model=...)` | Default: `"gpt-4o"` |
-| `persona.sections` | Prepended to instructions | Sections joined with headers |
+| `knowledge[]` | Inject into instructions OR file-reading tool | Small KB → instructions; large → stub tool |
 | `triggers[]` | README note | SDK has no native trigger system |
-| `knowledge[]` | README note + comment | No native knowledge store |
-| `governance.guardrails` | Inline comment stubs | SDK supports guardrails via Runner |
+| `constraints.guardrails` | Prepended to instructions | Added as `## Rules` prefix in instructions |
+| `governance` | Inline comment stubs | SDK supports guardrails via Runner |
 
 ---
 
@@ -192,6 +236,107 @@ gives weekly updates, and supports a healthy pregnancy journey.
     tools=[track_symptom, get_weekly_update, answer_question],
 )
 ```
+
+---
+
+## Code Examples
+
+### Minimal Agent
+
+```python
+from agents import Agent, Runner
+
+agent = Agent(
+    name="Greeter",
+    instructions="You are a friendly assistant. Greet the user warmly.",
+)
+
+result = asyncio.run(Runner.run(agent, "Hello!"))
+print(result.final_output)
+```
+
+### Tool-Heavy Agent
+
+```python
+from agents import Agent, Runner, function_tool
+
+@function_tool
+def track_symptom(symptom: str, severity: int) -> str:
+    """Record a pregnancy symptom with severity 1-5."""
+    # TODO: implement persistence
+    return f"Tracked: {symptom} (severity {severity})"
+
+@function_tool
+def get_weekly_update(week: int) -> str:
+    """Get pregnancy milestone info for a given week number."""
+    # TODO: implement
+    raise NotImplementedError
+
+@function_tool
+def run_shell_cmd(command: str) -> str:
+    """Execute a shell command and return output."""
+    import subprocess
+    result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=30)
+    return result.stdout or result.stderr
+
+agent = Agent(
+    name="Pregnancy Companion",
+    instructions="You are a 24/7 pregnancy companion...",
+    model="gpt-4o",
+    tools=[track_symptom, get_weekly_update, run_shell_cmd],
+)
+```
+
+### MCP Agent
+
+```python
+from agents import Agent, Runner
+from agents.mcp import MCPServerStdio
+
+mcp_fs = MCPServerStdio(
+    name="filesystem",
+    params={"command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "/data"]},
+)
+
+agent = Agent(
+    name="File Assistant",
+    instructions="You help users manage files using the filesystem tools.",
+    mcp_servers=[mcp_fs],
+)
+
+async def main():
+    async with mcp_fs:  # MCP servers need async context manager
+        result = await Runner.run(agent, "List files in /data")
+        print(result.final_output)
+```
+
+---
+
+## Notes for D30 Implementation
+
+**Code-gen strategy:**
+- The emitter generates `.py` files (not config). Use string templates or `ast` module.
+- Prefer simple f-string templates with proper escaping over AST manipulation for readability.
+- Triple-quoted strings for `instructions` — escape any `"""` in the system prompt.
+
+**Tool stub generation:**
+- For `kind=function`: generate `@function_tool` with typed params from JSON Schema → Python type mapping (`string` → `str`, `integer` → `int`, `number` → `float`, `boolean` → `bool`, `array` → `list`, `object` → `dict`).
+- For `kind=shell`: generate `@function_tool` that wraps `subprocess.run(cmd, ...)`.
+- For `kind=mcp`: generate `MCPServerStdio(name=..., params={...})` or `MCPServerSse(...)` depending on transport. Add to `mcp_servers=[]` not `tools=[]`.
+- Mark all stubs with `# TODO: implement` and `raise NotImplementedError`.
+
+**Handoff handling:**
+- Single-agent IR (default): no handoffs.
+- Multi-agent IR (from AGENTS.md registry): generate triage agent with `handoffs=[agent1, agent2]`.
+- Use `agent.as_tool(...)` if the IR specifies delegation as tool-like behavior.
+
+**Knowledge injection:**
+- If `knowledge[].load_mode == "always"` and content is small (< 4000 chars): inline into instructions.
+- Otherwise: generate a file-reading `@function_tool` that loads the knowledge file.
+
+**Requirements.txt:**
+- Always include `openai-agents>=0.0.9`.
+- Add `mcp` if any MCP tools are present.
 
 ---
 

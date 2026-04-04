@@ -129,9 +129,9 @@
 
 | ID | Priority | Owner | Status | Title |
 |----|----------|-------|--------|-------|
-| A17 | P0 | @architect | ready | Spec OpenAI Agents SDK emitter format — Python code-gen strategy, tool stubs, handoffs |
-| A18 | P0 | @architect | ready | Spec CrewAI parser + emitter — agents.yaml / tasks.yaml bidirectional mapping |
-| A19 | P1 | @architect | ready | Spec AutoGen AgentChat emitter — JSON component model, team config, model clients |
+| A17 | P0 | @architect | merged | Spec OpenAI Agents SDK emitter format — Python code-gen strategy, tool stubs, handoffs |
+| A18 | P0 | @architect | merged | Spec CrewAI parser + emitter — agents.yaml / tasks.yaml bidirectional mapping |
+| A19 | P1 | @architect | merged | Spec AutoGen AgentChat emitter — JSON component model, team config, model clients |
 | D30 | P1 | @dev | ready | Implement OpenAI Agents SDK emitter (IR → agent.py + tools.py + README) — blocked on A17 |
 | D31 | P1 | @dev | ready | Implement CrewAI emitter (IR → agents.yaml + tasks.yaml + crew.py + README) — blocked on A18 |
 | D32 | P1 | @dev | ready | Implement CrewAI parser (agents.yaml + tasks.yaml → IR) — blocked on A18 |

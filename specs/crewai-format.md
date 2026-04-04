@@ -171,25 +171,36 @@ class {ClassName}Crew:
 
 | IR Field | CrewAI Target | Notes |
 |----------|---------------|-------|
-| `identity.name` | Project directory name + `ClassName` in crew.py | snake_case + PascalCase |
-| `identity.description` | `goal` in agents.yaml | Primary purpose |
-| `instructions` | `backstory` + `role` in agents.yaml | Split heuristically |
+| `name` | Project directory name + `ClassName` in crew.py | snake_case + PascalCase |
+| `description` | `goal` in agents.yaml | Primary purpose |
+| `persona.system_prompt` | `backstory` + `role` in agents.yaml | Split heuristically (see below) |
 | `persona.sections` | `backstory` field, prepended | Sections as context |
-| `tools[].name` | Tool stub in `crew.py` + `tools.py` | One function per tool |
+| `tools[kind=function]` | Tool stub class in `tools.py` + wired in crew.py | One `BaseTool` subclass per tool |
+| `tools[kind=shell]` | Tool stub wrapping `subprocess.run()` | Shell command in tool |
+| `tools[kind=mcp]` | README note + stub | No native MCP; wrap as custom tool |
+| `tools[].name` | Tool class name | PascalCase |
 | `tools[].description` | Tool class docstring | Passed to Agent |
 | `model` | `llm:` in agents.yaml | Direct model name |
-| `triggers[]` | README note | No native trigger system |
-| `knowledge[]` | README note + stub | Knowledge via tool/RAG |
-| `governance.guardrails` | README note | No native guardrail system |
+| `triggers[]` | tasks.yaml task descriptions | Map `kind=manual` to task descriptions |
+| `knowledge[]` | README note + stub | Knowledge via RAG tool |
+| `constraints.guardrails` | Prepended to backstory | Added as behavioral rules |
+| `governance` | README note | No native guardrail system |
 
 ### IR → agents.yaml Strategy
 
-Since IR has a single `instructions` blob, the emitter applies this heuristic:
-1. **role**: `identity.description` (short) OR first sentence of instructions
+Since IR has a single `persona.system_prompt` blob, the emitter applies this heuristic:
+1. **role**: `description` (short) OR first sentence of system_prompt
 2. **goal**: Second sentence or first `## Goal` section if present
-3. **backstory**: Remaining instructions / persona sections
+3. **backstory**: Remaining system_prompt content / persona sections
 
 For multi-section IR (`persona.sections`), map sections to role/goal/backstory intelligently.
+
+### Simple Skill Mapping
+
+For simple single-skill IR (the common case):
+- One agent in agents.yaml (the skill itself)
+- One task in tasks.yaml (the primary action)
+- All tools assigned to that single agent
 
 ---
 
@@ -199,15 +210,19 @@ The parser reads `agents.yaml` and `tasks.yaml` from a CrewAI project:
 
 | CrewAI Source | IR Field | Notes |
 |---------------|----------|-------|
-| `agents.yaml[0].role` + `goal` + `backstory` | `instructions` | Joined with `\n\n` |
-| First agent key name | `identity.name` | Normalized |
-| `agents.yaml[0].goal` | `identity.description` | Truncated to 200 chars |
-| `agents.yaml[0].llm` | `model` | If present |
+| Agent key name | `name` | Normalized to slug |
+| `agents.yaml[].role` | `name` (if more descriptive) | Fallback from key |
+| `agents.yaml[].goal` | `description` | Truncated to 200 chars |
+| `agents.yaml[].backstory` | `persona.system_prompt` | Primary instruction text |
+| `agents.yaml[].role` + `goal` + `backstory` | `persona.system_prompt` (joined) | Joined with `\n\n` when backstory alone is insufficient |
+| `agents.yaml[].llm` | `model` | If present |
+| `tasks.yaml[].description` | `triggers[kind=manual].message` | Task as trigger |
 | `tasks.yaml` tasks | `persona.sections["tasks"]` | Serialized as markdown |
-| Tool names (from Python comments) | `tools[]` stubs | Best-effort, no code execution |
+| Tool names in YAML `tools:` list | `tools[kind=function]` stubs | Best-effort, no code execution |
 
 **Note:** Tools are defined in Python code, not YAML — the parser cannot extract tool implementations,
-only stubs based on any tool annotations in `agents.yaml` comments or crew.py patterns.
+only stubs based on tool names referenced in `agents.yaml` or `crew.py` patterns. The parser scans
+for `tools:` lists in agent configs and imports in `crew.py` to infer tool names.
 
 ---
 

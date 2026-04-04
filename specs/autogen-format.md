@@ -2,7 +2,7 @@
 
 **Version:** autogen-agentchat ≥ 0.4 (2025)
 **Direction:** IR → AutoGen JSON (emit only; parse is stretch goal)
-**Status:** Spec complete — ready for D32
+**Status:** Spec complete — ready for D33
 
 ---
 
@@ -207,17 +207,20 @@ The emitter generates a JSON config + Python tools file:
 
 | IR Field | AutoGen Target | Notes |
 |----------|----------------|-------|
-| `identity.name` | `config.name` (snake_case) + `label` | Also sets team label |
-| `identity.description` | `description` + `config.description` | Outer and inner description |
-| `instructions` | `config.system_message` | Direct; appended with TERMINATE instruction |
+| `name` | `config.name` (snake_case) + `label` | Also sets team label |
+| `description` | `description` + `config.description` | Outer and inner description |
+| `persona.system_prompt` | `config.system_message` | Direct; appended with TERMINATE instruction |
+| `persona.sections` | Prepended to `system_message` | As `## Section` headers |
 | `model` | `model_client.config.model` | Map model names if needed |
-| `tools[]` | `config.tools` array | FunctionTool components |
+| `tools[kind=function]` | `FunctionTool` component in `config.tools` | Typed Python functions in tools.py |
+| `tools[kind=shell]` | `FunctionTool` wrapping `subprocess.run()` | Shell command wrapped in function |
+| `tools[kind=mcp]` | `MCPToolServer` integration | Via `autogen_ext.tools.mcp` adapter |
 | `tools[].name` | `tool.label` + `config.name` | snake_case |
 | `tools[].description` | `tool.description` + `config.description` | Direct |
-| `persona.sections` | Prepended to `system_message` | As labeled sections |
+| `knowledge[]` | README note + stub | Use external RAG tool (`autogen_ext.tools.langchain`) |
 | `triggers[]` | README note | No native trigger system |
-| `knowledge[]` | README note + stub | Use external RAG tool |
-| `governance.guardrails` | Inline comments | Manual implementation needed |
+| `constraints.guardrails` | Prepended to `system_message` | Added as `## Rules` prefix |
+| `governance` | Inline comments | Manual implementation needed |
 
 ### System Message Convention
 
@@ -316,6 +319,40 @@ When the task is complete, reply with TERMINATE.
 - **Knowledge**: ⚠️ README + tool stub
 - **Triggers**: ⚠️ README only
 - **Multi-agent**: ⚠️ Single-agent RoundRobin by default; multi-agent from AGENTS.md registry
+
+---
+
+## MCP Tool Integration
+
+AutoGen supports MCP servers via the `autogen_ext.tools.mcp` package:
+
+```python
+from autogen_ext.tools.mcp import StdioMCPToolAdapter, SseMCPToolAdapter
+from mcp import StdioServerParameters
+
+# Stdio MCP server
+mcp_tool = StdioMCPToolAdapter(
+    server_params=StdioServerParameters(command="npx", args=["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]),
+    tool_name="filesystem",
+)
+
+# Add to agent's tools list
+agent = AssistantAgent(name="agent", tools=[mcp_tool], ...)
+```
+
+In JSON component config, MCP tools are referenced as:
+```json
+{
+  "provider": "autogen_ext.tools.mcp.StdioMCPToolAdapter",
+  "component_type": "tool",
+  "config": {
+    "server_params": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]},
+    "tool_name": "filesystem"
+  }
+}
+```
+
+The emitter should generate MCP tool components when `ir.tools[kind=mcp]` is present.
 
 ---
 
