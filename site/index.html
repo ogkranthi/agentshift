@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgentShift — Migrate OpenClaw agents to NemoClaw, Claude Code, Copilot, Bedrock</title>
-  <meta name="description" content="NVIDIA NemoClaw is out. Migrate your OpenClaw agents to NemoClaw or any platform in one command — with governance preserved.">
-  <meta property="og:title" content="AgentShift — Migrate OpenClaw to NemoClaw">
-  <meta property="og:description" content="NVIDIA just launched NemoClaw. Migrate your OpenClaw agents to NemoClaw, Claude Code, Copilot, or Bedrock in one command. Governance preserved.">
+  <title>AgentShift — Convert OpenClaw agents to GitHub Copilot, Claude Code, Bedrock</title>
+  <meta name="description" content="Convert your OpenClaw agents to GitHub Copilot in one command. Governance preserved. Open source.">
+  <meta property="og:title" content="AgentShift — OpenClaw to GitHub Copilot in one command">
+  <meta property="og:description" content="Convert your OpenClaw agents to GitHub Copilot, Claude Code, Bedrock, or any platform. Governance preserved. Open source.">
   <meta property="og:url" content="https://agentshift.sh">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
@@ -128,16 +128,16 @@
 </head>
 <body>
 
-  <div class="news-banner">
-    🟢 <strong>NVIDIA NemoClaw</strong> launched March 16 — run OpenClaw agents in hardened sandboxes with local Nemotron inference.
-    <a href="#nemoclaw-migration">Migrate your agents →</a>
+  <div class="news-banner" style="background: linear-gradient(135deg, #2196F3 0%, #1565C0 100%);">
+    <strong>Anthropic cut off OpenClaw from Claude subscriptions.</strong> Convert your agents to GitHub Copilot or Claude Code in one command.
+    <a href="https://github.com/ogkranthi/agentshift">Get started on GitHub &rarr;</a>
   </div>
 
   <nav class="nav">
     <div class="nav-inner">
       <a href="/" class="nav-logo">AgentShift</a>
       <div class="nav-links">
-        <a href="#nemoclaw-migration">NemoClaw</a>
+        <a href="#copilot-migration">Copilot Migration</a>
         <a href="#platforms">Platforms</a>
         <a href="#how-it-works">How it works</a>
         <a href="https://github.com/ogkranthi/agentshift" target="_blank">GitHub</a>
@@ -147,100 +147,30 @@
   </nav>
 
   <section class="hero">
-    <div class="hero-eyebrow">NemoClaw is here</div>
-    <h1>Your OpenClaw agents,<br><span class="highlight">anywhere they need to run.</span></h1>
-    <p class="hero-sub">NVIDIA just launched NemoClaw — hardened sandboxes for OpenClaw agents with local Nemotron inference. AgentShift migrates your entire OpenClaw install in one command, any cloud.</p>
+    <div class="hero-eyebrow" style="background: rgba(33,150,243,0.15); color: #2196F3; border-color: rgba(33,150,243,0.3);">OpenClaw &rarr; GitHub Copilot</div>
+    <h1>Convert your OpenClaw agents<br>to <span class="highlight">GitHub Copilot</span></h1>
+    <p class="hero-sub">One command. Governance preserved. Your guardrails, tool permissions, and safety rules survive the migration. Open source, Apache 2.0.</p>
     <div class="hero-install">
       <code>pip install agentshift</code>
       <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install agentshift');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
     </div>
     <div class="hero-actions">
-      <a href="#nemoclaw-migration" class="btn btn-primary">Migrate to NemoClaw</a>
-      <a href="https://github.com/ogkranthi/agentshift" class="btn btn-secondary">View on GitHub ↗</a>
+      <a href="https://github.com/ogkranthi/agentshift" class="btn btn-primary">Star on GitHub ↗</a>
+      <a href="#copilot-migration" class="btn btn-secondary">See the migration</a>
     </div>
   </section>
 
-  <!-- NemoClaw Migration Section -->
-  <section id="nemoclaw-migration" class="section-news">
-    <div class="news-card">
-      <div class="news-card-label">New · March 16, 2026</div>
-      <h3>NVIDIA NemoClaw: OpenClaw in a hardened sandbox</h3>
-      <p>NemoClaw wraps your OpenClaw agents in an OpenShell container with Landlock/seccomp isolation, deny-by-default network policies, and routed inference via NVIDIA Nemotron or any provider. AgentShift generates the workspace files, network policies, and cloud deploy scripts automatically.</p>
+  <!-- Copilot Migration Section -->
+  <section id="copilot-migration" class="section-news">
+    <div class="news-card" style="border-color: rgba(33,150,243,0.3); border-left-color: #2196F3;">
+      <div class="news-card-label" style="color: #2196F3;">Primary Target</div>
+      <h3>GitHub Copilot: The natural migration path</h3>
+      <p>GitHub Copilot agents use <code>.agent.md</code> files that run directly in VS Code and GitHub. AgentShift converts your OpenClaw skills to Copilot agents with guardrails preserved as inline instructions — ready to use immediately.</p>
     </div>
 
-    <h2 style="font-size:28px; font-weight:700; margin-bottom:8px;">Migrate your entire install in one command</h2>
-    <p style="color:var(--muted); margin-bottom:28px;">All your skills, cron jobs, and workspace files — migrated and ready to deploy.</p>
+    <h2 style="font-size:28px; font-weight:700; margin-bottom:8px;">Convert in 3 steps</h2>
+    <p style="color:var(--muted); margin-bottom:28px;">Your OpenClaw skill becomes a Copilot agent in seconds.</p>
 
-    <div class="terminal">
-      <div class="terminal-bar">
-        <span class="terminal-dot red"></span>
-        <span class="terminal-dot yellow"></span>
-        <span class="terminal-dot green"></span>
-        <span class="terminal-title">agentshift migrate</span>
-      </div>
-      <div class="terminal-body">
-        <div class="terminal-line"><span class="prompt">$</span> agentshift migrate --source ~/.openclaw --to nemoclaw --cloud aws --output ./migration</div>
-        <div class="terminal-output">
-AgentShift migrate ~/.openclaw (openclaw) → nemoclaw (cloud: aws)<br>
-Migrating... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
-<br>
-Migration complete!<br>
-&nbsp;&nbsp;Skills: <span class="g">14/14 migrated</span><br>
-&nbsp;&nbsp;Cron jobs: <span class="g">19/19 migrated</span><br>
-&nbsp;&nbsp;Network policies: <span class="g">generated (12 unique endpoints)</span><br>
-<br>
-✓ Output → ./migration/<br>
-&nbsp;&nbsp;Report: ./migration/MIGRATION_REPORT.md<br>
-&nbsp;&nbsp;Deploy:  ./migration/deploy/aws/userdata.sh<br>
-        </div>
-        <div class="terminal-line"><span class="prompt">$</span> cat ./migration/deploy/aws/userdata.sh</div>
-        <div class="terminal-output">
-<span class="dim">#!/usr/bin/env bash</span><br>
-curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash<br>
-<span class="dim"># Upload workspace + start sandbox...</span><br>
-        </div>
-      </div>
-    </div>
-
-    <div class="migrate-steps">
-      <div class="migrate-step">
-        <div class="migrate-step-num">Step 1</div>
-        <h4>Run migrate</h4>
-        <p>Scans every skill, reads jobs.json, generates workspace files + network policies.</p>
-      </div>
-      <div class="migrate-step">
-        <div class="migrate-step-num">Step 2</div>
-        <h4>Review the report</h4>
-        <p>MIGRATION_REPORT.md tells you exactly what migrated, what needs manual steps, and what credentials to re-enter.</p>
-      </div>
-      <div class="migrate-step">
-        <div class="migrate-step-num">Step 3</div>
-        <h4>Deploy</h4>
-        <p>Paste userdata.sh into your EC2 launch config — or run deploy.sh locally.</p>
-      </div>
-      <div class="migrate-step">
-        <div class="migrate-step-num">Step 4</div>
-        <h4>Re-enter credentials</h4>
-        <p>NemoClaw strips tokens for security. Run <code>nemoclaw onboard</code> to re-configure Telegram, Slack, GitHub.</p>
-      </div>
-    </div>
-
-    <div style="margin-top: 24px;">
-      <p style="font-size:13px; color:var(--muted); margin-bottom:10px;">Works with:</p>
-      <div class="cloud-pills">
-        <span class="cloud-pill">--cloud aws</span>
-        <span class="cloud-pill">--cloud gcp</span>
-        <span class="cloud-pill">--cloud azure</span>
-        <span class="cloud-pill">--cloud docker</span>
-        <span class="cloud-pill">--cloud bare-metal</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Terminal demo for single-skill convert -->
-  <section class="terminal-demo">
-    <h2 style="text-align:center; margin-bottom:8px;">Or convert individual skills</h2>
-    <p style="text-align:center; color:var(--muted); margin-bottom:28px;">Not migrating the whole install? Convert just the skills you need.</p>
     <div class="terminal">
       <div class="terminal-bar">
         <span class="terminal-dot red"></span>
@@ -249,28 +179,81 @@ curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash<br>
         <span class="terminal-title">agentshift</span>
       </div>
       <div class="terminal-body">
-        <div class="terminal-line"><span class="prompt">$</span> agentshift convert ~/.openclaw/skills/github --from openclaw --to nemoclaw --output ./github-nemoclaw</div>
+        <div class="terminal-line"><span class="prompt">$</span> pip install agentshift</div>
+        <div class="terminal-output"></div>
+        <div class="terminal-line"><span class="prompt">$</span> agentshift convert ~/.openclaw/skills/my-agent --from openclaw --to copilot -o ./my-copilot-agent</div>
         <div class="terminal-output">
-✓ Converted github → ./github-nemoclaw<br>
+&#x2714; Parsed OpenClaw skill: my-agent<br>
+&#x2714; Preserved 8/8 guardrails (L1)<br>
+&#x2714; Elevated 3 tool permissions to instructions<br>
+&#x2714; Generated GitHub Copilot agent<br>
 <br>
-github-nemoclaw/<br>
-├── workspace/<br>
-│&nbsp;&nbsp; ├── SKILL.md<br>
-│&nbsp;&nbsp; ├── SOUL.md<br>
-│&nbsp;&nbsp; └── IDENTITY.md<br>
-├── nemoclaw-config.yaml<br>
-├── network-policy.yaml &nbsp;<span class="dim">(gh + git → github policy)</span><br>
-├── deploy.sh<br>
-└── README.md<br>
+my-copilot-agent/<br>
+&#x251C;&#x2500;&#x2500; my-agent.agent.md<br>
+&#x2514;&#x2500;&#x2500; README.md<br>
         </div>
-        <div class="terminal-line"><span class="prompt">$</span> agentshift convert ./my-skill --from openclaw --to all</div>
+        <div class="terminal-line"><span class="prompt">$</span> agentshift audit ~/.openclaw/skills/my-agent --targets copilot,claude-code</div>
+        <div class="terminal-output diff-output">
+ Target &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GPR-L1 &nbsp;GPR-L2 &nbsp;Overall<br>
+&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;<br>
+ Copilot &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="g">1.00</span> &nbsp;&nbsp;&nbsp;<span class="y">0.37</span> &nbsp;&nbsp;&nbsp;<span class="y">0.62</span><br>
+ Claude Code &nbsp;&nbsp;<span class="g">1.00</span> &nbsp;&nbsp;&nbsp;<span class="g">0.93</span> &nbsp;&nbsp;&nbsp;<span class="g">0.83</span><br>
+        </div>
+      </div>
+    </div>
+
+    <div class="migrate-steps">
+      <div class="migrate-step">
+        <div class="migrate-step-num">Step 1</div>
+        <h4>Install</h4>
+        <p><code>pip install agentshift</code></p>
+      </div>
+      <div class="migrate-step">
+        <div class="migrate-step-num">Step 2</div>
+        <h4>Convert</h4>
+        <p>One command generates the <code>.agent.md</code> file with all guardrails inline.</p>
+      </div>
+      <div class="migrate-step">
+        <div class="migrate-step-num">Step 3</div>
+        <h4>Use in VS Code</h4>
+        <p>Drop the file in <code>.github/copilot-agents/</code> and use it with <code>@my-agent</code> in Copilot Chat.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <p style="font-size:13px; color:var(--muted); margin-bottom:10px;">Also converts to:</p>
+      <div class="cloud-pills">
+        <span class="cloud-pill">--to claude-code</span>
+        <span class="cloud-pill">--to bedrock</span>
+        <span class="cloud-pill">--to vertex</span>
+        <span class="cloud-pill">--to m365</span>
+        <span class="cloud-pill">--to nemoclaw</span>
+        <span class="cloud-pill">--to all</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Terminal demo for convert all -->
+  <section class="terminal-demo">
+    <h2 style="text-align:center; margin-bottom:8px;">Or convert to every platform at once</h2>
+    <p style="text-align:center; color:var(--muted); margin-bottom:28px;">One command, all targets.</p>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">agentshift</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line"><span class="prompt">$</span> agentshift convert ./my-skill --from openclaw --to all -o ./output</div>
         <div class="terminal-output">
-&nbsp;&nbsp;✓ claude-code → ./output/claude-code/<br>
-&nbsp;&nbsp;✓ copilot &nbsp;&nbsp;&nbsp;→ ./output/copilot/<br>
-&nbsp;&nbsp;✓ bedrock &nbsp;&nbsp;&nbsp;→ ./output/bedrock/<br>
-&nbsp;&nbsp;✓ m365 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ ./output/m365/<br>
-&nbsp;&nbsp;✓ vertex &nbsp;&nbsp;&nbsp;&nbsp;→ ./output/vertex/<br>
-&nbsp;&nbsp;✓ nemoclaw &nbsp;&nbsp;→ ./output/nemoclaw/<br>
+&nbsp;&nbsp;&#x2714; copilot &nbsp;&nbsp;&nbsp;&nbsp;&#x2192; ./output/copilot/<br>
+&nbsp;&nbsp;&#x2714; claude-code &#x2192; ./output/claude-code/<br>
+&nbsp;&nbsp;&#x2714; bedrock &nbsp;&nbsp;&nbsp;&nbsp;&#x2192; ./output/bedrock/<br>
+&nbsp;&nbsp;&#x2714; m365 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#x2192; ./output/m365/<br>
+&nbsp;&nbsp;&#x2714; vertex &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#x2192; ./output/vertex/<br>
+&nbsp;&nbsp;&#x2714; nemoclaw &nbsp;&nbsp;&nbsp;&#x2192; ./output/nemoclaw/<br>
+&nbsp;&nbsp;&#x2714; langgraph &nbsp;&nbsp;&#x2192; ./output/langgraph/<br>
         </div>
       </div>
     </div>
@@ -303,11 +286,12 @@ github-nemoclaw/<br>
         </div>
         <div class="platform-status live">Works today</div>
       </div>
-      <div class="platform-card">
-        <div class="platform-name">GitHub Copilot</div>
+      <div class="platform-card" style="border-color: rgba(33,150,243,0.5); background: rgba(33,150,243,0.05);">
+        <div class="platform-name" style="color:#2196F3;">GitHub Copilot</div>
         <div class="platform-tags">
           <span class="tag tag-green">Parser</span>
           <span class="tag tag-blue">Emitter</span>
+          <span class="tag" style="background:rgba(33,150,243,0.15); color:#2196F3;">Primary</span>
         </div>
         <div class="platform-status live">Works today</div>
       </div>
@@ -441,15 +425,15 @@ github-nemoclaw/<br>
   </section>
 
   <section class="cta">
-    <h2>Migrate to NemoClaw today</h2>
-    <p style="color:var(--muted); margin-bottom:20px;">One command. All your skills. Any cloud.</p>
+    <h2>Convert your agents today</h2>
+    <p style="color:var(--muted); margin-bottom:20px;">One command. Governance preserved. Open source.</p>
     <div class="hero-install">
-      <code>agentshift migrate --source ~/.openclaw --to nemoclaw --cloud aws</code>
-      <button class="copy-btn" onclick="navigator.clipboard.writeText('agentshift migrate --source ~/.openclaw --to nemoclaw --cloud aws');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
+      <code>agentshift convert ./my-skill --from openclaw --to copilot</code>
+      <button class="copy-btn" onclick="navigator.clipboard.writeText('agentshift convert ./my-skill --from openclaw --to copilot');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
     </div>
     <div class="hero-actions">
       <a href="https://github.com/ogkranthi/agentshift" class="btn btn-primary">Star on GitHub ↗</a>
-      <a href="https://github.com/ogkranthi/agentshift/blob/main/docs/nemoclaw.md" class="btn btn-secondary">NemoClaw guide</a>
+      <a href="https://github.com/ogkranthi/agentshift/blob/main/README.md#migrate-from-openclaw" class="btn btn-secondary">Migration guide</a>
     </div>
   </section>
 
@@ -462,7 +446,7 @@ github-nemoclaw/<br>
       <div class="footer-right">
         <a href="https://github.com/ogkranthi/agentshift">GitHub</a>
         <a href="https://pypi.org/project/agentshift/">PyPI</a>
-        <a href="https://github.com/ogkranthi/agentshift/blob/main/docs/nemoclaw.md">NemoClaw docs</a>
+        <a href="https://github.com/ogkranthi/agentshift/blob/main/README.md">Docs</a>
         <a href="https://github.com/ogkranthi/agentshift/blob/main/CONTRIBUTING.md">Contribute</a>
       </div>
     </div>
