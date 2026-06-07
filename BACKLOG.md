@@ -136,9 +136,9 @@
 | D31 | P1 | @dev | merged | Implement CrewAI emitter (IR → agents.yaml + tasks.yaml + crew.py + README) — blocked on A18 |
 | D32 | P1 | @dev | merged | Implement CrewAI parser (agents.yaml + tasks.yaml → IR) — blocked on A18 |
 | D33 | P1 | @dev | merged | Implement AutoGen emitter (IR → agent_config.json + tools.py + run.py) — blocked on A19 |
-| D34 | P2 | @dev | pr-created | Implement `agentshift init` scaffold command — interactive new-agent wizard (name, format, tools) |
-| D35 | P2 | @dev | pr-created | Automated PyPI publish via GitHub Actions Trusted Publisher — on tag push, wheel + sdist |
-| D36 | P1 | @dev | pr-created | Bump version to 0.5.0 — CHANGELOG.md, pyproject.toml, add new platforms to README — blocked on D30-D33 |
+| D34 | P2 | @dev | merged | Implement `agentshift init` scaffold command — interactive new-agent wizard (name, format, tools) |
+| D35 | P2 | @dev | merged | Automated PyPI publish via GitHub Actions Trusted Publisher — on tag push, wheel + sdist |
+| D36 | P1 | @dev | merged | Bump version to 0.5.0 — CHANGELOG.md, pyproject.toml, add new platforms to README — blocked on D30-D33 |
 | T20 | P1 | @tester | ready | Write tests for OpenAI Agents SDK emitter (fixture conversion, tool stub generation) — blocked on D30 |
 | T21 | P1 | @tester | ready | Write tests for CrewAI parser + emitter (agents.yaml round-trip, task mapping) — blocked on D31-D32 |
 | T22 | P1 | @tester | ready | Write tests for AutoGen emitter (JSON schema validation, fixture conversion) — blocked on D33 |
