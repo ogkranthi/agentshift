@@ -139,6 +139,6 @@
 | D34 | P2 | @dev | merged | Implement `agentshift init` scaffold command — interactive new-agent wizard (name, format, tools) |
 | D35 | P2 | @dev | merged | Automated PyPI publish via GitHub Actions Trusted Publisher — on tag push, wheel + sdist |
 | D36 | P1 | @dev | merged | Bump version to 0.5.0 — CHANGELOG.md, pyproject.toml, add new platforms to README — blocked on D30-D33 |
-| T20 | P1 | @tester | ready | Write tests for OpenAI Agents SDK emitter (fixture conversion, tool stub generation) — blocked on D30 |
-| T21 | P1 | @tester | ready | Write tests for CrewAI parser + emitter (agents.yaml round-trip, task mapping) — blocked on D31-D32 |
-| T22 | P1 | @tester | ready | Write tests for AutoGen emitter (JSON schema validation, fixture conversion) — blocked on D33 |
+| T20 | P1 | @tester | pr-created | Write tests for OpenAI Agents SDK emitter (fixture conversion, tool stub generation) — blocked on D30 |
+| T21 | P1 | @tester | pr-created | Write tests for CrewAI parser + emitter (agents.yaml round-trip, task mapping) — blocked on D31-D32 |
+| T22 | P1 | @tester | pr-created | Write tests for AutoGen emitter (JSON schema validation, fixture conversion) — blocked on D33 |
