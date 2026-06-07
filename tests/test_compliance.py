@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -22,7 +23,7 @@ from agentshift.ir import (
     Persona,
 )
 
-VENV_PYTHON = str(Path(__file__).resolve().parents[1] / ".venv" / "bin" / "python")
+VENV_PYTHON = sys.executable
 FIXTURE_DIR = Path(__file__).resolve().parent / "fixtures"
 
 
