@@ -735,5 +735,20 @@ def _truncate(s: str, max_len: int) -> str:
     return s[: max_len - 3] + "..."
 
 
+@app.command()
+def init(
+    config: Path | None = typer.Option(
+        None, "--config", "-c", help="JSON config file for non-interactive mode"
+    ),
+) -> None:
+    """Scaffold a new agent interactively (or from a JSON config with --config)."""
+    from agentshift.init_wizard import init_from_config, init_interactive
+
+    if config:
+        init_from_config(config)
+    else:
+        init_interactive()
+
+
 if __name__ == "__main__":
     app()
