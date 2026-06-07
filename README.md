@@ -54,6 +54,18 @@ weather-claude/               weather-copilot/
 └── settings.json             └── README.md
 ```
 
+## Scaffold a new agent
+
+```bash
+# Interactive wizard
+agentshift init
+
+# Non-interactive (from JSON config)
+agentshift init --config agent-config.json
+```
+
+The wizard prompts for agent name, target format, tools, cron, knowledge, and auth — then generates platform-ready files in `./output/{agent-name}/`.
+
 ## Migrate from OpenClaw
 
 With Anthropic ending Claude subscription access for OpenClaw on April 4th, here's how to move your agents:
@@ -213,6 +225,9 @@ Registry is stored at `~/.agentshift/registry.json` and works offline.
 | Google A2A | — | ✅ | Works today |
 | LangGraph | — | ✅ | Works today |
 | NVIDIA NemoClaw | — | ✅ | Works today |
+| OpenAI Agents SDK | — | ✅ | Works today |
+| CrewAI | ✅ | ✅ | Works today |
+| AutoGen | — | ✅ | Works today |
 
 ## Guides
 

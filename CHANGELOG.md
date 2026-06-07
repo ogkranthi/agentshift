@@ -7,6 +7,21 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.5.0] - 2026-05-25
+
+### Added
+- `agentshift init` — interactive scaffold wizard for new agents (D34)
+- OpenAI Agents SDK emitter — generate `agent.py` + `tools.py` (D30)
+- CrewAI emitter + parser — bidirectional `agents.yaml`/`tasks.yaml` (D31-D32)
+- AutoGen emitter — generate `agent_config.json` + `tools.py` + `run.py` (D33)
+- Automated PyPI publish via GitHub Actions Trusted Publisher (D35)
+- Tests for OpenAI Agents SDK, CrewAI, AutoGen emitters/parsers (T20-T22)
+
+### Changed
+- README updated with new platform support table entries
+
+---
+
 ## [0.4.0] — 2026-04-03
 
 ### Added
